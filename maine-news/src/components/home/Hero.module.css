@@ -29,15 +29,26 @@
 
 .image {
   object-fit: cover;
-  filter: blur(3px);
-  transform: scale(1.05); /* Prevent blur edge artifacts */
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.4) 100%);
-  backdrop-filter: blur(2px);
+  background: linear-gradient(
+    to bottom, 
+    rgba(0,0,0,0.2) 0%, 
+    rgba(0,0,0,0.4) 40%, 
+    rgba(0,0,0,0.7) 70%, 
+    rgba(0,0,0,0.95) 100%
+  );
+  z-index: 5;
 }
 
 .content {
@@ -86,6 +97,59 @@
   margin: 0;
   max-width: 60ch;
   display: none; /* Hide subtitle on very small mobile if needed, or keep */
+}
+
+.indicators {
+  display: flex;
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.indicator {
+  width: 20px;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.activeIndicator {
+  background-color: var(--color-accent);
+  width: 40px;
+}
+
+.navButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.navButton:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.prevButton { left: 1.5rem; }
+.nextButton { right: 1.5rem; }
+
+@media (max-width: 768px) {
+  .navButton {
+    display: none; /* Hide buttons on mobile in favor of touch if we add it, or keep simple */
+  }
 }
 
 @media (min-width: 400px) {

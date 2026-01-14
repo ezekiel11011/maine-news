@@ -78,16 +78,7 @@ export default function ArticleDetail() {
                     </View>
                 );
             case 'image':
-                return (
-                    <View key={index} style={styles.imageContainer}>
-                        <Image
-                            source={{ uri: attributes.src }}
-                            style={styles.inlineImage}
-                            resizeMode="contain"
-                        />
-                        {attributes.alt ? <Text style={styles.imageCaption}>{attributes.alt}</Text> : null}
-                    </View>
-                );
+                return null; // Skip body images to prevent layout distortion
             default:
                 // Fallback: just try to join children text
                 if (children) {

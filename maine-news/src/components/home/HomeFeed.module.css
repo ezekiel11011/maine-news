@@ -1,0 +1,142 @@
+.feedContainer {
+    width: 100%;
+}
+
+.controlsBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color-dim);
+    margin-bottom: 2rem;
+    position: sticky;
+    top: calc(var(--header-height-desktop) - 1px);
+    background-color: var(--color-bg);
+    z-index: 100;
+}
+
+.activeFilters {
+    display: flex;
+    flex-direction: column;
+}
+
+.filterSource {
+    font-family: var(--font-heading);
+    color: var(--color-accent);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.filterCount {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.actionButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color-dim);
+    background: transparent;
+    color: var(--color-text);
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+
+.actionButton:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+.activeAction {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-bg);
+}
+
+.activeAction:hover {
+    color: var(--color-bg);
+    opacity: 0.9;
+}
+
+.filterDrawer {
+    background-color: #151515;
+    border: 1px solid var(--border-color-dim);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    animation: slideDown 0.3s ease-out;
+}
+
+.drawerHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.drawerHeader h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.drawerHeader button {
+    background: transparent;
+    border: none;
+    color: var(--color-text);
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.chipGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.filterChip {
+    padding: 0.5rem 1.25rem;
+    border-radius: 20px;
+    border: 1px solid var(--border-color-dim);
+    background: transparent;
+    color: var(--color-text);
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filterChip:hover {
+    border-color: var(--color-accent);
+}
+
+.activeChip {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-bg);
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .controlsBar {
+        top: var(--header-height-mobile);
+    }
+}

@@ -5,7 +5,7 @@ import Constants from 'expo-constants';
 // Get the dev machine IP for physical device testing
 const getApiBaseUrl = () => {
     // Change this to true if you want to test against your local Next.js server
-    const USE_LOCAL_BACKEND = true;
+    const USE_LOCAL_BACKEND = false;
 
     if (__DEV__ && USE_LOCAL_BACKEND) {
         const debuggerHost = Constants.expoConfig?.hostUri || '';

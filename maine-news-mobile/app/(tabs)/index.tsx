@@ -12,6 +12,7 @@ import {
     ScrollView,
     Animated,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { fetchPosts, Post, getImageUrl, filterByCategory } from '../../services/api';
 import { colors, typography, spacing, fontSize } from '../../constants/theme';
@@ -29,8 +30,12 @@ export default function HomeFeed() {
     const [activeCategory, setActiveCategory] = useState('all');
     const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
     const [showScrollTop, setShowScrollTop] = useState(false);
+    const [heroIndex, setHeroIndex] = useState(0);
+    const [interactionCount, setInteractionCount] = useState(0);
 
     const flatListRef = useRef<FlatList>(null);
+    const heroScrollViewRef = useRef<ScrollView>(null);
+    const heroTimerRef = useRef<NodeJS.Timeout | null>(null);
     const scrollY = useRef(new Animated.Value(0)).current;
     const router = useRouter();
 
@@ -64,6 +69,18 @@ export default function HomeFeed() {
     }, []);
 
     useEffect(() => {
+        if (allPosts.length > 1) {
+            heroTimerRef.current = setInterval(() => {
+                const nextIndex = (heroIndex + 1) % Math.min(6, allPosts.length);
+                setHeroIndex(nextIndex);
+                heroScrollViewRef.current?.scrollTo({ x: nextIndex * width, animated: true });
+            }, 3500); // 3.5 seconds
+        }
+        return () => {
+            if (heroTimerRef.current) clearInterval(heroTimerRef.current);
+        };
+    }, [allPosts, heroIndex, interactionCount]);
+    useEffect(() => {
         applyFilters(allPosts, activeCategory, sortBy);
     }, [activeCategory, sortBy]);
 
@@ -89,42 +106,78 @@ export default function HomeFeed() {
         flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
     };
 
-    const renderHero = (heroPost: Post) => {
-        const imageUrl = getImageUrl(heroPost.image);
+    const renderHero = () => {
+        const heroStories = allPosts.slice(0, 6);
+        if (heroStories.length === 0) return null;
 
         return (
-            <TouchableOpacity
-                style={styles.heroContainer}
-                onPress={() => router.push(`/article/${heroPost.slug}`)}
-                activeOpacity={0.9}
-            >
-                <View style={styles.heroImagePlaceholder}>
-                    <Image
-                        source={imageUrl ? { uri: imageUrl } : require('../../assets/square-logo.png')}
-                        style={StyleSheet.absoluteFill}
-                        resizeMode="cover"
-                    />
+            <View style={styles.heroContainer}>
+                <ScrollView
+                    ref={heroScrollViewRef}
+                    horizontal
+                    pagingEnabled
+                    showsHorizontalScrollIndicator={false}
+                    onMomentumScrollEnd={(e) => {
+                        const newIndex = Math.round(e.nativeEvent.contentOffset.x / width);
+                        setHeroIndex(newIndex);
+                        setInteractionCount(prev => prev + 1);
+                    }}
+                    onScrollBeginDrag={() => {
+                        if (heroTimerRef.current) clearInterval(heroTimerRef.current);
+                    }}
+                >
+                    {heroStories.map((post) => (
+                        <TouchableOpacity
+                            key={post.slug}
+                            style={styles.heroSlide}
+                            onPress={() => router.push(`/article/${post.slug}`)}
+                            activeOpacity={0.9}
+                        >
+                            <View style={styles.heroImagePlaceholder}>
+                                <Image
+                                    source={getImageUrl(post.image) ? { uri: getImageUrl(post.image) } : require('../../assets/square-logo.png')}
+                                    style={StyleSheet.absoluteFill}
+                                    resizeMode="cover"
+                                />
+                            </View>
+                            <LinearGradient
+                                colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.95)']}
+                                style={StyleSheet.absoluteFill}
+                            />
+                            <View style={styles.heroContent}>
+                                <Text style={styles.heroTitle} numberOfLines={3}>
+                                    {post.title}
+                                </Text>
+                                <View style={styles.meta}>
+                                    <Text style={styles.metaTextInverse}>{post.author}</Text>
+                                    <Text style={styles.separatorInverse}>///</Text>
+                                    <Text style={styles.metaTextInverse}>
+                                        {new Date(post.publishedDate).toLocaleDateString()}
+                                    </Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+                <View style={styles.heroIndicatorsOverlay}>
+                    {heroStories.map((_, i) => (
+                        <View
+                            key={i}
+                            style={[
+                                styles.heroIndicator,
+                                i === heroIndex && styles.activeHeroIndicator
+                            ]}
+                        />
+                    ))}
                 </View>
-                <View style={styles.heroOverlay} />
-                <View style={styles.heroContent}>
-                    <Text style={styles.heroTitle} numberOfLines={3}>
-                        {heroPost.title}
-                    </Text>
-                    <View style={styles.meta}>
-                        <Text style={styles.metaTextInverse}>{heroPost.author}</Text>
-                        <Text style={styles.separatorInverse}>///</Text>
-                        <Text style={styles.metaTextInverse}>
-                            {new Date(heroPost.publishedDate).toLocaleDateString()}
-                        </Text>
-                    </View>
-                </View>
-            </TouchableOpacity>
+            </View>
         );
     };
 
     const renderPost = ({ item, index }: { item: Post; index: number }) => {
-        // Skip the item if it's already shown as the hero
-        if (item.slug === allPosts[0]?.slug) return null;
+        // Skip items shown in the hero slider
+        const heroSlugs = allPosts.slice(0, 6).map(p => p.slug);
+        if (heroSlugs.includes(item.slug)) return null;
 
         const imageUrl = getImageUrl(item.image);
 
@@ -222,7 +275,7 @@ export default function HomeFeed() {
                 scrollEventThrottle={16}
                 ListHeaderComponent={
                     <View>
-                        {heroPost && renderHero(heroPost)}
+                        {renderHero()}
                         {renderSectionHeader()}
                     </View>
                 }
@@ -278,6 +331,10 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         backgroundColor: '#000',
     },
+    heroSlide: {
+        width: width,
+        height: 350,
+    },
     heroImagePlaceholder: {
         ...StyleSheet.absoluteFillObject,
         backgroundColor: '#1a1a1a',
@@ -291,14 +348,36 @@ const styles = StyleSheet.create({
         color: colors.border,
         opacity: 0.3,
     },
-    heroOverlay: {
+    heroOverlayGradient: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.6)',
+        backgroundColor: 'rgba(0,0,0,0.3)', // Base tint
     },
     heroContent: {
-        flex: 1,
-        justifyContent: 'flex-end',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
         padding: spacing.lg,
+        paddingBottom: spacing.xl,
+        backgroundColor: 'transparent',
+    },
+    heroIndicatorsOverlay: {
+        position: 'absolute',
+        bottom: spacing.md,
+        left: spacing.lg,
+        flexDirection: 'row',
+        gap: 6,
+        zIndex: 20,
+    },
+    heroIndicator: {
+        height: 3,
+        width: 15,
+        backgroundColor: 'rgba(255,255,255,0.3)',
+        borderRadius: 2,
+    },
+    activeHeroIndicator: {
+        backgroundColor: colors.accent,
+        width: 30,
     },
     heroTitle: {
         fontFamily: 'Oswald_700Bold',
