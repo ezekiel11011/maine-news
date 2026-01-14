@@ -61,6 +61,15 @@
   margin-bottom: 1.5rem;
 }
 
+.body img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 2.5rem auto;
+  border-radius: 4px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
 .imageWrapper {
   position: relative;
   width: 100vw;
@@ -130,8 +139,8 @@
     }
   
     .imageWrapper {
-      grid-column: 1 / -1; /* Full width or contained? Spec says "Wider reading column", let's keep image wide */
-      grid-column: 2; /* Or keep it contained to reading width for editorial feel? Let's go wide -> 2 */
+      grid-column: 1 / -1; /* Full bleed across all columns for impact */
+      max-height: 500px;
     }
   
     .actions {
