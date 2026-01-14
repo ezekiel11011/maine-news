@@ -14,10 +14,34 @@ export async function GET(request: Request) {
         scraperUrl.searchParams.set('key', process.env.SCRAPER_API_KEY || '');
         scraperUrl.searchParams.set('save', 'true');
 
+        console.log(`[CRON] Triggering scraper at: ${scraperUrl.pathname}`);
+
         const response = await fetch(scraperUrl.toString());
+
+        // Handle non-OK responses or non-JSON responses
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`[CRON] Scraper API failed with status ${response.status}:`, errorText.substring(0, 200));
+            return NextResponse.json({
+                error: 'Scraper API returned an error',
+                status: response.status,
+                preview: errorText.substring(0, 500)
+            }, { status: response.status });
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('[CRON] Scraper API returned non-JSON response:', text.substring(0, 200));
+            return NextResponse.json({
+                error: 'Expected JSON but received HTML/Text. This often happens if the route 404s or crashes.',
+                preview: text.substring(0, 500)
+            }, { status: 500 });
+        }
+
         const data = await response.json();
 
-        console.log(`[CRON] Scraper ran: ${data.count} stories found, ${data.saved} saved`);
+        console.log(`[CRON] Scraper ran successfully: ${data.count} stories found, ${data.saved} saved`);
 
         return NextResponse.json({
             success: true,
