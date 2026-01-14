@@ -114,7 +114,7 @@ function detectRegion(locations: string[]): string | undefined {
     return undefined;
 }
 
-function categorizeStory(text: string, feedType: string): 'local' | 'politics' | 'opinion' | 'top-stories' | 'health' {
+function categorizeStory(text: string, feedType: string): 'local' | 'politics' | 'opinion' | 'top-stories' | 'health' | 'sports' | 'weather' | 'entertainment' {
     const lowerText = text.toLowerCase();
 
     // If from health feed, default to health category
@@ -123,13 +123,13 @@ function categorizeStory(text: string, feedType: string): 'local' | 'politics' |
     }
 
     let maxScore = 0;
-    let category: 'local' | 'politics' | 'opinion' | 'top-stories' | 'health' = feedType === 'national' ? 'politics' : 'local';
+    let category: 'local' | 'politics' | 'opinion' | 'top-stories' | 'health' | 'sports' | 'weather' | 'entertainment' = feedType === 'national' ? 'politics' : 'local';
 
     for (const [cat, keywords] of Object.entries(TOPIC_KEYWORDS)) {
         const score = keywords.filter(kw => lowerText.includes(kw)).length;
         if (score > maxScore) {
             maxScore = score;
-            category = cat as typeof category;
+            category = cat as any;
         }
     }
 

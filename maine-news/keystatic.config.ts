@@ -5,7 +5,7 @@ export default config({
         ? {
             kind: 'github',
             repo: {
-                owner: 'carnage999-max',
+                owner: 'ezekiel11011',
                 name: 'maine-news',
             },
             pathPrefix: 'maine-news',
@@ -36,6 +36,9 @@ export default config({
                         { label: 'Politics', value: 'politics' },
                         { label: 'Opinion', value: 'opinion' },
                         { label: 'Health', value: 'health' },
+                        { label: 'Sports', value: 'sports' },
+                        { label: 'Weather', value: 'weather' },
+                        { label: 'Entertainment', value: 'entertainment' },
                     ],
                     defaultValue: 'local'
                 }),
@@ -82,6 +85,9 @@ export default config({
                         { label: 'Health', value: 'health' },
                         { label: 'Broadcast', value: 'broadcast' },
                         { label: 'Shorts', value: 'shorts' },
+                        { label: 'Sports', value: 'sports' },
+                        { label: 'Weather', value: 'weather' },
+                        { label: 'Entertainment', value: 'entertainment' },
                     ],
                     defaultValue: 'local'
                 }),
