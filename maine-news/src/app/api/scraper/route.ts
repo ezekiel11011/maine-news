@@ -26,7 +26,7 @@ const REGIONS = {
 
 // RSS Feed sources - Maine + National
 const MAINE_FEEDS = [
-    { url: 'https://www.newscentermaine.com/feeds/rss/news/local/maine', name: 'News Center Maine', type: 'maine' },
+    { url: 'https://www.newscentermaine.com/feeds/syndication/rss/news/local', name: 'News Center Maine', type: 'maine' },
     { url: 'https://www.pressherald.com/feed/', name: 'Press Herald', type: 'maine' },
     { url: 'https://www.bangordailynews.com/feed/', name: 'Bangor Daily News', type: 'maine' },
     { url: 'https://www.maine.gov/tools/whatsnew/rss.php?id=portal-news', name: 'Maine.gov', type: 'maine' },
@@ -149,7 +149,18 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
         const res = await fetch(feedUrl, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml,application/rss+xml;q=0.9,*/*;q=0.8',
+                'Accept': 'text/html,application/xhtml+xml,application/xml,application/rss+xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache',
+                'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+                'Sec-Ch-Ua-Mobile': '?0',
+                'Sec-Ch-Ua-Platform': '"Windows"',
+                'Sec-Fetch-Dest': 'document',
+                'Sec-Fetch-Mode': 'navigate',
+                'Sec-Fetch-Site': 'none',
+                'Sec-Fetch-User': '?1',
+                'Upgrade-Insecure-Requests': '1',
                 'Referer': 'https://www.google.com/'
             }
         });
@@ -236,12 +247,13 @@ async function commitBatchToGitHub(files: { path: string, content: string }[], m
     const token = process.env.KEYSTATIC_GITHUB_TOKEN;
     if (!token || files.length === 0) return 0;
 
-    const repo = 'carnage999-max/maine-news';
+    const repo = 'ezekiel11011/maine-news';
     const baseUrl = `https://api.github.com/repos/${repo}`;
     const headers = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
-        'Accept': 'application/vnd.github.v3+json'
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'MaineNewsToday-Scraper/1.0'
     };
 
     try {
@@ -369,7 +381,7 @@ ${video.description}
 `;
 
         if (process.env.NODE_ENV === 'production') {
-            return { path: `maine-news/${relativePath}`, content: frontmatter };
+            return { path: relativePath, content: frontmatter };
         }
 
         // Ensure directory exists
@@ -419,7 +431,7 @@ ${story.region ? `\n*Region: ${story.region}*` : ''}
 `;
 
         if (process.env.NODE_ENV === 'production') {
-            return { path: `maine-news/${relativePath}`, content: frontmatter };
+            return { path: relativePath, content: frontmatter };
         }
 
         // Check if file already exists
