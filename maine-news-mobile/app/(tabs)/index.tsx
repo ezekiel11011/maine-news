@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     View,
     Text,
@@ -10,11 +10,12 @@ import {
     Image,
     Dimensions,
     ScrollView,
+    Animated,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { fetchPosts, Post, getImageUrl, filterByCategory } from '../../services/api';
 import { colors, typography, spacing, fontSize } from '../../constants/theme';
-import { Clock, Filter, ArrowUpDown } from 'lucide-react-native';
+import { Clock, Filter, ArrowUpDown, ChevronUp } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -27,6 +28,10 @@ export default function HomeFeed() {
     const [refreshing, setRefreshing] = useState(false);
     const [activeCategory, setActiveCategory] = useState('all');
     const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
+    const [showScrollTop, setShowScrollTop] = useState(false);
+
+    const flatListRef = useRef<FlatList>(null);
+    const scrollY = useRef(new Animated.Value(0)).current;
     const router = useRouter();
 
     const loadPosts = async () => {
@@ -69,6 +74,19 @@ export default function HomeFeed() {
 
     const toggleSort = () => {
         setSortBy(prev => prev === 'newest' ? 'oldest' : 'newest');
+    };
+
+    const handleScroll = (event: any) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        if (offsetY > 400 && !showScrollTop) {
+            setShowScrollTop(true);
+        } else if (offsetY <= 400 && showScrollTop) {
+            setShowScrollTop(false);
+        }
+    };
+
+    const scrollToTop = () => {
+        flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
     };
 
     const renderHero = (heroPost: Post) => {
@@ -196,9 +214,12 @@ export default function HomeFeed() {
     return (
         <View style={styles.container}>
             <FlatList
+                ref={flatListRef}
                 data={displayPosts}
                 renderItem={renderPost}
                 keyExtractor={item => item.slug}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
                 ListHeaderComponent={
                     <View>
                         {heroPost && renderHero(heroPost)}
@@ -219,6 +240,16 @@ export default function HomeFeed() {
                     </View>
                 }
             />
+
+            {showScrollTop && (
+                <TouchableOpacity
+                    style={styles.scrollToTopButton}
+                    onPress={scrollToTop}
+                    activeOpacity={0.8}
+                >
+                    <ChevronUp size={24} color={colors.background} />
+                </TouchableOpacity>
+            )}
         </View>
     );
 }
@@ -244,12 +275,15 @@ const styles = StyleSheet.create({
         height: 350,
         width: width,
         marginBottom: spacing.lg,
+        overflow: 'hidden',
+        backgroundColor: '#000',
     },
     heroImagePlaceholder: {
         ...StyleSheet.absoluteFillObject,
         backgroundColor: '#1a1a1a',
         justifyContent: 'center',
         alignItems: 'center',
+        overflow: 'hidden',
     },
     placeholderText: {
         fontFamily: 'Oswald_700Bold',
@@ -418,5 +452,21 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter_400Regular',
         color: colors.textDim,
         textAlign: 'center',
+    },
+    scrollToTopButton: {
+        position: 'absolute',
+        bottom: spacing.lg,
+        right: spacing.lg,
+        backgroundColor: colors.accent,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 3,
     },
 });

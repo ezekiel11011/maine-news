@@ -47,9 +47,11 @@ export default function ArticleDetail() {
                 return children.map((child: any, i: number) => renderNode(child, i));
             case 'paragraph':
                 return (
-                    <Text key={index} style={[styles.paragraph, { fontSize: FONT_SIZES[sizeKey] }]}>
-                        {children ? children.map((child: any, i: number) => renderNode(child, i)) : null}
-                    </Text>
+                    <View key={index} style={styles.paragraphContainer}>
+                        <Text style={[styles.paragraph, { fontSize: FONT_SIZES[sizeKey] }]}>
+                            {children ? children.map((child: any, i: number) => renderNode(child, i)) : null}
+                        </Text>
+                    </View>
                 );
             case 'text':
                 return <Text key={index}>{attributes?.content || node.children?.[0] || ''}</Text>;
@@ -300,11 +302,13 @@ const styles = StyleSheet.create({
     content: {
         padding: spacing.lg,
     },
+    paragraphContainer: {
+        marginBottom: spacing.lg,
+    },
     paragraph: {
         fontFamily: 'Inter_400Regular',
         color: colors.textMuted,
         lineHeight: 28,
-        marginBottom: spacing.lg,
     },
     heading: {
         fontFamily: 'Oswald_700Bold',

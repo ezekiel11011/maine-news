@@ -139,8 +139,7 @@ function sanitizeForFilename(text: string): string {
     return text
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '')
-        .substring(0, 50);
+        .replace(/^-+|-+$/g, '');
 }
 
 async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'maine' | 'national' | 'health'): Promise<ScrapedStory[]> {
@@ -158,8 +157,40 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
 
         for (const item of feed.items) {
             const title = item.title || 'Untitled';
-            const rawContent = item.content || item.contentSnippet || item.summary || '';
-            const content = turndown.turndown(rawContent);
+            const link = item.link || '';
+            let content = turndown.turndown(item.content || item.contentSnippet || item.summary || '');
+
+            // Attempt to fetch full content if the RSS only has a snippet
+            if (link && (content.length < 500 || content.includes('read more') || content.includes('...'))) {
+                try {
+                    const pageRes = await fetch(link, {
+                        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36' }
+                    });
+                    if (pageRes.ok) {
+                        const html = await pageRes.text();
+                        // Basic extraction: Look for the main article content (common patterns)
+                        // This is a naive heuristic but works well for most news sites
+                        const articleMatch = html.match(/<article[\s\S]*?>([\s\S]*?)<\/article>/i) ||
+                            html.match(/<div class="[^"]*article[^"]*"[\s\S]*?>([\s\S]*?)<\/div>/i) ||
+                            html.match(/<div class="[^"]*story[^"]*"[\s\S]*?>([\s\S]*?)<\/div>/i);
+
+                        if (articleMatch) {
+                            const cleanedHtml = articleMatch[1]
+                                .replace(/<script[\s\S]*?<\/script>/gi, '')
+                                .replace(/<style[\s\S]*?<\/style>/gi, '')
+                                .replace(/<div class="newsletter-signup"[\s\S]*?<\/div>/gi, '');
+
+                            const fullContent = turndown.turndown(cleanedHtml);
+                            if (fullContent.length > content.length) {
+                                content = fullContent;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log(`Failed to fetch deep content for ${link}`);
+                }
+            }
+
             const excerpt = content.substring(0, 200).replace(/[\\#\\*]/g, '') + (content.length > 200 ? '...' : '');
 
             // Extract image
@@ -173,7 +204,7 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
                 excerpt,
                 content,
                 source: sourceName,
-                sourceUrl: item.link || feedUrl,
+                sourceUrl: link || feedUrl,
                 category: 'local', // Will be overridden
                 locations: [],
                 publishedDate: item.pubDate || new Date().toISOString(),
