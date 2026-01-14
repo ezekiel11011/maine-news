@@ -55,6 +55,9 @@
   font-size: 1.1rem;
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.9);
+  word-wrap: break-word; /* Catch long strings like ======== */
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .body p {

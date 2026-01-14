@@ -213,10 +213,22 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
 
             const excerpt = content.substring(0, 200).replace(/[\\#\\*]/g, '') + (content.length > 200 ? '...' : '');
 
+            // Clean content from repeated characters that break layout (like =========)
+            content = content.replace(/([=_-]){5,}/g, '$1$1$1');
+
             // Extract image
             let image = item.enclosure?.url;
             if (!image && (item as any)['media:content']) {
                 image = (item as any)['media:content'].$.url;
+            }
+
+            // Fallback: search for first <img> tag in the original content/summary
+            if (!image) {
+                const searchArea = (item.content || item.summary || item.contentSnippet || '');
+                const imgMatch = searchArea.match(/<img[^>]+src="([^">]+)"/i);
+                if (imgMatch) {
+                    image = imgMatch[1];
+                }
             }
 
             stories.push({
