@@ -45,12 +45,14 @@ export default function Footer() {
 
                     <div className={styles.linkGroup}>
                         <h3>Download Our App</h3>
-                        <a href="https://apps.apple.com" target="_blank" rel="noopener noreferrer" className={styles.appLink}>
-                            <Image src="/App_Store.svg" alt="Download on App Store" width={120} height={40} />
-                        </a>
-                        <a href="https://play.google.com" target="_blank" rel="noopener noreferrer" className={styles.appLink}>
-                            <Image src="/Google_Play.svg" alt="Get it on Google Play" width={135} height={40} />
-                        </a>
+                        <div className={styles.appLinksGroup}>
+                            <a href="https://apps.apple.com" target="_blank" rel="noopener noreferrer" className={styles.appLink}>
+                                <Image src="/App_Store.svg" alt="Download on App Store" width={120} height={40} />
+                            </a>
+                            <a href="https://play.google.com" target="_blank" rel="noopener noreferrer" className={styles.appLink}>
+                                <Image src="/Google_Play.svg" alt="Get it on Google Play" width={135} height={40} />
+                            </a>
+                        </div>
                     </div>
                 </div>
 

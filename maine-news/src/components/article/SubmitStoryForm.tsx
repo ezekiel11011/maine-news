@@ -6,6 +6,7 @@ import styles from './SubmitStoryForm.module.css';
 
 export default function SubmitStoryForm() {
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [files, setFiles] = useState<File[]>([]);
     const [formData, setFormData] = useState({
         title: '',
         name: '',
@@ -19,16 +20,27 @@ export default function SubmitStoryForm() {
         setStatus('loading');
 
         try {
+            const data = new FormData();
+            data.append('title', formData.title);
+            data.append('name', formData.name);
+            data.append('email', formData.email);
+            data.append('content', formData.content);
+            data.append('urgency', formData.urgency);
+
+            files.forEach((file, index) => {
+                data.append(`file-${index}`, file);
+            });
+
             const res = await fetch('/api/submit-story', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: data // Automatic Content-Type for FormData
             });
 
             if (!res.ok) throw new Error('Failed to submit');
 
             setStatus('success');
             setFormData({ title: '', name: '', email: '', content: '', urgency: 'Standard' });
+            setFiles([]);
         } catch (error) {
             console.error(error);
             setStatus('error');
@@ -114,6 +126,23 @@ export default function SubmitStoryForm() {
                     value={formData.content}
                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 />
+            </div>
+
+            <div className={styles.inputGroup}>
+                <label htmlFor="media">Attach Photos or Videos</label>
+                <div className={styles.fileUploadArea}>
+                    <input
+                        id="media"
+                        type="file"
+                        multiple
+                        accept="image/*,video/*"
+                        className={styles.fileInput}
+                        onChange={(e) => setFiles(Array.from(e.target.files || []))}
+                    />
+                    <div className={styles.filePlaceholder}>
+                        <p>{files.length > 0 ? `${files.length} file(s) selected` : 'Click to select or drag and drop media'}</p>
+                    </div>
+                </div>
             </div>
 
             {status === 'error' && (

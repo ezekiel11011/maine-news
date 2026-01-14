@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import styles from '../privacy/Policy.module.css';
 
 export default function AboutPage() {
@@ -6,6 +7,19 @@ export default function AboutPage() {
         <main className={styles.container}>
             <h1 className={styles.title}>About Maine News Today</h1>
             <div className={styles.content}>
+                <div style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                    <Image
+                        src="/nathan.jpeg"
+                        alt="Nathan Reardon"
+                        width={200}
+                        height={200}
+                        style={{ borderRadius: '50%', marginBottom: '1.5rem', objectFit: 'cover', border: '3px solid var(--color-accent)' }}
+                    />
+                    <p style={{ fontSize: '1.2rem', maxWidth: '800px' }}>
+                        Founded by <strong>Nathan Reardon</strong> in 2025 because he was tired of local newspapers bias reporting.
+                    </p>
+                </div>
+
                 <p><strong>Unbiased. Unafraid. Unfiltered.</strong></p>
 
                 <section>
