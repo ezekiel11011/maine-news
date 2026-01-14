@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server';
 import Parser from 'rss-parser';
 import fs from 'fs/promises';
 import path from 'path';
+import TurndownService from 'turndown';
 
 const parser = new Parser();
+const turndown = new TurndownService();
 
 // Maine towns/cities database for geographic filtering
 const MAINE_LOCATIONS = [
@@ -156,8 +158,9 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
 
         for (const item of feed.items) {
             const title = item.title || 'Untitled';
-            const content = item.content || item.contentSnippet || item.summary || '';
-            const excerpt = content.substring(0, 200) + (content.length > 200 ? '...' : '');
+            const rawContent = item.content || item.contentSnippet || item.summary || '';
+            const content = turndown.turndown(rawContent);
+            const excerpt = content.substring(0, 200).replace(/[\\#\\*]/g, '') + (content.length > 200 ? '...' : '');
 
             // Extract image
             let image = item.enclosure?.url;
@@ -278,7 +281,7 @@ async function saveVideoToKeystatic(video: ScrapedVideo): Promise<boolean> {
         const filepath = path.join(process.cwd(), relativePath);
 
         const frontmatter = `---
-title: ${video.title}
+title: ${JSON.stringify(video.title)}
 videoUrl: "${video.videoUrl}"
 thumbnail: "${video.thumbnail}"
 duration: "${video.duration}"
@@ -332,9 +335,9 @@ async function saveToKeystatic(story: ScrapedStory): Promise<boolean> {
         const filepath = path.join(process.cwd(), relativePath);
 
         const frontmatter = `---
-title: ${story.title}
-image: ${story.image ? `"${story.image}"` : 'null'}
-author: ${story.author || story.source}
+title: ${JSON.stringify(story.title)}
+image: ${story.image ? JSON.stringify(story.image) : 'null'}
+author: ${JSON.stringify(story.author || story.source)}
 publishedDate: ${new Date(story.publishedDate).toISOString().split('T')[0]}
 category: ${story.category}
 ---

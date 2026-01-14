@@ -4,6 +4,11 @@ import Constants from 'expo-constants';
 
 // Get the dev machine IP for physical device testing
 const getApiBaseUrl = () => {
+    // In production builds, always use Vercel
+    if (!__DEV__) {
+        return 'https://maine-news-temp.vercel.app';
+    }
+
     const debuggerHost = Constants.expoConfig?.hostUri || '';
     const localhost = debuggerHost.split(':')[0];
 

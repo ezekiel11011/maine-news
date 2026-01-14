@@ -75,6 +75,17 @@ export default function ArticleDetail() {
                         </Text>
                     </View>
                 );
+            case 'image':
+                return (
+                    <View key={index} style={styles.imageContainer}>
+                        <Image
+                            source={{ uri: attributes.src }}
+                            style={styles.inlineImage}
+                            resizeMode="contain"
+                        />
+                        {attributes.alt ? <Text style={styles.imageCaption}>{attributes.alt}</Text> : null}
+                    </View>
+                );
             default:
                 // Fallback: just try to join children text
                 if (children) {
@@ -302,6 +313,23 @@ const styles = StyleSheet.create({
         color: colors.text,
         marginTop: spacing.lg,
         marginBottom: spacing.md,
+    },
+    imageContainer: {
+        marginVertical: spacing.lg,
+    },
+    inlineImage: {
+        width: '100%',
+        height: 200,
+        backgroundColor: colors.borderDim,
+        borderRadius: 4,
+    },
+    imageCaption: {
+        fontFamily: 'Inter_400Regular',
+        fontSize: 12,
+        color: colors.textDim,
+        marginTop: 4,
+        fontStyle: 'italic',
+        textAlign: 'center',
     },
     h1: { fontSize: 28 },
     h2: { fontSize: 24 },
