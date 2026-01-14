@@ -297,16 +297,8 @@ ${story.region ? `\n*Region: ${story.region}*` : ''}
     }
 }
 
-export async function GET(request: Request) {
-    const { searchParams } = new URL(request.url);
-    const authKey = searchParams.get('key');
-    const save = searchParams.get('save') === 'true';
-    const includeNational = searchParams.get('national') === 'true';
-
-    // Simple auth check
-    if (authKey !== process.env.SCRAPER_API_KEY) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+export async function runScraper(options: { save: boolean, includeNational: boolean }) {
+    const { save, includeNational } = options;
 
     try {
         const allStories: ScrapedStory[] = [];
@@ -349,7 +341,7 @@ export async function GET(request: Request) {
             };
         });
 
-        // Enrich National stories (limit to top 5 per source)
+        // Enrich National stories (limit to top 15 total)
         const enrichedNationalStories = nationalStories
             .map(story => ({
                 ...story,
@@ -357,7 +349,7 @@ export async function GET(request: Request) {
                 urgency: calculateUrgency(story.title + ' ' + story.excerpt)
             }))
             .sort((a, b) => b.urgency - a.urgency)
-            .slice(0, 15); // Top 15 national stories total
+            .slice(0, 15);
 
         // Combine if requested
         const finalStories = includeNational
@@ -381,21 +373,37 @@ export async function GET(request: Request) {
             }
         }
 
-        return NextResponse.json({
+        return {
             success: true,
             count: finalStories.length,
             videoCount: allVideos.length,
-            maineCount: enrichedMaineStories.length,
-            nationalCount: enrichedNationalStories.length,
             saved: savedCount,
             savedVideos: savedVideoCount,
-            stories: finalStories.slice(0, 10), // Return top 10 for preview
+            stories: finalStories.slice(0, 10),
             videos: allVideos.slice(0, 5),
             timestamp: new Date().toISOString()
-        });
-
+        };
     } catch (error) {
-        console.error('Scraper error:', error);
+        console.error('[SCRAPER] Global failure:', error);
+        throw error;
+    }
+}
+
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const authKey = searchParams.get('key');
+    const save = searchParams.get('save') === 'true';
+    const includeNational = searchParams.get('national') === 'true';
+
+    // Simple auth check
+    if (authKey !== process.env.SCRAPER_API_KEY) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    try {
+        const result = await runScraper({ save, includeNational });
+        return NextResponse.json(result);
+    } catch (error) {
         return NextResponse.json({
             error: 'Scraping failed',
             details: error instanceof Error ? error.message : 'Unknown error'
