@@ -30,12 +30,16 @@ const MAINE_FEEDS = [
     { url: 'https://www.pressherald.com/feed/', name: 'Press Herald', type: 'maine' },
     { url: 'https://www.bangordailynews.com/feed/', name: 'Bangor Daily News', type: 'maine' },
     { url: 'https://www.maine.gov/tools/whatsnew/rss.php?id=portal-news', name: 'Maine.gov', type: 'maine' },
+    { url: 'https://www.newscentermaine.com/feeds/syndication/rss/weather', name: 'NCM Weather', type: 'maine' },
+    { url: 'https://www.wabi.tv/feeds/syndication/rss/sports', name: 'WABI Sports', type: 'maine' },
 ];
 
 const NATIONAL_FEEDS = [
     { url: 'https://moxie.foxnews.com/google-publisher/politics.xml', name: 'Fox News Politics', type: 'national' },
     { url: 'https://www.pbs.org/newshour/feeds/rss/politics', name: 'PBS NewsHour Politics', type: 'national' },
     { url: 'https://www.politico.com/rss/politicopicks.xml', name: 'Politico', type: 'national' },
+    { url: 'https://moxie.foxnews.com/google-publisher/sports.xml', name: 'Fox Sports', type: 'national' },
+    { url: 'https://www.cnbc.com/id/10000110/device/rss/rss.html', name: 'CNBC Entertainment', type: 'national' },
 ];
 
 const VIDEO_FEEDS = [
@@ -63,7 +67,10 @@ const TOPIC_KEYWORDS = {
     'politics': ['legislature', 'governor', 'election', 'vote', 'policy', 'bill', 'senate', 'house', 'congress', 'white house'],
     'opinion': ['editorial', 'opinion', 'commentary', 'letter to editor'],
     'top-stories': ['breaking', 'urgent', 'alert', 'major', 'emergency'],
-    'health': ['health', 'medical', 'disease', 'vaccine', 'cdc', 'fda', 'medicine', 'hospital']
+    'health': ['health', 'medical', 'disease', 'vaccine', 'cdc', 'fda', 'medicine', 'hospital'],
+    'sports': ['team', 'player', 'game', 'score', 'coach', 'championship', 'tournament', 'basketball', 'football', 'hockey', 'baseball'],
+    'entertainment': ['movie', 'film', 'music', 'actor', 'celebrity', 'concert', 'theater', 'arts', 'culture'],
+    'weather': ['storm', 'forecast', 'snow', 'rain', 'temperature', 'wind', 'warning', 'advisory', 'climate']
 };
 
 interface ScrapedStory {
