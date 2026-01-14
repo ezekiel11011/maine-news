@@ -56,6 +56,30 @@
   color: var(--color-text);
   cursor: pointer;
   padding: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.tipButton {
+  background: transparent;
+  border: 1.5px solid var(--color-accent);
+  color: var(--color-accent);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tipButton:hover {
+  background: var(--color-accent);
+  color: #000;
 }
 
 @media (min-width: 768px) {

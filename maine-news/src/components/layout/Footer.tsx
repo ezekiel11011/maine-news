@@ -16,6 +16,7 @@ export default function Footer() {
                         <Link href="/">Home</Link>
                         <Link href="/latest">Latest</Link>
                         <Link href="/sections">Sections</Link>
+                        <Link href="/submit">Submit a Story</Link>
                     </div>
 
                     <div className={styles.linkGroup}>

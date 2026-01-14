@@ -30,8 +30,11 @@ export default function Header() {
             </nav>
 
             <div className={styles.actions}>
+                <Link href="/submit" className={styles.tipButton}>
+                    <span>Send Tip</span>
+                </Link>
                 <Link href="/search" className={styles.iconButton} aria-label="Search">
-                    <Search size={24} strokeWidth={1.5} />
+                    <Search size={22} strokeWidth={1.5} />
                 </Link>
             </div>
         </header>

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Clock, Grid, Search } from 'lucide-react';
+import { Home, Clock, Grid, Search, MessageSquarePlus } from 'lucide-react';
 import styles from './BottomNav.module.css';
 
 export default function BottomNav() {
@@ -11,6 +11,7 @@ export default function BottomNav() {
     const navItems = [
         { label: 'Home', href: '/', icon: Home },
         { label: 'Latest', href: '/latest', icon: Clock },
+        { label: 'Submit', href: '/submit', icon: MessageSquarePlus },
         { label: 'Sections', href: '/sections', icon: Grid },
         { label: 'Search', href: '/search', icon: Search },
     ];
