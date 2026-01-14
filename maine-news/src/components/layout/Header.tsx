@@ -48,8 +48,10 @@ export default function Header() {
                     <a href="#" target="_blank" rel="noopener noreferrer">
                         <Twitter size={14} />
                     </a>
-                    <a href="#" target="_blank" rel="noopener noreferrer">
-                        <ShieldCheck size={14} />
+                    <a href="https://www.mylibertysocial.com/app/pages/200" target="_blank" rel="noopener noreferrer" aria-label="Liberty Social">
+                        <div className={styles.socialIconWrapper}>
+                            <Image src="/liberty-social.png" alt="Liberty Social" width={14} height={14} />
+                        </div>
                     </a>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Facebook, Instagram, Twitter, ShieldCheck } from 'lucide-react';
+import Image from 'next/image';
+import { Facebook, Instagram, Twitter } from 'lucide-react';
 import styles from './Footer.module.css';
 
 export default function Footer() {
@@ -20,9 +21,8 @@ export default function Footer() {
                         <a href="#" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
                             <Twitter size={20} />
                         </a>
-                        <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Liberty Social" className={styles.libertySocial}>
-                            <ShieldCheck size={20} />
-                            <span>Liberty</span>
+                        <a href="https://www.mylibertysocial.com/app/pages/200" target="_blank" rel="noopener noreferrer" aria-label="Liberty Social" className={styles.libertySocialIcon}>
+                            <Image src="/liberty-social.png" alt="Liberty Social" width={20} height={20} />
                         </a>
                     </div>
                 </div>
@@ -46,10 +46,10 @@ export default function Footer() {
                     <div className={styles.linkGroup}>
                         <h3>Download Our App</h3>
                         <a href="https://apps.apple.com" target="_blank" rel="noopener noreferrer" className={styles.appLink}>
-                            <span>App Store</span>
+                            <Image src="/App_Store.svg" alt="Download on App Store" width={120} height={40} />
                         </a>
                         <a href="https://play.google.com" target="_blank" rel="noopener noreferrer" className={styles.appLink}>
-                            <span>Google Play</span>
+                            <Image src="/Google_Play.svg" alt="Get it on Google Play" width={135} height={40} />
                         </a>
                     </div>
                 </div>

@@ -50,21 +50,17 @@
     transform: translateY(-3px);
 }
 
-.libertySocial {
+.libertySocialIcon {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 0.4rem 0.8rem;
-    border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    justify-content: center;
+    opacity: 0.6;
+    transition: all 0.3s ease;
 }
 
-.libertySocial span {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.libertySocialIcon:hover {
+    opacity: 1;
+    transform: translateY(-3px);
 }
 
 .links {

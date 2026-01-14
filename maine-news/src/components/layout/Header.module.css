@@ -72,6 +72,26 @@
   color: var(--color-accent);
 }
 
+.socialIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.4;
+  transition: opacity 0.2s ease;
+}
+
+.socialIconWrapper:hover {
+  opacity: 1;
+}
+
+.socialIconWrapper img {
+  filter: grayscale(1) brightness(2);
+}
+
+.socialIconWrapper:hover img {
+  filter: none;
+}
+
 .iconButton {
   background: none;
   border: none;
