@@ -381,7 +381,7 @@ ${video.description}
 `;
 
         if (process.env.NODE_ENV === 'production') {
-            return { path: relativePath, content: frontmatter };
+            return { path: `maine-news/${relativePath}`, content: frontmatter };
         }
 
         // Ensure directory exists
@@ -431,7 +431,7 @@ ${story.region ? `\n*Region: ${story.region}*` : ''}
 `;
 
         if (process.env.NODE_ENV === 'production') {
-            return { path: relativePath, content: frontmatter };
+            return { path: `maine-news/${relativePath}`, content: frontmatter };
         }
 
         // Check if file already exists
