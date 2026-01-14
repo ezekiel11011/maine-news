@@ -46,11 +46,23 @@ export default function Footer() {
                     <div className={styles.linkGroup}>
                         <h3>Download Our App</h3>
                         <div className={styles.appLinksGroup}>
-                            <a href="https://apps.apple.com" target="_blank" rel="noopener noreferrer" className={styles.appLink}>
-                                <Image src="/App_Store.svg" alt="Download on App Store" width={120} height={40} />
+                            <a href="https://apps.apple.com" target="_blank" rel="noopener noreferrer" className={styles.storeBadge}>
+                                <div className={styles.badgeIcon}>
+                                    <Image src="/App_Store.svg" alt="App Store" width={24} height={24} />
+                                </div>
+                                <div className={styles.badgeText}>
+                                    <span className={styles.badgeSmall}>Download on</span>
+                                    <span className={styles.badgeLarge}>App Store</span>
+                                </div>
                             </a>
-                            <a href="https://play.google.com" target="_blank" rel="noopener noreferrer" className={styles.appLink}>
-                                <Image src="/Google_Play.svg" alt="Get it on Google Play" width={135} height={40} />
+                            <a href="https://play.google.com" target="_blank" rel="noopener noreferrer" className={styles.storeBadge}>
+                                <div className={styles.badgeIcon}>
+                                    <Image src="/Google_Play.svg" alt="Google Play" width={24} height={24} />
+                                </div>
+                                <div className={styles.badgeText}>
+                                    <span className={styles.badgeSmall}>Get it on</span>
+                                    <span className={styles.badgeLarge}>Google Play</span>
+                                </div>
                             </a>
                         </div>
                     </div>

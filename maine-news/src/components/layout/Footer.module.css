@@ -64,16 +64,19 @@
 }
 
 .links {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    justify-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+    width: 100%;
 }
 
 .linkGroup {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    align-items: center;
+    width: 100%;
 }
 
 .linkGroup h3 {
@@ -95,19 +98,67 @@
 
 .appLinksGroup {
     display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
+    gap: 0.75rem;
+    flex-wrap: nowrap;
+    justify-content: center;
     margin-top: 0.5rem;
+    overflow-x: auto;
+    max-width: 100%;
+    padding-bottom: 0.5rem; /* Space for scrollbar interactions */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
 }
 
-.appLink {
+.appLinksGroup::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+.storeBadge {
     display: flex;
     align-items: center;
-    transition: transform 0.2s ease;
+    gap: 0.75rem;
+    background: #000;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color-dim);
+    transition: all 0.2s ease;
+    min-width: auto;
+    flex: 0 0 auto;
 }
 
-.appLink:hover {
+.storeBadge:hover {
+    border-color: var(--color-accent);
     transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.badgeIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.badgeText {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.1;
+}
+
+.badgeSmall {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badgeLarge {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: var(--font-heading);
+    letter-spacing: 0.5px;
 }
 
 .bottomBar {
@@ -135,9 +186,19 @@
     }
 
     .links {
+        display: grid;
         grid-template-columns: repeat(2, minmax(150px, auto));
         gap: 4rem;
         justify-items: start;
+        width: auto;
+    }
+
+    .linkGroup {
+        align-items: flex-start;
+    }
+
+    .appLinksGroup {
+        justify-content: flex-start;
     }
 
     .bottomBar {

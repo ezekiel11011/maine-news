@@ -48,13 +48,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 1rem;
-}
-
-.headerSocialsRow {
-  display: flex;
-  gap: 1rem;
-  padding-right: 0.25rem;
+  justify-content: center; /* Center content vertically */
+  height: 100%;
 }
 
 .socialLink {
@@ -79,21 +74,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.4;
-  transition: opacity 0.2s ease;
 }
 
 .socialIconWrapper:hover {
   opacity: 1;
 }
 
-.socialIconWrapper img {
-  filter: grayscale(1) brightness(2);
-}
-
-.socialIconWrapper:hover img {
-  filter: none;
-}
 
 .iconButton {
   background: none;
@@ -141,6 +127,7 @@
     display: flex;
     gap: 2rem;
     position: absolute;
+    top: 1.5rem;
     left: 50%;
     transform: translateX(-50%);
   }
@@ -161,4 +148,55 @@
 
 .desktopNav {
   display: none;
+}
+
+.socialBar {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: var(--color-accent);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.25rem 0;
+  z-index: 90;
+}
+
+.socialBarLink {
+  color: #000;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  /* Removed opacity */
+}
+
+.socialBarLink:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+@media (min-width: 768px) {
+    .socialBar {
+        background: transparent;
+        position: absolute;
+        bottom: 0.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto;
+        padding: 0;
+        border: none;
+    }
+    
+    .socialBarLink {
+        color: var(--color-text);
+        /* Removed opacity */
+    }
+    
+    .socialBarLink:hover {
+        color: var(--color-accent);
+        /* simplified hover */
+        transform: translateY(-2px);
+    }
 }
