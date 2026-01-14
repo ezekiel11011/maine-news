@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Facebook, Instagram, Twitter, ShieldCheck } from 'lucide-react';
 import styles from './Footer.module.css';
 
 export default function Footer() {
@@ -8,6 +9,22 @@ export default function Footer() {
                 <div className={styles.brand}>
                     <h2 className={styles.logo}>MAINE NEWS TODAY</h2>
                     <p className={styles.tagline}>Unbiased. Unafraid. Unfiltered.</p>
+
+                    <div className={styles.socialLinks}>
+                        <a href="https://www.facebook.com/share/1DWXu7JBHo/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                            <Facebook size={20} />
+                        </a>
+                        <a href="https://www.instagram.com/maine_news_today?igsh=NXo3OHJzMmRwbXRq&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                            <Instagram size={20} />
+                        </a>
+                        <a href="#" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+                            <Twitter size={20} />
+                        </a>
+                        <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Liberty Social" className={styles.libertySocial}>
+                            <ShieldCheck size={20} />
+                            <span>Liberty</span>
+                        </a>
+                    </div>
                 </div>
 
                 <div className={styles.links}>

@@ -30,6 +30,41 @@
     color: var(--color-accent);
     text-transform: uppercase;
     letter-spacing: 1px;
+    margin-bottom: 2rem;
+}
+
+.socialLinks {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.socialLinks a {
+    color: rgba(255, 255, 255, 0.6);
+    transition: all 0.3s ease;
+}
+
+.socialLinks a:hover {
+    color: var(--color-accent);
+    transform: translateY(-3px);
+}
+
+.libertySocial {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.libertySocial span {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .links {
@@ -80,6 +115,10 @@
 
     .brand {
         text-align: left;
+    }
+
+    .socialLinks {
+        justify-content: flex-start;
     }
 
     .links {
