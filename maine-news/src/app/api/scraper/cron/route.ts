@@ -22,7 +22,6 @@ export async function GET(request: Request) {
         console.log(`[CRON] Scraper finished: ${result.count} stories found, ${result.saved} saved`);
 
         return NextResponse.json({
-            success: true,
             source: 'direct_execution',
             ...result
         });

@@ -10,7 +10,7 @@ const getApiBaseUrl = () => {
     if (localhost) {
         return `http://${localhost}:3000`;
     }
-    return 'http://localhost:3000';
+    return 'https://maine-news-temp.vercel.app';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
