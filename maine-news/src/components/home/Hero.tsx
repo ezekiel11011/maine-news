@@ -99,7 +99,8 @@ export default function Hero({ posts }: HeroProps) {
                                 alt={post.title}
                                 fill
                                 className={styles.image}
-                                priority={index === 0}
+                                priority
+                                quality={90}
                                 sizes="100vw"
                             />
                         </div>

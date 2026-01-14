@@ -4,6 +4,7 @@ import { reader } from '@/lib/reader';
 import Markdoc from '@markdoc/markdoc';
 import React from 'react';
 import ArticleActions from '@/components/article/ArticleActions';
+import TextResizer from '@/components/article/TextResizer';
 import styles from './Article.module.css';
 
 interface ArticlePageProps {
@@ -57,6 +58,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     />
                 </figure>
             )}
+
+            <div className={styles.centerContent}>
+                <TextResizer />
+            </div>
 
             <div className={styles.body} data-article-body>
                 {Markdoc.renderers.react(Markdoc.transform((await content()).node), React)}

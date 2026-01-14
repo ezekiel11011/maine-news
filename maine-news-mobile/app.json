@@ -50,16 +50,17 @@
       "favicon": "./assets/favicon.png"
     },
     "privacyPolicyUrl": "https://maine-news-temp.vercel.app/privacy",
-    "extra": {
-      "eas": {
-        "projectId": "your-project-id"
-      }
-    },
     "plugins": [
       "expo-router",
       "expo-font",
       "expo-secure-store",
       "expo-web-browser"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "34155bc3-3eb4-4c43-b278-7e0143fa49fc"
+      }
+    }
   }
 }

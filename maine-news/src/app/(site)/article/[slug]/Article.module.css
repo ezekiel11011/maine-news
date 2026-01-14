@@ -125,7 +125,7 @@
       padding-top: 2rem;
     }
   
-    .header, .body {
+    .header, .body, .centerContent {
       grid-column: 2;
     }
   

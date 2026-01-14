@@ -1,0 +1,44 @@
+.container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color-dim);
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--color-bg-dim);
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    border: 1px solid var(--border-color-dim);
+}
+
+.button {
+    background: transparent;
+    border: none;
+    color: var(--color-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.button:hover {
+    color: var(--color-accent);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.label {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-text-dim);
+    min-width: 40px;
+    text-align: center;
+}
