@@ -262,6 +262,37 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
     }
 }
 
+async function getExistingSlugs(repo: string, token: string): Promise<Set<string>> {
+    const slugs = new Set<string>();
+    const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'MaineNewsToday-Scraper/1.0'
+    };
+
+    try {
+        // Fetch files from posts and videos directories
+        const directories = ['maine-news/src/content/posts', 'maine-news/src/content/videos'];
+        for (const dir of directories) {
+            const res = await fetch(`https://api.github.com/repos/${repo}/contents/${dir}`, { headers });
+            if (res.ok) {
+                const files = await res.json();
+                if (Array.isArray(files)) {
+                    files.forEach(file => {
+                        if (file.name.endsWith('.mdoc')) {
+                            slugs.add(file.name.replace('.mdoc', ''));
+                        }
+                    });
+                }
+            }
+        }
+        return slugs;
+    } catch (error) {
+        console.error('Failed to fetch existing slugs:', error);
+        return slugs;
+    }
+}
+
 async function commitBatchToGitHub(files: { path: string, content: string }[], message: string): Promise<number> {
     const token = process.env.KEYSTATIC_GITHUB_TOKEN;
     if (!token || files.length === 0) return 0;
@@ -375,9 +406,16 @@ async function parseVideoFeed(feedUrl: string, sourceName: string): Promise<Scra
     }
 }
 
-async function saveVideoToKeystatic(video: ScrapedVideo): Promise<{ path: string, content: string } | null> {
+async function saveVideoToKeystatic(video: ScrapedVideo, existingSlugs?: Set<string>): Promise<{ path: string, content: string } | null> {
     try {
         const slug = sanitizeForFilename(video.title);
+
+        // Skip if slug already exists in remote repo
+        if (existingSlugs?.has(slug)) {
+            console.log(`Video already exists (remote): ${slug}`);
+            return null;
+        }
+
         const filename = `${slug}.mdoc`;
         const relativePath = `src/content/videos/${filename}`;
         const filepath = path.join(process.cwd(), relativePath);
@@ -425,9 +463,16 @@ ${video.description}
     }
 }
 
-async function saveToKeystatic(story: ScrapedStory): Promise<{ path: string, content: string } | null> {
+async function saveToKeystatic(story: ScrapedStory, existingSlugs?: Set<string>): Promise<{ path: string, content: string } | null> {
     try {
         const slug = sanitizeForFilename(story.title);
+
+        // Skip if slug already exists in remote repo
+        if (existingSlugs?.has(slug)) {
+            console.log(`Story already exists (remote): ${slug}`);
+            return null;
+        }
+
         const filename = `${slug}.mdoc`;
         const relativePath = `src/content/posts/${filename}`;
         const filepath = path.join(process.cwd(), relativePath);
@@ -533,6 +578,13 @@ export async function runScraper(options: { save: boolean, includeNational: bool
         // Sort by urgency
         finalStories.sort((a, b) => b.urgency - a.urgency);
 
+        // Fetch existing slugs from GitHub if in production to avoid duplicates
+        const repo = 'ezekiel11011/maine-news';
+        const token = process.env.KEYSTATIC_GITHUB_TOKEN;
+        const existingSlugs = (process.env.NODE_ENV === 'production' && token)
+            ? await getExistingSlugs(repo, token)
+            : new Set<string>();
+
         // Save to Keystatic if requested
         let savedCount = 0;
         let savedVideoCount = 0;
@@ -540,7 +592,7 @@ export async function runScraper(options: { save: boolean, includeNational: bool
             const batchFiles: { path: string, content: string }[] = [];
 
             for (const story of finalStories) {
-                const result = await saveToKeystatic(story);
+                const result = await saveToKeystatic(story, existingSlugs);
                 if (result) {
                     if (process.env.NODE_ENV === 'production') {
                         batchFiles.push(result);
@@ -550,7 +602,7 @@ export async function runScraper(options: { save: boolean, includeNational: bool
                 }
             }
             for (const video of allVideos) {
-                const result = await saveVideoToKeystatic(video);
+                const result = await saveVideoToKeystatic(video, existingSlugs);
                 if (result) {
                     if (process.env.NODE_ENV === 'production') {
                         batchFiles.push(result);
