@@ -16,7 +16,7 @@ export async function GET(request: Request) {
 
         console.log(`[CRON] Triggering scraper at: ${scraperUrl.pathname}`);
 
-        const response = await fetch(scraperUrl.toString());
+        const response = await fetch(scraperUrl.toString(), { cache: 'no-store' });
 
         // Handle non-OK responses or non-JSON responses
         if (!response.ok) {

@@ -243,6 +243,10 @@ ${video.description}
         await fs.writeFile(filepath, frontmatter, 'utf-8');
         return true;
     } catch (error) {
+        if ((error as any).code === 'EROFS') {
+            console.warn(`[SCRAPER] Skipping write for "${video.title}" - Read-only filesystem detected (Vercel Production).`);
+            return false;
+        }
         console.error(`Failed to save video "${video.title}":`, error);
         return false;
     }
@@ -284,6 +288,10 @@ ${story.region ? `\n*Region: ${story.region}*` : ''}
         console.log(`Saved story: ${slug}`);
         return true;
     } catch (error) {
+        if ((error as any).code === 'EROFS') {
+            console.warn(`[SCRAPER] Skipping write for "${story.title}" - Read-only filesystem detected.`);
+            return false;
+        }
         console.error(`Failed to save story "${story.title}":`, error);
         return false;
     }
