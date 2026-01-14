@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Hero from '@/components/home/Hero';
 import LiveTicker from '@/components/home/LiveTicker';
 import SectionList from '@/components/home/SectionList';
+import ScrollToTop from '@/components/ui/ScrollToTop';
 import { Filter, ArrowUpDown, X } from 'lucide-react';
 import styles from './HomeFeed.module.css';
 
@@ -26,7 +27,7 @@ const CATEGORIES = [
     { id: 'local', label: 'Local' },
     { id: 'politics', label: 'Politics' },
     { id: 'sports', label: 'Sports' },
-    { id: 'health', label: 'Health' }, // Keeping original mapping but will label as needed
+    { id: 'health', label: 'Health' },
     { id: 'opinion', label: 'Opinion' },
     { id: 'weather', label: 'Weather' },
     { id: 'entertainment', label: 'Entertainment' }
@@ -124,6 +125,8 @@ export default function HomeFeed({ initialPosts }: HomeFeedProps) {
                     stories={sortedPosts}
                 />
             </div>
+
+            <ScrollToTop />
         </div>
     );
 }

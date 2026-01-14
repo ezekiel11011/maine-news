@@ -17,6 +17,29 @@ export async function generateStaticParams() {
     return posts.map((slug) => ({ slug }));
 }
 
+export async function generateMetadata({ params }: ArticlePageProps) {
+    const { slug } = await params;
+    const post = await reader.collections.posts.read(slug);
+
+    if (!post) return {};
+
+    return {
+        title: post.title,
+        openGraph: {
+            title: post.title,
+            images: post.image ? [post.image] : ['/hero-fallback.jpeg'],
+            type: 'article',
+            authors: [post.author],
+            publishedTime: post.publishedDate,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: post.title,
+            images: post.image ? [post.image] : ['/hero-fallback.jpeg'],
+        }
+    };
+}
+
 export default async function ArticlePage({ params }: ArticlePageProps) {
     const { slug } = await params;
     const post = await reader.collections.posts.read(slug);

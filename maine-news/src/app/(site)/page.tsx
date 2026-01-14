@@ -1,5 +1,11 @@
 import HomeFeed from '@/components/home/HomeFeed';
 import { reader } from '@/lib/reader';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Home | Maine News Today',
+  description: 'The latest news, politics, and stories from across the great state of Maine.',
+};
 
 export default async function Home() {
   const posts = await reader.collections.posts.all();

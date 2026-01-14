@@ -1,0 +1,43 @@
+.scrollTop {
+    position: fixed;
+    bottom: calc(var(--bottom-nav-height) + 1.5rem);
+    right: 1.5rem;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    z-index: 800;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.scrollTop:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    background-color: #d4ae3b; /* Slightly lighter gold */
+}
+
+.scrollTop:active {
+    transform: scale(0.95);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.8); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (min-width: 768px) {
+    .scrollTop {
+        bottom: 2rem;
+        right: 2rem;
+        width: 50px;
+        height: 50px;
+    }
+}

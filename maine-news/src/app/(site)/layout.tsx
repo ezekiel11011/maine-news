@@ -16,9 +16,40 @@ const inter = Inter({
   weight: ["400", "600"],
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://mymainenews.com';
+
 export const metadata: Metadata = {
-  title: "Maine News Today",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Maine News Today",
+    template: "%s | Maine News Today"
+  },
   description: "Editorial Minimalism with Live Intelligence. Unbiased. Unafraid. Unfiltered.",
+  alternates: {
+    canonical: './',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: SITE_URL,
+    siteName: 'Maine News Today',
+    title: 'Maine News Today',
+    description: 'Editorial Minimalism with Live Intelligence. Unbiased. Unafraid. Unfiltered.',
+    images: [
+      {
+        url: '/hero-fallback.jpeg',
+        width: 1200,
+        height: 630,
+        alt: 'Maine News Today',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Maine News Today',
+    description: 'Editorial Minimalism with Live Intelligence. Unbiased. Unafraid. Unfiltered.',
+    images: ['/hero-fallback.jpeg'],
+  },
 };
 
 export default function RootLayout({
