@@ -37,6 +37,7 @@ const CATEGORIES = [
 export default function HomeFeed({ initialPosts }: HomeFeedProps) {
     const [activeCategory, setActiveCategory] = useState('all');
     const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
+    const [visibleCount, setVisibleCount] = useState(15);
     const [showFilters, setShowFilters] = useState(false);
 
     // Filter and Sort Logic
@@ -50,6 +51,7 @@ export default function HomeFeed({ initialPosts }: HomeFeedProps) {
         return sortBy === 'newest' ? dateB - dateA : dateA - dateB;
     });
 
+    const visiblePosts = sortedPosts.slice(0, visibleCount);
     const tickerHeadlines = initialPosts.slice(0, 5).map(post => post.title);
     const heroPosts = initialPosts.slice(0, 6);
 
@@ -64,7 +66,10 @@ export default function HomeFeed({ initialPosts }: HomeFeedProps) {
                     {CATEGORIES.map(cat => (
                         <button
                             key={cat.id}
-                            onClick={() => setActiveCategory(cat.id)}
+                            onClick={() => {
+                                setActiveCategory(cat.id);
+                                setVisibleCount(15); // Reset count on category change
+                            }}
                             className={`${styles.tabButton} ${activeCategory === cat.id ? styles.activeTab : ''}`}
                         >
                             {cat.label}
@@ -109,6 +114,7 @@ export default function HomeFeed({ initialPosts }: HomeFeedProps) {
                                 key={cat.id}
                                 onClick={() => {
                                     setActiveCategory(cat.id);
+                                    setVisibleCount(15);
                                     setShowFilters(false);
                                 }}
                                 className={`${styles.filterChip} ${activeCategory === cat.id ? styles.activeChip : ''}`}
@@ -123,8 +129,19 @@ export default function HomeFeed({ initialPosts }: HomeFeedProps) {
             <div className="content-stack">
                 <SectionList
                     title={activeCategory === 'all' ? "Latest News" : `${CATEGORIES.find(c => c.id === activeCategory)?.label} News`}
-                    stories={sortedPosts}
+                    stories={visiblePosts}
                 />
+
+                {visibleCount < sortedPosts.length && (
+                    <div className={styles.loadMoreWrapper}>
+                        <button
+                            onClick={() => setVisibleCount(prev => prev + 15)}
+                            className={styles.loadMoreButton}
+                        >
+                            Load More Stories
+                        </button>
+                    </div>
+                )}
             </div>
 
             <ScrollToTop />

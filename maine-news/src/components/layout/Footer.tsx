@@ -42,6 +42,16 @@ export default function Footer() {
                         <Link href="/privacy">Privacy Policy</Link>
                         <Link href="/terms">Terms of Service</Link>
                     </div>
+
+                    <div className={styles.linkGroup}>
+                        <h3>Download Our App</h3>
+                        <a href="https://apps.apple.com" target="_blank" rel="noopener noreferrer" className={styles.appLink}>
+                            <span>App Store</span>
+                        </a>
+                        <a href="https://play.google.com" target="_blank" rel="noopener noreferrer" className={styles.appLink}>
+                            <span>Google Play</span>
+                        </a>
+                    </div>
                 </div>
 
                 <div className={styles.bottomBar}>

@@ -97,6 +97,31 @@
     color: var(--color-accent);
 }
 
+.appLink {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color-dim);
+    transition: all 0.2s ease !important;
+}
+
+.appLink span {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-accent);
+}
+
+.appLink:hover {
+    background: rgba(191, 155, 48, 0.1);
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+}
+
 .bottomBar {
     border-top: 1px solid var(--border-color-dim);
     padding-top: 2rem;
