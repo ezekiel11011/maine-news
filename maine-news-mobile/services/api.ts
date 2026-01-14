@@ -4,17 +4,18 @@ import Constants from 'expo-constants';
 
 // Get the dev machine IP for physical device testing
 const getApiBaseUrl = () => {
-    // In production builds, always use Vercel
-    if (!__DEV__) {
-        return 'https://maine-news-temp.vercel.app';
+    // Change this to true if you want to test against your local Next.js server
+    const USE_LOCAL_BACKEND = false;
+
+    if (__DEV__ && USE_LOCAL_BACKEND) {
+        const debuggerHost = Constants.expoConfig?.hostUri || '';
+        const localhost = debuggerHost.split(':')[0];
+        if (localhost) {
+            return `http://${localhost}:3000`;
+        }
     }
 
-    const debuggerHost = Constants.expoConfig?.hostUri || '';
-    const localhost = debuggerHost.split(':')[0];
-
-    if (localhost) {
-        return `http://${localhost}:3000`;
-    }
+    // Default to the live production server
     return 'https://maine-news-temp.vercel.app';
 };
 

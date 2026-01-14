@@ -81,11 +81,11 @@ export default function HomeFeed() {
                 activeOpacity={0.9}
             >
                 <View style={styles.heroImagePlaceholder}>
-                    {imageUrl ? (
-                        <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" />
-                    ) : (
-                        <Image source={require('../../assets/logo.jpeg')} style={StyleSheet.absoluteFill} resizeMode="cover" />
-                    )}
+                    <Image
+                        source={imageUrl ? { uri: imageUrl } : require('../../assets/square-logo.png')}
+                        style={StyleSheet.absoluteFill}
+                        resizeMode="cover"
+                    />
                 </View>
                 <View style={styles.heroOverlay} />
                 <View style={styles.heroContent}>
@@ -116,9 +116,11 @@ export default function HomeFeed() {
                 onPress={() => router.push(`/article/${item.slug}`)}
                 activeOpacity={0.7}
             >
-                {imageUrl && (
-                    <Image source={{ uri: imageUrl }} style={styles.cardImage} resizeMode="cover" />
-                )}
+                <Image
+                    source={imageUrl ? { uri: imageUrl } : require('../../assets/hero-fallback.jpeg')}
+                    style={styles.cardImage}
+                    resizeMode="cover"
+                />
                 <View style={styles.cardBody}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.categoryBadge}>{item.category.toUpperCase()}</Text>

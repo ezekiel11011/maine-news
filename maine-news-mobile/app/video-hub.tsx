@@ -59,14 +59,14 @@ export default function VideoHub() {
             onPress={() => handleVideoPress(item)}
         >
             <ImageBackground
-                source={{ uri: item.thumbnail }}
+                source={item.thumbnail ? { uri: item.thumbnail } : require('../assets/hero-fallback.jpeg')}
                 style={styles.thumbnail}
                 imageStyle={{ borderRadius: 8 }}
             >
                 <View style={styles.durationBadge}>
                     <Text style={styles.durationText}>{item.duration}</Text>
                 </View>
-                <View style={styles.playIconContainer}>
+                <View style={[styles.playIconContainer, !item.thumbnail && { backgroundColor: 'rgba(191, 155, 48, 0.2)' }]}>
                     <Play size={32} color={colors.text} fill={colors.text} />
                 </View>
             </ImageBackground>

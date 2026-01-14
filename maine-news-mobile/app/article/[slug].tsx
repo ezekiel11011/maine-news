@@ -198,13 +198,11 @@ export default function ArticleDetail() {
                     </View>
                 </View>
 
-                {getImageUrl(post.image) && (
-                    <Image
-                        source={{ uri: getImageUrl(post.image)! }}
-                        style={styles.heroImage}
-                        resizeMode="cover"
-                    />
-                )}
+                <Image
+                    source={getImageUrl(post.image) ? { uri: getImageUrl(post.image)! } : require('../../assets/hero-fallback.jpeg')}
+                    style={styles.heroImage}
+                    resizeMode="cover"
+                />
 
                 <View style={styles.content}>
                     {renderNode(post.content, 0)}
