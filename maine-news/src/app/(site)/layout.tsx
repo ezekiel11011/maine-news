@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Oswald, Inter } from "next/font/google";
 import Header from "@/components/layout/Header";
 import BottomNav from "@/components/layout/BottomNav";
+import Footer from "@/components/layout/Footer";
 import "../globals.css";
 
 const oswald = Oswald({
@@ -64,6 +65,7 @@ export default function RootLayout({
         <main className="container" style={{ minHeight: '100vh', paddingBottom: '80px' }}>
           {children}
         </main>
+        <Footer />
         <BottomNav />
       </body>
     </html>
