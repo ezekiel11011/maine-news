@@ -13,8 +13,8 @@
   --font-body: var(--font-body-sans);
   
   /* Spacing & Layout */
-  --header-height-mobile: 60px;
-  --header-height-desktop: 80px;
+  --header-height-mobile: 80px;
+  --header-height-desktop: 100px;
   --bottom-nav-height: 60px;
   
   /* Borders */

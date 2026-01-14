@@ -25,6 +25,7 @@ interface HomeFeedProps {
 const CATEGORIES = [
     { id: 'all', label: 'News' },
     { id: 'local', label: 'Local' },
+    { id: 'national', label: 'National' },
     { id: 'politics', label: 'Politics' },
     { id: 'sports', label: 'Sports' },
     { id: 'health', label: 'Health' },

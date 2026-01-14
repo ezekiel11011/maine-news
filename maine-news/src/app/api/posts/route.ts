@@ -37,7 +37,7 @@ export async function GET(request: Request) {
             return dateB - dateA;
         });
 
-        return NextResponse.json(formattedPosts);
+        return NextResponse.json({ posts: formattedPosts });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 });
     }

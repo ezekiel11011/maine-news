@@ -33,6 +33,7 @@ export default config({
                     options: [
                         { label: 'Top Stories', value: 'top-stories' },
                         { label: 'Local', value: 'local' },
+                        { label: 'National', value: 'national' },
                         { label: 'Politics', value: 'politics' },
                         { label: 'Opinion', value: 'opinion' },
                         { label: 'Health', value: 'health' },

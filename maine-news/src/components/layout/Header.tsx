@@ -1,11 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Search, Menu } from 'lucide-react';
+import { Search, Menu, CloudSun, Facebook, Instagram, Twitter, ShieldCheck } from 'lucide-react';
 import styles from './Header.module.css';
-
-// Basic placeholders for interactivity
-// In a real app we would use a context or state for these
-// For now, ensuring UI elements are present as per spec
 
 export default function Header() {
     return (
@@ -29,13 +25,33 @@ export default function Header() {
                 <Link href="/opinion" className={styles.desktopNavLink}>Opinion</Link>
             </nav>
 
-            <div className={styles.actions}>
-                <Link href="/submit" className={styles.tipButton}>
-                    <span>Send Tip</span>
-                </Link>
-                <Link href="/search" className={styles.iconButton} aria-label="Search">
-                    <Search size={22} strokeWidth={1.5} />
-                </Link>
+            <div className={styles.actionsContainer}>
+                <div className={styles.topActions}>
+                    <Link href="/weather" className={styles.iconButton} aria-label="Weather">
+                        <CloudSun size={24} strokeWidth={1.5} color="var(--color-accent)" />
+                    </Link>
+                    <Link href="/submit" className={styles.tipButton}>
+                        <span>Send Tip</span>
+                    </Link>
+                    <Link href="/search" className={styles.iconButton} aria-label="Search">
+                        <Search size={22} strokeWidth={1.5} />
+                    </Link>
+                </div>
+
+                <div className={styles.headerSocials}>
+                    <a href="https://www.facebook.com/share/1DWXu7JBHo/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">
+                        <Facebook size={14} />
+                    </a>
+                    <a href="https://www.instagram.com/maine_news_today?igsh=NXo3OHJzMmRwbXRq&utm_source=qr" target="_blank" rel="noopener noreferrer">
+                        <Instagram size={14} />
+                    </a>
+                    <a href="#" target="_blank" rel="noopener noreferrer">
+                        <Twitter size={14} />
+                    </a>
+                    <a href="#" target="_blank" rel="noopener noreferrer">
+                        <ShieldCheck size={14} />
+                    </a>
+                </div>
             </div>
         </header>
     );

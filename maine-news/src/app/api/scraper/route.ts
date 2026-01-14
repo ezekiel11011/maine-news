@@ -35,11 +35,13 @@ const MAINE_FEEDS = [
 ];
 
 const NATIONAL_FEEDS = [
-    { url: 'https://moxie.foxnews.com/google-publisher/politics.xml', name: 'Fox News Politics', type: 'national' },
-    { url: 'https://www.pbs.org/newshour/feeds/rss/politics', name: 'PBS NewsHour Politics', type: 'national' },
+    { url: 'https://moxie.foxnews.com/google-publisher/latest.xml', name: 'Fox News', type: 'national' },
+    { url: 'https://feeds.a.dj.com/rss/RSSWorldNews.xml', name: 'WSJ World', type: 'national' },
+    { url: 'https://www.newsmax.com/rss/Newsfront/1/', name: 'Newsmax', type: 'national' },
+    { url: 'https://news.google.com/rss/search?q=source:Associated+Press&hl=en-US&gl=US&ceid=US:en', name: 'AP News', type: 'national' },
+    { url: 'https://moxie.foxnews.com/google-publisher/politics.xml', name: 'Fox Politics', type: 'national' },
+    { url: 'https://www.pbs.org/newshour/feeds/rss/politics', name: 'PBS NewsHour', type: 'national' },
     { url: 'https://www.politico.com/rss/politicopicks.xml', name: 'Politico', type: 'national' },
-    { url: 'https://moxie.foxnews.com/google-publisher/sports.xml', name: 'Fox Sports', type: 'national' },
-    { url: 'https://www.cnbc.com/id/10000110/device/rss/rss.html', name: 'CNBC Entertainment', type: 'national' },
 ];
 
 const VIDEO_FEEDS = [
@@ -79,7 +81,7 @@ interface ScrapedStory {
     content: string;
     source: string;
     sourceUrl: string;
-    category: string;
+    category: 'local' | 'national' | 'politics' | 'opinion' | 'top-stories' | 'health' | 'sports' | 'weather' | 'entertainment';
     region?: string;
     locations: string[];
     publishedDate: string;
@@ -114,7 +116,7 @@ function detectRegion(locations: string[]): string | undefined {
     return undefined;
 }
 
-function categorizeStory(text: string, feedType: string): 'local' | 'politics' | 'opinion' | 'top-stories' | 'health' | 'sports' | 'weather' | 'entertainment' {
+function categorizeStory(text: string, feedType: string): 'local' | 'national' | 'politics' | 'opinion' | 'top-stories' | 'health' | 'sports' | 'weather' | 'entertainment' {
     const lowerText = text.toLowerCase();
 
     // If from health feed, default to health category
@@ -123,7 +125,7 @@ function categorizeStory(text: string, feedType: string): 'local' | 'politics' |
     }
 
     let maxScore = 0;
-    let category: 'local' | 'politics' | 'opinion' | 'top-stories' | 'health' | 'sports' | 'weather' | 'entertainment' = feedType === 'national' ? 'politics' : 'local';
+    let category: 'local' | 'national' | 'politics' | 'opinion' | 'top-stories' | 'health' | 'sports' | 'weather' | 'entertainment' = feedType === 'national' ? 'national' : 'local';
 
     for (const [cat, keywords] of Object.entries(TOPIC_KEYWORDS)) {
         const score = keywords.filter(kw => lowerText.includes(kw)).length;
