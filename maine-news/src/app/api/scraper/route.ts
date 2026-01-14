@@ -26,9 +26,10 @@ const REGIONS = {
 
 // RSS Feed sources - Maine + National
 const MAINE_FEEDS = [
-    { url: 'https://www.maine.gov/tools/whatsnew/rss.php?id=portal-news', name: 'Maine.gov', type: 'maine' },
+    { url: 'https://www.newscentermaine.com/feeds/rss/news/local/maine', name: 'News Center Maine', type: 'maine' },
     { url: 'https://www.pressherald.com/feed/', name: 'Press Herald', type: 'maine' },
     { url: 'https://www.bangordailynews.com/feed/', name: 'Bangor Daily News', type: 'maine' },
+    { url: 'https://www.maine.gov/tools/whatsnew/rss.php?id=portal-news', name: 'Maine.gov', type: 'maine' },
 ];
 
 const NATIONAL_FEEDS = [
@@ -38,8 +39,8 @@ const NATIONAL_FEEDS = [
 ];
 
 const VIDEO_FEEDS = [
-    { url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UC6_K2_70rW3_8p_q6jM9Y5A', name: 'News Center Maine', type: 'broadcast' },
-    { url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCY7K2YmRIn25D0XU759kLXQ', name: 'WABI 5 News', type: 'broadcast' },
+    { url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCYfdidRxbB8Qhf0Nx7ioOYw', name: 'News Center Maine', type: 'broadcast' },
+    { url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCLubgoPg9ahtXP1Mpq3J0uA', name: 'WABI 5 News', type: 'broadcast' },
 ];
 
 const ALL_FEEDS = [...MAINE_FEEDS, ...NATIONAL_FEEDS];
@@ -146,7 +147,11 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
     try {
         // Use fetch with a browser-like User-Agent to avoid bot-blocking 404s
         const res = await fetch(feedUrl, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36' }
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml,application/rss+xml;q=0.9,*/*;q=0.8',
+                'Referer': 'https://www.google.com/'
+            }
         });
 
         if (!res.ok) throw new Error(`Status ${res.status}`);
@@ -164,7 +169,11 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
             if (link && (content.length < 500 || content.includes('read more') || content.includes('...'))) {
                 try {
                     const pageRes = await fetch(link, {
-                        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36' }
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                            'Accept': 'text/html,application/xhtml+xml,application/xml,application/rss+xml;q=0.9,*/*;q=0.8',
+                            'Referer': 'https://www.google.com/'
+                        }
                     });
                     if (pageRes.ok) {
                         const html = await pageRes.text();
@@ -238,19 +247,20 @@ async function commitBatchToGitHub(files: { path: string, content: string }[], m
     try {
         // 1. Get the latest commit SHA of the main branch
         const branchRes = await fetch(`${baseUrl}/git/refs/heads/main`, { headers });
+        if (!branchRes.ok) throw new Error(`[Step 1] Branch ref failed: ${branchRes.status}`);
         const branchData = await branchRes.json();
         const baseCommitSha = branchData.object.sha;
 
         // 2. Get the tree SHA of that commit
         const commitRes = await fetch(`${baseUrl}/git/commits/${baseCommitSha}`, { headers });
+        if (!commitRes.ok) throw new Error(`[Step 2] Base commit failed: ${commitRes.status}`);
         const commitData = await commitRes.json();
         const baseTreeSha = commitData.tree.sha;
 
         // 3. Create a new tree with the added files
-        // We only add new files, existing ones are kept via base_tree
         const treeItems = files.map(file => ({
             path: file.path,
-            mode: '100644', // normal file
+            mode: '100644',
             type: 'blob',
             content: file.content
         }));
@@ -263,6 +273,7 @@ async function commitBatchToGitHub(files: { path: string, content: string }[], m
                 tree: treeItems
             })
         });
+        if (!treeRes.ok) throw new Error(`[Step 3] Tree creation failed: ${treeRes.status}`);
         const treeData = await treeRes.json();
         const newTreeSha = treeData.sha;
 
@@ -276,6 +287,7 @@ async function commitBatchToGitHub(files: { path: string, content: string }[], m
                 parents: [baseCommitSha]
             })
         });
+        if (!newCommitRes.ok) throw new Error(`[Step 4] Commit creation failed: ${newCommitRes.status}`);
         const newCommitData = await newCommitRes.json();
         const newCommitSha = newCommitData.sha;
 
@@ -289,7 +301,10 @@ async function commitBatchToGitHub(files: { path: string, content: string }[], m
             })
         });
 
-        if (!refRes.ok) throw new Error(await refRes.text());
+        if (!refRes.ok) {
+            const errorText = await refRes.text();
+            throw new Error(`[Step 5] Ref update failed: ${refRes.status} - ${errorText}`);
+        }
 
         console.log(`[GITHUB] Successfully committed ${files.length} files in one batch.`);
         return files.length;
