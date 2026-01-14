@@ -1,9 +1,17 @@
 import { config, fields, collection } from '@keystatic/core';
 
 export default config({
-    storage: {
-        kind: 'local',
-    },
+    storage: (process.env.NODE_ENV === 'production' && process.env.KEYSTATIC_GITHUB_CLIENT_ID && process.env.KEYSTATIC_GITHUB_CLIENT_SECRET)
+        ? {
+            kind: 'github',
+            repo: {
+                owner: 'carnage999-max',
+                name: 'maine-news',
+            },
+        }
+        : {
+            kind: 'local',
+        },
     collections: {
         posts: collection({
             label: 'Posts',

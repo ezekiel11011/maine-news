@@ -24,14 +24,14 @@ const REGIONS = {
 
 // RSS Feed sources - Maine + National
 const MAINE_FEEDS = [
-    { url: 'https://apnews.com/rss', name: 'AP News', type: 'maine' },
-    { url: 'https://www.maine.gov/portal/news/rss.xml', name: 'Maine.gov', type: 'maine' },
+    { url: 'https://www.maine.gov/tools/whatsnew/rss.php?id=portal-news', name: 'Maine.gov', type: 'maine' },
+    { url: 'https://www.pressherald.com/feed/', name: 'Press Herald', type: 'maine' },
 ];
 
 const NATIONAL_FEEDS = [
     { url: 'https://moxie.foxnews.com/google-publisher/politics.xml', name: 'Fox News Politics', type: 'national' },
+    { url: 'https://feeds.a.commonwealth.com/news-politics', name: 'AP Politics (via Mirror)', type: 'national' },
     { url: 'https://www.newsweek.com/rss', name: 'Newsweek', type: 'national' },
-    { url: 'https://www.cdc.gov/rss/cdcnewsroom.xml', name: 'CDC', type: 'health' },
 ];
 
 const VIDEO_FEEDS = [
@@ -142,7 +142,15 @@ function sanitizeForFilename(text: string): string {
 
 async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'maine' | 'national' | 'health'): Promise<ScrapedStory[]> {
     try {
-        const feed = await parser.parseURL(feedUrl);
+        // Use fetch with a browser-like User-Agent to avoid bot-blocking 404s
+        const res = await fetch(feedUrl, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36' }
+        });
+
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const xml = await res.text();
+
+        const feed = await parser.parseString(xml);
         const stories: ScrapedStory[] = [];
 
         for (const item of feed.items) {
@@ -180,9 +188,67 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
     }
 }
 
+async function saveToGitHub(path: string, content: string, message: string): Promise<boolean> {
+    const token = process.env.KEYSTATIC_GITHUB_TOKEN || process.env.GITHUB_TOKEN;
+    if (!token) {
+        console.error('[GITHUB] No token found for GitHub persistence');
+        return false;
+    }
+
+    const repo = 'carnage999-max/maine-news';
+    const branch = 'main';
+    const url = `https://api.github.com/repos/${repo}/contents/${path}`;
+
+    try {
+        // Check if file exists to get SHA
+        const checkRes = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        let sha: string | undefined;
+        if (checkRes.ok) {
+            const data = await checkRes.json();
+            sha = data.sha;
+        }
+
+        const res = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message,
+                content: Buffer.from(content).toString('base64'),
+                branch,
+                sha
+            })
+        });
+
+        if (!res.ok) {
+            const err = await res.text();
+            console.error(`[GITHUB] Failed to push to ${path}:`, err);
+            return false;
+        }
+
+        console.log(`[GITHUB] Successfully committed ${path}`);
+        return true;
+    } catch (error) {
+        console.error(`[GITHUB] Error pushing ${path}:`, error);
+        return false;
+    }
+}
+
 async function parseVideoFeed(feedUrl: string, sourceName: string): Promise<ScrapedVideo[]> {
     try {
-        const feed = await parser.parseURL(feedUrl);
+        const res = await fetch(feedUrl, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36' }
+        });
+
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const xml = await res.text();
+
+        const feed = await parser.parseString(xml);
         return feed.items.map(item => {
             const videoId = item.link?.split('v=')[1] || item.id?.split(':')[2] || '';
             return {
@@ -207,21 +273,8 @@ async function saveVideoToKeystatic(video: ScrapedVideo): Promise<boolean> {
     try {
         const slug = sanitizeForFilename(video.title);
         const filename = `${slug}.mdoc`;
-        const filepath = path.join(process.cwd(), 'src/content/videos', filename);
-
-        // Ensure directory exists
-        const dir = path.dirname(filepath);
-        try {
-            await fs.access(dir);
-        } catch {
-            await fs.mkdir(dir, { recursive: true });
-        }
-
-        // Check if file already exists
-        try {
-            await fs.access(filepath);
-            return false;
-        } catch { }
+        const relativePath = `src/content/videos/${filename}`;
+        const filepath = path.join(process.cwd(), relativePath);
 
         const frontmatter = `---
 title: ${video.title}
@@ -240,6 +293,24 @@ ${video.description}
 *Source: ${video.source}*
 `;
 
+        if (process.env.NODE_ENV === 'production') {
+            return await saveToGitHub(relativePath, frontmatter, `chore: add video ${slug} [skip ci]`);
+        }
+
+        // Ensure directory exists
+        const dir = path.dirname(filepath);
+        try {
+            await fs.access(dir);
+        } catch {
+            await fs.mkdir(dir, { recursive: true });
+        }
+
+        // Check if file already exists
+        try {
+            await fs.access(filepath);
+            return false;
+        } catch { }
+
         await fs.writeFile(filepath, frontmatter, 'utf-8');
         return true;
     } catch (error) {
@@ -256,16 +327,8 @@ async function saveToKeystatic(story: ScrapedStory): Promise<boolean> {
     try {
         const slug = sanitizeForFilename(story.title);
         const filename = `${slug}.mdoc`;
-        const filepath = path.join(process.cwd(), 'src/content/posts', filename);
-
-        // Check if file already exists
-        try {
-            await fs.access(filepath);
-            console.log(`Story already exists: ${slug}`);
-            return false;
-        } catch {
-            // File doesn't exist, proceed
-        }
+        const relativePath = `src/content/posts/${filename}`;
+        const filepath = path.join(process.cwd(), relativePath);
 
         const frontmatter = `---
 title: ${story.title}
@@ -283,6 +346,19 @@ ${story.content}
 ${story.locations.length > 0 ? `\n*Locations: ${story.locations.join(', ')}*` : ''}
 ${story.region ? `\n*Region: ${story.region}*` : ''}
 `;
+
+        if (process.env.NODE_ENV === 'production') {
+            return await saveToGitHub(relativePath, frontmatter, `chore: add article ${slug} [skip ci]`);
+        }
+
+        // Check if file already exists
+        try {
+            await fs.access(filepath);
+            console.log(`Story already exists: ${slug}`);
+            return false;
+        } catch {
+            // File doesn't exist, proceed
+        }
 
         await fs.writeFile(filepath, frontmatter, 'utf-8');
         console.log(`Saved story: ${slug}`);
