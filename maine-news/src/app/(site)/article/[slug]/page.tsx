@@ -19,10 +19,15 @@ export const dynamic = 'force-dynamic';
 export async function generateMetadata({ params }: ArticlePageProps) {
     const { slug } = await params;
 
-    // Check DB first
-    const dbPost = await db.query.posts.findFirst({
-        where: eq(dbPosts.slug, slug),
-    });
+    // Check DB first (with error handling)
+    let dbPost = null;
+    try {
+        dbPost = await db.query.posts.findFirst({
+            where: eq(dbPosts.slug, slug),
+        });
+    } catch (error) {
+        console.error('Database connection failed in metadata generation:', error);
+    }
 
     if (dbPost) {
         return {
@@ -56,10 +61,15 @@ export async function generateMetadata({ params }: ArticlePageProps) {
 export default async function ArticlePage({ params }: ArticlePageProps) {
     const { slug } = await params;
 
-    // 1. Try fetching from Database
-    const dbPost = await db.query.posts.findFirst({
-        where: eq(dbPosts.slug, slug),
-    });
+    // 1. Try fetching from Database (with error handling)
+    let dbPost = null;
+    try {
+        dbPost = await db.query.posts.findFirst({
+            where: eq(dbPosts.slug, slug),
+        });
+    } catch (error) {
+        console.error('Database query failed, falling back to Keystatic:', error);
+    }
 
     if (dbPost) {
         return (

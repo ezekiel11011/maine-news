@@ -13,13 +13,18 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  // Fetch from both sources
-  const [keystaticPosts, authoredPosts] = await Promise.all([
-    reader.collections.posts.all(),
-    db.query.posts.findMany({
+  // Fetch from both sources with error handling
+  let authoredPosts: any[] = [];
+
+  try {
+    authoredPosts = await db.query.posts.findMany({
       orderBy: [desc(dbPosts.publishedDate)],
-    })
-  ]);
+    });
+  } catch (error) {
+    console.error('Database connection failed, using Keystatic posts only:', error);
+  }
+
+  const keystaticPosts = await reader.collections.posts.all();
 
   // Transform filesystem posts
   const formattedKeystaticPosts = keystaticPosts.map(post => ({
