@@ -16,7 +16,7 @@ export default config({
         posts: collection({
             label: 'Posts',
             slugField: 'title',
-            path: 'maine-news/src/content/posts/*',
+            path: 'src/content/posts/*',
             format: { contentField: 'content' },
             schema: {
                 title: fields.slug({ name: { label: 'Title' } }),
@@ -59,7 +59,7 @@ export default config({
         authors: collection({
             label: 'Authors',
             slugField: 'name',
-            path: 'maine-news/src/content/authors/*',
+            path: 'src/content/authors/*',
             schema: {
                 name: fields.slug({ name: { label: 'Name' } }),
                 avatar: fields.image({
@@ -73,7 +73,7 @@ export default config({
         videos: collection({
             label: 'Videos',
             slugField: 'title',
-            path: 'maine-news/src/content/videos/*',
+            path: 'src/content/videos/*',
             schema: {
                 title: fields.slug({ name: { label: 'Title' } }),
                 videoUrl: fields.text({ label: 'Video URL' }),
