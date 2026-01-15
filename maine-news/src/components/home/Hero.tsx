@@ -33,7 +33,7 @@ export default function Hero({ posts }: HeroProps) {
     useEffect(() => {
         if (!posts || posts.length <= 1 || isPaused) return;
 
-        const timer = setInterval(nextSlide, 3500); // 3.5 seconds for a premium feel
+        const timer = setInterval(nextSlide, 5000); // 5 seconds for a more relaxed pace
 
         return () => clearInterval(timer);
     }, [posts, isPaused, nextSlide]);

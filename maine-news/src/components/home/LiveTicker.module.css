@@ -39,7 +39,7 @@
 .track {
   display: flex;
   white-space: nowrap;
-  animation: scroll 12s linear infinite;
+  animation: scroll 8s linear infinite;
   padding-left: 20px;
 }
 

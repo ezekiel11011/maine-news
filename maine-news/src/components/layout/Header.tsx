@@ -8,7 +8,7 @@ export default function Header() {
         <header className={styles.header}>
             <Link href="/" className={styles.logoWrapper}>
                 <Image
-                    src="/maine-news-longer-img.jpeg"
+                    src="/maine-news-now.png"
                     alt="Maine News Today"
                     width={180}
                     height={40}
