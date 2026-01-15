@@ -155,7 +155,7 @@
   top: 100%;
   left: 0;
   width: 100%;
-  background: var(--color-accent);
+  background: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -179,7 +179,7 @@
 
 @media (min-width: 768px) {
     .socialBar {
-        background: transparent;
+        background: #ffffff;
         position: absolute;
         bottom: 0.5rem;
         left: 50%;

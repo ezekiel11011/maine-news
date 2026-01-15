@@ -39,6 +39,19 @@
   font-weight: 700;
 }
 
+.metaRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.date {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+}
+
 .title {
   font-size: 1.1rem;
   line-height: 1.3;

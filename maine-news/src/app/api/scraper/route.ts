@@ -28,7 +28,7 @@ const REGIONS = {
 const MAINE_FEEDS = [
     { url: 'https://www.newscentermaine.com/feeds/syndication/rss/news/local', name: 'News Center Maine', type: 'maine' },
     { url: 'https://www.pressherald.com/feed/', name: 'Press Herald', type: 'maine' },
-    { url: 'https://www.bangordailynews.com/feed/', name: 'Bangor Daily News', type: 'maine' },
+    // { url: 'https://www.bangordailynews.com/feed/', name: 'Bangor Daily News', type: 'maine' },
     { url: 'https://www.maine.gov/tools/whatsnew/rss.php?id=portal-news', name: 'Maine.gov', type: 'maine' },
     { url: 'https://www.newscentermaine.com/feeds/syndication/rss/weather', name: 'NCM Weather', type: 'maine' },
     { url: 'https://www.wabi.tv/feeds/syndication/rss/sports', name: 'WABI Sports', type: 'maine' },
@@ -233,8 +233,8 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
 
             // Fallback: search for first <img> tag in the original content/summary
             if (!image) {
-                const searchArea = (item.content || item.summary || item.contentSnippet || '');
-                const imgMatch = searchArea.match(/<img[^>]+src="([^">]+)"/i);
+                const searchArea = (item.content || item.summary || item.contentSnippet || '') + (item['content:encoded'] || '');
+                const imgMatch = searchArea.match(/<img[^>]+src=["']([^"']+)["']/i);
                 if (imgMatch) {
                     image = imgMatch[1];
                 }

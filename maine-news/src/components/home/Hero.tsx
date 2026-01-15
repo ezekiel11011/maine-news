@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './Hero.module.css';
+import { formatTimeAgo } from '@/utils/formatDate';
 
 interface HeroPost {
     title: string;
@@ -12,6 +13,7 @@ interface HeroPost {
     image?: string;
     category: string;
     author: string;
+    publishedDate: string;
 }
 
 interface HeroProps {
@@ -95,7 +97,7 @@ export default function Hero({ posts }: HeroProps) {
                             }}
                         >
                             <Image
-                                src={post.image || "/hero-fallback.jpeg"}
+                                src={post.image || "/maine-news-now.png"}
                                 alt={post.title}
                                 fill
                                 className={styles.image}
@@ -113,7 +115,9 @@ export default function Hero({ posts }: HeroProps) {
                         <span className={styles.badge}>{currentPost.category}</span>
                     </div>
                     <h1 className={styles.title}>{currentPost.title}</h1>
-                    <p className={styles.subtitle}>By {currentPost.author} • Unbiased. Unafraid. Unfiltered.</p>
+                    <p className={styles.subtitle}>
+                        By {currentPost.author} • {formatTimeAgo(currentPost.publishedDate)} • Unbiased. Unafraid. Unfiltered.
+                    </p>
 
                     <div className={styles.indicators}>
                         {posts.map((_, index) => (

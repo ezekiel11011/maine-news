@@ -6,6 +6,8 @@ interface Story {
     title: string;
     image?: string;
     slug: string;
+    publishedDate: string;
+    category?: string;
 }
 
 interface SectionProps {
@@ -27,6 +29,8 @@ export default function SectionList({ title, stories }: SectionProps) {
                         title={story.title}
                         image={story.image}
                         slug={story.slug}
+                        publishedDate={story.publishedDate}
+                        category={story.category}
                     />
                 ))}
             </div>
