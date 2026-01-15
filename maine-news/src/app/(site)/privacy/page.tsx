@@ -81,7 +81,7 @@ export default function PrivacyPage() {
 
                 <section>
                     <h2>14. Updates to This Policy</h2>
-                    <p>We may update this Policy to reflect legal, technical, or business developments. The latest version will always be available on our website, with a new 'Last Updated' date. Continued use of our Services constitutes acceptance of any modifications.</p>
+                    <p>We may update this Policy to reflect legal, technical, or business developments. The latest version will always be available on our website, with a new &apos;Last Updated&apos; date. Continued use of our Services constitutes acceptance of any modifications.</p>
                 </section>
 
                 <p>© 2026 Maine News Today. All rights reserved.</p>

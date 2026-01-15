@@ -1,8 +1,8 @@
 import React from 'react';
-import Markdoc from '@markdoc/markdoc';
+import Markdoc, { type RenderableTreeNode } from '@markdoc/markdoc';
 
 interface MarkdocRendererProps {
-    content: { node: any };
+    content: { node: RenderableTreeNode };
 }
 
 export default function MarkdocRenderer({ content }: MarkdocRendererProps) {

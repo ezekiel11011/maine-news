@@ -38,7 +38,7 @@ export default function ArticleActions({ title, url }: ArticleActionsProps) {
                     title,
                     url,
                 });
-            } catch (error) {
+            } catch {
                 // User cancelled or error occurred
                 setShowShareModal(true);
             }

@@ -1,15 +1,43 @@
 import Link from 'next/link';
 import { reader } from '@/lib/reader';
+import { db } from '@/db';
+import { posts as dbPosts } from '@/db/schema';
+import { desc } from 'drizzle-orm';
 import styles from './Latest.module.css';
 
+export const dynamic = 'force-dynamic';
+
 export default async function LatestPage() {
-    const posts = await reader.collections.posts.all();
+    const [keystaticPosts, authoredPosts] = await Promise.all([
+        reader.collections.posts.all(),
+        db.query.posts.findMany({
+            orderBy: [desc(dbPosts.publishedDate)],
+        })
+    ]);
+
+    const formattedKeystatic = keystaticPosts.map(post => ({
+        slug: post.slug,
+        title: post.entry.title as string,
+        category: post.entry.category as string,
+        publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
+        author: post.entry.author as string || 'Staff',
+    }));
+
+    const formattedAuthored = authoredPosts.map(post => ({
+        slug: post.slug,
+        title: post.title,
+        category: post.category,
+        publishedDate: post.publishedDate.toISOString(),
+        author: post.author,
+    }));
+
+    const allPosts = [...formattedAuthored, ...formattedKeystatic];
 
     // Sort by date descending
-    const sortedPosts = posts.sort((a, b) => {
-        const dateA = new Date(a.entry.publishedDate || '');
-        const dateB = new Date(b.entry.publishedDate || '');
-        return dateB.getTime() - dateA.getTime();
+    allPosts.sort((a, b) => {
+        const dateA = new Date(a.publishedDate).getTime();
+        const dateB = new Date(b.publishedDate).getTime();
+        return dateB - dateA;
     });
 
     return (
@@ -20,14 +48,14 @@ export default async function LatestPage() {
             </header>
 
             <div className={styles.grid}>
-                {sortedPosts.map((post) => (
+                {allPosts.map((post) => (
                     <Link key={post.slug} href={`/article/${post.slug}`} className={styles.card}>
                         <div className={styles.meta}>
-                            <span className={styles.category}>{post.entry.category}</span>
-                            <span className={styles.date}>{post.entry.publishedDate?.toString()}</span>
+                            <span className={styles.category}>{post.category}</span>
+                            <span className={styles.date}>{new Date(post.publishedDate).toLocaleDateString()}</span>
                         </div>
-                        <h2 className={styles.headline}>{post.entry.title}</h2>
-                        <p className={styles.author}>By {post.entry.author}</p>
+                        <h2 className={styles.headline}>{post.title}</h2>
+                        <p className={styles.author}>By {post.author}</p>
                     </Link>
                 ))}
             </div>

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Search, Menu, CloudSun, Facebook, Instagram, Twitter, ShieldCheck, Youtube } from 'lucide-react';
+import { Search, CloudSun, Facebook, Instagram, Youtube } from 'lucide-react';
 import styles from './Header.module.css';
 
 export default function Header() {

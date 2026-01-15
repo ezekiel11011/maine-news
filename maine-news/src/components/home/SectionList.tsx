@@ -23,7 +23,7 @@ export default function SectionList({ title, stories }: SectionProps) {
                 <div className={styles.divider} />
             </div>
             <div className={styles.grid}>
-                {stories.map((story, index) => (
+                {stories.map((story) => (
                     <StoryCard
                         key={story.id}
                         title={story.title}

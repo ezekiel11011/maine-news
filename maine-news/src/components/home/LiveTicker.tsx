@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import styles from './LiveTicker.module.css';
 
 interface LiveTickerProps {
@@ -8,7 +8,7 @@ interface LiveTickerProps {
 }
 
 export default function LiveTicker({ headlines }: LiveTickerProps) {
-    const items = headlines.length > 0 ? headlines : ["No breaking news at this time"];
+    const items = useMemo(() => headlines.length > 0 ? headlines : ["No breaking news at this time"], [headlines]);
     const [scrollWidth, setScrollWidth] = useState(0);
     const itemsRef = useRef<HTMLDivElement>(null);
 
@@ -32,11 +32,11 @@ export default function LiveTicker({ headlines }: LiveTickerProps) {
                     } as React.CSSProperties}
                 >
                     {items.map((item, i) => (
-                        <span key={i} className={styles.item}>{item} <span className={styles.separator}>///</span></span>
+                        <span key={i} className={styles.item}>{item} <span className={styles.separator}>{'///'}</span></span>
                     ))}
                     {/* Duplicate for seamless loop */}
                     {items.map((item, i) => (
-                        <span key={`dup-${i}`} className={styles.item}>{item} <span className={styles.separator}>///</span></span>
+                        <span key={`dup-${i}`} className={styles.item}>{item} <span className={styles.separator}>{'///'}</span></span>
                     ))}
                 </div>
             </div>

@@ -1,26 +1,56 @@
 import { Metadata } from 'next';
 import SectionList from '@/components/home/SectionList';
 import { reader } from '@/lib/reader';
+import { db } from '@/db';
+import { posts as dbPosts } from '@/db/schema';
+import { desc, eq } from 'drizzle-orm';
 
 export const metadata: Metadata = {
     title: 'Maine Weather | Maine News Today',
     description: 'Latest weather updates, forecasts, and storm alerts for the Pine Tree State.',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function WeatherPage() {
-    const allPosts = await reader.collections.posts.all();
-    const weatherPosts = allPosts
+    const [keystaticPosts, authoredPosts] = await Promise.all([
+        reader.collections.posts.all(),
+        db.query.posts.findMany({
+            where: eq(dbPosts.category, 'weather'),
+            orderBy: [desc(dbPosts.publishedDate)],
+        })
+    ]);
+
+    const formattedKeystatic = keystaticPosts
         .filter(post => post.entry.category === 'weather')
         .map(post => ({
             id: post.slug,
-            title: post.entry.title,
+            title: post.entry.title as string,
             slug: post.slug,
-            image: post.entry.image ?? undefined,
-            category: post.entry.category,
-            publishedDate: post.entry.publishedDate ?? new Date().toISOString(),
-            author: post.entry.author,
-        }))
-        .sort((a, b) => new Date(b.publishedDate || '').getTime() - new Date(a.publishedDate || '').getTime());
+            image: (post.entry.image as unknown as string) ?? undefined,
+            category: post.entry.category as string,
+            publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
+            author: post.entry.author as string || 'Staff',
+        }));
+
+    const formattedAuthored = authoredPosts.map(post => ({
+        id: post.id,
+        title: post.title,
+        slug: post.slug,
+        image: post.image || undefined,
+        category: post.category,
+        publishedDate: post.publishedDate.toISOString(),
+        author: post.author,
+    }));
+
+    const allWeatherPosts = [...formattedAuthored, ...formattedKeystatic];
+
+    // Sort by date descending
+    allWeatherPosts.sort((a, b) => {
+        const dateA = new Date(a.publishedDate).getTime();
+        const dateB = new Date(b.publishedDate).getTime();
+        return dateB - dateA;
+    });
 
     return (
         <main className="container" style={{ padding: '2rem 1rem' }}>
@@ -31,8 +61,8 @@ export default async function WeatherPage() {
                 </p>
             </div>
 
-            {weatherPosts.length > 0 ? (
-                <SectionList title="Latest Weather Reports" stories={weatherPosts} />
+            {allWeatherPosts.length > 0 ? (
+                <SectionList title="Latest Weather Reports" stories={allWeatherPosts} />
             ) : (
                 <div style={{ textAlign: 'center', padding: '4rem', background: '#111', borderRadius: '12px' }}>
                     <p style={{ opacity: 0.5 }}>Currently tracking fair skies. Check back soon for new weather updates.</p>

@@ -1,18 +1,45 @@
 import Link from 'next/link';
 import { reader } from '@/lib/reader';
+import { db } from '@/db';
+import { posts as dbPosts } from '@/db/schema';
+import { desc, eq } from 'drizzle-orm';
 import styles from './Opinion.module.css';
 
-export default async function OpinionPage() {
-    const posts = await reader.collections.posts.all();
+export const dynamic = 'force-dynamic';
 
-    // Filter for Opinion and sort by date
-    const opinionPosts = posts
+export default async function OpinionPage() {
+    const [keystaticPosts, authoredPosts] = await Promise.all([
+        reader.collections.posts.all(),
+        db.query.posts.findMany({
+            where: eq(dbPosts.category, 'opinion'),
+            orderBy: [desc(dbPosts.publishedDate)],
+        })
+    ]);
+
+    const formattedKeystatic = keystaticPosts
         .filter(post => post.entry.category === 'opinion')
-        .sort((a, b) => {
-            const dateA = new Date(a.entry.publishedDate || '');
-            const dateB = new Date(b.entry.publishedDate || '');
-            return dateB.getTime() - dateA.getTime();
-        });
+        .map(post => ({
+            slug: post.slug,
+            title: post.entry.title as string,
+            author: post.entry.author as string || 'Staff',
+            publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
+        }));
+
+    const formattedAuthored = authoredPosts.map(post => ({
+        slug: post.slug,
+        title: post.title,
+        author: post.author,
+        publishedDate: post.publishedDate.toISOString(),
+    }));
+
+    const allOpinionPosts = [...formattedAuthored, ...formattedKeystatic];
+
+    // Sort by date descending
+    allOpinionPosts.sort((a, b) => {
+        const dateA = new Date(a.publishedDate).getTime();
+        const dateB = new Date(b.publishedDate).getTime();
+        return dateB - dateA;
+    });
 
     return (
         <main className={styles.container}>
@@ -22,16 +49,15 @@ export default async function OpinionPage() {
             </header>
 
             <div className={styles.list}>
-                {opinionPosts.length > 0 ? (
-                    opinionPosts.map((post) => (
+                {allOpinionPosts.length > 0 ? (
+                    allOpinionPosts.map((post) => (
                         <Link key={post.slug} href={`/article/${post.slug}`} className={styles.card}>
                             <div className={styles.authorBadge}>
-                                {/* Placeholder for author image if available */}
                                 <div className={styles.avatarPlaceholder} />
                             </div>
                             <div className={styles.content}>
-                                <h2 className={styles.headline}>{post.entry.title}</h2>
-                                <p className={styles.author}>{post.entry.author}</p>
+                                <h2 className={styles.headline}>{post.title}</h2>
+                                <p className={styles.author}>{post.author}</p>
                             </div>
                         </Link>
                     ))

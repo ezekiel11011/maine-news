@@ -1,40 +1,63 @@
 import HomeFeed from '@/components/home/HomeFeed';
 import { reader } from '@/lib/reader';
 import { Metadata } from 'next';
+import { db } from '@/db';
+import { posts as dbPosts } from '@/db/schema';
+import { desc } from 'drizzle-orm';
 
 export const metadata: Metadata = {
   title: 'Home | Maine News Today',
   description: 'The latest news, politics, and stories from across the great state of Maine.',
 };
 
-export default async function Home() {
-  const posts = await reader.collections.posts.all();
+export const dynamic = 'force-dynamic';
 
-  // Transform posts to match expected format
-  const formattedPosts = posts.map(post => ({
+export default async function Home() {
+  // Fetch from both sources
+  const [keystaticPosts, authoredPosts] = await Promise.all([
+    reader.collections.posts.all(),
+    db.query.posts.findMany({
+      orderBy: [desc(dbPosts.publishedDate)],
+    })
+  ]);
+
+  // Transform filesystem posts
+  const formattedKeystaticPosts = keystaticPosts.map(post => ({
     id: post.slug,
-    title: post.entry.title,
+    title: post.entry.title as string,
     slug: post.slug,
-    image: post.entry.image || undefined,
-    category: post.entry.category,
-    publishedDate: post.entry.publishedDate || new Date().toISOString(),
-    author: post.entry.author || 'Staff',
-    // It's original if:
-    // 1. No sourceUrl (new scraped posts will have this)
-    // 2. AND Author is one of our internal authors (fixes existing scraped posts)
-    isOriginal: !post.entry.sourceUrl && ['Staff', 'Maine News Today', 'Nathan Reardon'].includes(post.entry.author || '')
+    image: (post.entry.image as unknown as string) || undefined,
+    category: post.entry.category as string,
+    publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
+    author: post.entry.author as string || 'Staff',
+    isOriginal: !post.entry.sourceUrl && ['Staff', 'Maine News Today', 'Nathan Reardon'].includes(post.entry.author as string || '')
   }));
 
-  // Sort by date (descending) initially
-  formattedPosts.sort((a, b) => {
-    const dateA = new Date(a.publishedDate || '').getTime();
-    const dateB = new Date(b.publishedDate || '').getTime();
+  // Transform database posts (these are always original)
+  const formattedAuthoredPosts = authoredPosts.map(post => ({
+    id: post.id,
+    title: post.title,
+    slug: post.slug,
+    image: post.image || undefined,
+    category: post.category,
+    publishedDate: post.publishedDate.toISOString(),
+    author: post.author,
+    isOriginal: true
+  }));
+
+  // Merge all posts
+  const allPosts = [...formattedAuthoredPosts, ...formattedKeystaticPosts];
+
+  // Sort by date (descending)
+  allPosts.sort((a, b) => {
+    const dateA = new Date(a.publishedDate).getTime();
+    const dateB = new Date(b.publishedDate).getTime();
     return dateB - dateA;
   });
 
   return (
     <div style={{ marginTop: '2rem' }}>
-      <HomeFeed initialPosts={formattedPosts} />
+      <HomeFeed initialPosts={allPosts} />
     </div>
   );
 }

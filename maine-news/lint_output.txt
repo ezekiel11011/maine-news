@@ -1,0 +1,79 @@
+
+> maine-news@0.1.0 lint
+> eslint
+
+
+/home/binary/Desktop/maine-news-today/maine-news/src/app/(site)/article/[slug]/page.tsx
+   71:31  error  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+  125:27  error  Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+
+/home/binary/Desktop/maine-news-today/maine-news/src/app/(site)/page.tsx
+  29:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/binary/Desktop/maine-news-today/maine-news/src/app/(site)/privacy/page.tsx
+  84:176  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  84:189  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/home/binary/Desktop/maine-news-today/maine-news/src/app/(site)/search/page.tsx
+  76:76  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  76:84  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/home/binary/Desktop/maine-news-today/maine-news/src/app/(site)/weather/page.tsx
+  30:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/binary/Desktop/maine-news-today/maine-news/src/app/admin/layout.tsx
+  3:52  warning  'Settings' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/binary/Desktop/maine-news-today/maine-news/src/app/admin/page.tsx
+  25:66  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  25:73  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  78:49  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/home/binary/Desktop/maine-news-today/maine-news/src/app/admin/posts/new/page.tsx
+  203:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/home/binary/Desktop/maine-news-today/maine-news/src/app/admin/posts/page.tsx
+    5:59  warning  'MoreVertical' is defined but never used                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+   60:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  115:87  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+
+/home/binary/Desktop/maine-news-today/maine-news/src/app/api/admin/posts/route.ts
+  4:16  warning  'eq' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/binary/Desktop/maine-news-today/maine-news/src/app/api/posts/route.ts
+  41:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/binary/Desktop/maine-news-today/maine-news/src/app/api/scraper/route.ts
+  134:31  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  218:26  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+  230:36  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  231:34  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/binary/Desktop/maine-news-today/maine-news/src/app/not-found.tsx
+  12:33  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  12:54  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/home/binary/Desktop/maine-news-today/maine-news/src/components/admin/TiptapEditor.tsx
+  20:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/binary/Desktop/maine-news-today/maine-news/src/components/article/ArticleActions.tsx
+  41:22  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/binary/Desktop/maine-news-today/maine-news/src/components/home/LiveTicker.tsx
+  11:11   warning  The 'items' conditional could make the dependencies of useEffect Hook (at line 21) change on every render. To fix this, wrap the initialization of 'items' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  35:105  error    Comments inside children section of tag should be placed inside braces                                                                                                                react/jsx-no-comment-textnodes
+  39:114  error    Comments inside children section of tag should be placed inside braces                                                                                                                react/jsx-no-comment-textnodes
+
+/home/binary/Desktop/maine-news-today/maine-news/src/components/home/SectionList.tsx
+  26:38  warning  'index' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/binary/Desktop/maine-news-today/maine-news/src/components/layout/Footer.tsx
+  3:31  warning  'Twitter' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/binary/Desktop/maine-news-today/maine-news/src/components/layout/Header.tsx
+  3:18  warning  'Menu' is defined but never used         @typescript-eslint/no-unused-vars
+  3:55  warning  'Twitter' is defined but never used      @typescript-eslint/no-unused-vars
+  3:64  warning  'ShieldCheck' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 34 problems (19 errors, 15 warnings)
+

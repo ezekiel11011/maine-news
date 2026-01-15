@@ -6,21 +6,39 @@ import React from 'react';
 import ArticleActions from '@/components/article/ArticleActions';
 import TextResizer from '@/components/article/TextResizer';
 import styles from './Article.module.css';
+import { db } from '@/db';
+import { posts as dbPosts } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 interface ArticlePageProps {
     params: Promise<{ slug: string }>;
 }
 
-// Generate static params for all posts
-export async function generateStaticParams() {
-    const posts = await reader.collections.posts.list();
-    return posts.map((slug) => ({ slug }));
-}
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: ArticlePageProps) {
     const { slug } = await params;
-    const post = await reader.collections.posts.read(slug);
 
+    // Check DB first
+    const dbPost = await db.query.posts.findFirst({
+        where: eq(dbPosts.slug, slug),
+    });
+
+    if (dbPost) {
+        return {
+            title: dbPost.title,
+            openGraph: {
+                title: dbPost.title,
+                images: dbPost.image ? [dbPost.image] : ['/hero-fallback.jpeg'],
+                type: 'article',
+                authors: [dbPost.author],
+                publishedTime: dbPost.publishedDate.toISOString(),
+            },
+        };
+    }
+
+    // Then check Keystatic
+    const post = await reader.collections.posts.read(slug);
     if (!post) return {};
 
     return {
@@ -32,16 +50,59 @@ export async function generateMetadata({ params }: ArticlePageProps) {
             authors: [post.author],
             publishedTime: post.publishedDate,
         },
-        twitter: {
-            card: 'summary_large_image',
-            title: post.title,
-            images: post.image ? [post.image] : ['/hero-fallback.jpeg'],
-        }
     };
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
     const { slug } = await params;
+
+    // 1. Try fetching from Database
+    const dbPost = await db.query.posts.findFirst({
+        where: eq(dbPosts.slug, slug),
+    });
+
+    if (dbPost) {
+        return (
+            <article className={styles.articleContainer}>
+                <header className={styles.header}>
+                    <h1 className={styles.headline}>{dbPost.title}</h1>
+                    <div className={styles.metadata}>
+                        <span className={styles.author}>By {dbPost.author}</span>
+                        <span>{'///'}</span>
+                        <span className={styles.timestamp}>{new Date(dbPost.publishedDate).toLocaleDateString()}</span>
+                    </div>
+                </header>
+
+                {dbPost.image && (
+                    <figure className={styles.imageWrapper}>
+                        <Image
+                            src={dbPost.image}
+                            alt={dbPost.title}
+                            fill
+                            className={styles.image}
+                            priority
+                        />
+                    </figure>
+                )}
+
+                <div className={styles.centerContent}>
+                    <TextResizer />
+                </div>
+
+                <div className={styles.body} data-article-body>
+                    {/* For database posts, we render content directly as HTML or Markdown */}
+                    <div dangerouslySetInnerHTML={{ __html: dbPost.content }} />
+                </div>
+
+                <ArticleActions
+                    title={dbPost.title}
+                    url={`${process.env.NEXT_PUBLIC_SITE_URL}/article/${slug}`}
+                />
+            </article>
+        );
+    }
+
+    // 2. Try fetching from Keystatic
     const post = await reader.collections.posts.read(slug);
 
     if (!post) {
@@ -49,8 +110,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     }
 
     const { title, author, publishedDate, image, content } = post;
-
-    // Format date if needed
     const dateStr = new Date(publishedDate?.toString() || '').toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -61,11 +120,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         <article className={styles.articleContainer}>
             <header className={styles.header}>
                 <h1 className={styles.headline}>{title}</h1>
-                {/* Subtitle is not in schema yet, skipping or could add to schema */}
-
                 <div className={styles.metadata}>
                     <span className={styles.author}>By {author}</span>
-                    <span>///</span>
+                    <span>{'///'}</span>
                     <span className={styles.timestamp}>{dateStr}</span>
                 </div>
             </header>
@@ -92,7 +149,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
             <ArticleActions
                 title={title}
-                url={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/article/${slug}`}
+                url={`${process.env.NEXT_PUBLIC_SITE_URL}/article/${slug}`}
             />
         </article>
     );

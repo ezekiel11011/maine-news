@@ -131,7 +131,7 @@ function categorizeStory(text: string, feedType: string): 'local' | 'national' |
         const score = keywords.filter(kw => lowerText.includes(kw)).length;
         if (score > maxScore) {
             maxScore = score;
-            category = cat as any;
+            category = cat as "national" | "local" | "opinion" | "health" | "politics" | "top-stories" | "sports" | "weather" | "entertainment";
         }
     }
 
@@ -215,7 +215,7 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
                             }
                         }
                     }
-                } catch (e) {
+                } catch {
                     console.log(`Failed to fetch deep content for ${link}`);
                 }
             }
@@ -227,8 +227,9 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
 
             // Extract image
             let image = item.enclosure?.url;
-            if (!image && (item as any)['media:content']) {
-                image = (item as any)['media:content'].$.url;
+            const mediaContent = (item as Record<string, unknown>)['media:content'] as { $: { url: string } } | undefined;
+            if (!image && mediaContent) {
+                image = mediaContent.$.url;
             }
 
             // Fallback: search for first <img> tag in the original content/summary

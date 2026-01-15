@@ -59,15 +59,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${oswald.variable} ${inter.variable}`}>
-        <Header />
-        <main className="container" style={{ minHeight: '100vh', paddingBottom: '80px' }}>
-          {children}
-        </main>
-        <Footer />
-        <BottomNav />
-      </body>
-    </html>
+    <div className={`${oswald.variable} ${inter.variable}`}>
+      <Header />
+      <main className="container" style={{ minHeight: '100vh', paddingBottom: '80px' }}>
+        {children}
+      </main>
+      <Footer />
+      <BottomNav />
+    </div>
   );
 }

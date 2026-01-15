@@ -73,7 +73,7 @@ export default function SearchPage() {
                 ) : !query.trim() ? (
                     <p className={styles.placeholder}>Type to start searching...</p>
                 ) : filteredPosts.length === 0 ? (
-                    <p className={styles.placeholder}>No results found for "{query}"</p>
+                    <p className={styles.placeholder}>No results found for &quot;{query}&quot;</p>
                 ) : (
                     <>
                         <p className={styles.resultCount}>
