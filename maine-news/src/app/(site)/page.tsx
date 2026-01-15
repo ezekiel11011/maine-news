@@ -18,7 +18,8 @@ export default async function Home() {
     image: post.entry.image || undefined,
     category: post.entry.category,
     publishedDate: post.entry.publishedDate || new Date().toISOString(),
-    author: post.entry.author || 'Staff'
+    author: post.entry.author || 'Staff',
+    isOriginal: !post.entry.sourceUrl // If no sourceUrl, it's original content
   }));
 
   // Sort by date (descending) initially

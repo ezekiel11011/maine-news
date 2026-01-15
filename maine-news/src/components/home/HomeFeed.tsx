@@ -16,6 +16,7 @@ interface Post {
     category: string;
     publishedDate: string;
     author: string;
+    isOriginal?: boolean;
 }
 
 interface HomeFeedProps {
@@ -24,6 +25,7 @@ interface HomeFeedProps {
 
 const CATEGORIES = [
     { id: 'all', label: 'News' },
+    { id: 'exclusives', label: 'Exclusives' },
     { id: 'local', label: 'Local' },
     { id: 'national', label: 'National' },
     { id: 'politics', label: 'Politics' },
@@ -41,9 +43,14 @@ export default function HomeFeed({ initialPosts }: HomeFeedProps) {
     const [showFilters, setShowFilters] = useState(false);
 
     // Filter and Sort Logic
-    const filteredPosts = initialPosts.filter(post =>
-        activeCategory === 'all' || post.category === activeCategory
-    );
+    const filteredPosts = initialPosts.filter(post => {
+        // Handle Exclusives filter
+        if (activeCategory === 'exclusives') {
+            return post.isOriginal === true;
+        }
+        // Handle other category filters
+        return activeCategory === 'all' || post.category === activeCategory;
+    });
 
     const sortedPosts = [...filteredPosts].sort((a, b) => {
         const dateA = new Date(a.publishedDate).getTime();

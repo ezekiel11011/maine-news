@@ -17,7 +17,7 @@ const inter = Inter({
   weight: ["400", "600"],
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://mymainenews.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://mainenewsnow.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

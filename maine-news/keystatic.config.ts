@@ -43,6 +43,7 @@ export default config({
                     ],
                     defaultValue: 'local'
                 }),
+                sourceUrl: fields.text({ label: 'Source URL (Scraped Only)', description: 'Leave empty for original content' }),
                 content: fields.markdoc({
                     label: 'Content',
                     options: {

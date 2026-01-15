@@ -31,7 +31,7 @@ export default function Header() {
                         <CloudSun size={24} strokeWidth={1.5} color="var(--color-accent)" />
                     </Link>
                     <Link href="/submit" className={styles.tipButton} id="send-tip-header">
-                        <span>Send Tip</span>
+                        <span>Send News Tip</span>
                     </Link>
                     <Link href="/search" className={styles.iconButton} aria-label="Search">
                         <Search size={22} strokeWidth={1.5} />

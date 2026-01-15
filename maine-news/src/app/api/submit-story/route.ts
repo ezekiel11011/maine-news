@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
         const data = await resend.emails.send({
             from: 'Maine News Today <info@nathanreardon.com>',
-            to: ['jamesezekiel039@gmail.com', 'info@mymainenews.com', 'nathan@membershipauto.com'],
+            to: ['jamesezekiel039@gmail.com', 'info@mainenewsnow.com', 'nathan@membershipauto.com'],
             subject: `STORY SUBMISSION: ${title || 'New Tip'}`,
             html: `
                 <div style="font-family: sans-serif; padding: 20px; color: #333;">

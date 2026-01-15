@@ -485,6 +485,7 @@ image: ${story.image ? JSON.stringify(story.image) : 'null'}
 author: ${JSON.stringify(story.author || story.source)}
 publishedDate: ${new Date(story.publishedDate).toISOString().split('T')[0]}
 category: ${story.category}
+sourceUrl: ${JSON.stringify(story.sourceUrl)}
 ---
 
 ${story.content}

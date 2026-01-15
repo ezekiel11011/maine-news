@@ -39,7 +39,7 @@ export default function AboutPage() {
 
                 <section>
                     <h2>Contact Us</h2>
-                    <p>Have a tip or a question? Reach out to our team at <a href="mailto:support@mymainenews.com" style={{ color: 'var(--color-accent)' }}>support@mymainenews.com</a>.</p>
+                    <p>Have a tip or a question? Reach out to our team at <a href="mailto:info@mainenewsnow.com" style={{ color: 'var(--color-accent)' }}>info@mainenewsnow.com</a>.</p>
                 </section>
 
                 <p>© 2026 Maine News Today. All rights reserved.</p>
