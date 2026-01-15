@@ -274,7 +274,7 @@ async function getExistingSlugs(repo: string, token: string): Promise<Set<string
 
     try {
         // Fetch files from posts and videos directories
-        const directories = ['src/content/scraped', 'src/content/videos'];
+        const directories = ['maine-news/src/content/scraped', 'maine-news/src/content/videos'];
         for (const dir of directories) {
             const res = await fetch(`https://api.github.com/repos/${repo}/contents/${dir}`, { headers });
             if (res.ok) {
@@ -440,7 +440,7 @@ ${video.description}
 `;
 
         if (process.env.NODE_ENV === 'production') {
-            return { path: relativePath, content: frontmatter };
+            return { path: `maine-news/${relativePath}`, content: frontmatter };
         }
 
         // Ensure directory exists
@@ -498,7 +498,7 @@ ${story.region ? `\n*Region: ${story.region}*` : ''}
 `;
 
         if (process.env.NODE_ENV === 'production') {
-            return { path: relativePath, content: frontmatter };
+            return { path: `maine-news/${relativePath}`, content: frontmatter };
         }
 
         // Check if file already exists
