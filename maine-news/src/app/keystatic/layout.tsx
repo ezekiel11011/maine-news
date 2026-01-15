@@ -1,11 +1,13 @@
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 
 export const metadata: Metadata = {
-    viewport: {
-        width: 'device-width',
-        initialScale: 1,
-        maximumScale: 1
-    }
+    title: 'Keystatic Admin',
+};
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
 };
 
 export default function Layout({

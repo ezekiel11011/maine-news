@@ -274,7 +274,7 @@ async function getExistingSlugs(repo: string, token: string): Promise<Set<string
 
     try {
         // Fetch files from posts and videos directories
-        const directories = ['src/content/posts', 'src/content/videos'];
+        const directories = ['src/content/scraped', 'src/content/videos'];
         for (const dir of directories) {
             const res = await fetch(`https://api.github.com/repos/${repo}/contents/${dir}`, { headers });
             if (res.ok) {
@@ -476,7 +476,7 @@ async function saveToKeystatic(story: ScrapedStory, existingSlugs?: Set<string>)
         }
 
         const filename = `${slug}.mdoc`;
-        const relativePath = `src/content/posts/${filename}`;
+        const relativePath = `src/content/scraped/${filename}`;
         const filepath = path.join(process.cwd(), relativePath);
 
         const frontmatter = `---

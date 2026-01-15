@@ -11,15 +11,20 @@ interface ArticlePageProps {
     params: Promise<{ slug: string }>;
 }
 
-// Generate static params for all posts
+// Generate static params for all stories (both manual and scraped)
 export async function generateStaticParams() {
-    const posts = await reader.collections.posts.list();
-    return posts.map((slug) => ({ slug }));
+    const [manual, scraped] = await Promise.all([
+        reader.collections.posts.list(),
+        reader.collections.scraped.list(),
+    ]);
+    return [...manual, ...scraped].map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: ArticlePageProps) {
     const { slug } = await params;
-    const post = await reader.collections.posts.read(slug);
+    // Check both collections
+    const post = await (reader.collections.posts.read(slug)) ||
+        await (reader.collections.scraped.read(slug));
 
     if (!post) return {};
 
@@ -42,7 +47,10 @@ export async function generateMetadata({ params }: ArticlePageProps) {
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
     const { slug } = await params;
-    const post = await reader.collections.posts.read(slug);
+
+    // Check both collections
+    const post = await (reader.collections.posts.read(slug)) ||
+        await (reader.collections.scraped.read(slug));
 
     if (!post) {
         notFound();
@@ -61,7 +69,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         <article className={styles.articleContainer}>
             <header className={styles.header}>
                 <h1 className={styles.headline}>{title}</h1>
-                {/* Subtitle is not in schema yet, skipping or could add to schema */}
 
                 <div className={styles.metadata}>
                     <span className={styles.author}>By {author}</span>
@@ -73,7 +80,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             {image && (
                 <figure className={styles.imageWrapper}>
                     <Image
-                        src={image}
+                        src={typeof image === 'string' ? image : '/hero-fallback.jpeg'}
                         alt={title}
                         fill
                         className={styles.image}
