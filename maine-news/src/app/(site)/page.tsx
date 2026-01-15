@@ -1,50 +1,40 @@
-import { reader } from '@/lib/reader';
 import HomeFeed from '@/components/home/HomeFeed';
-import styles from './page.module.css';
+import { reader } from '@/lib/reader';
+import { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const metadata: Metadata = {
+  title: 'Home | Maine News Today',
+  description: 'The latest news, politics, and stories from across the great state of Maine.',
+};
 
 export default async function Home() {
-  const [manualPosts, scrapedPosts] = await Promise.all([
-    reader.collections.posts.all(),
-    reader.collections.scraped.all(),
-  ]);
+  const posts = await reader.collections.posts.all();
 
-  const formattedManualPosts = manualPosts.map(post => ({
+  // Transform posts to match expected format
+  const formattedPosts = posts.map(post => ({
     id: post.slug,
-    title: post.entry.title as string,
+    title: post.entry.title,
     slug: post.slug,
-    image: (post.entry.image as any) || undefined,
-    category: post.entry.category as string,
-    publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
-    author: post.entry.author as string || 'Staff',
-    isOriginal: true,
+    image: post.entry.image || undefined,
+    category: post.entry.category,
+    publishedDate: post.entry.publishedDate || new Date().toISOString(),
+    author: post.entry.author || 'Staff',
+    // It's original if:
+    // 1. No sourceUrl (new scraped posts will have this)
+    // 2. AND Author is one of our internal authors (fixes existing scraped posts)
+    isOriginal: !post.entry.sourceUrl && ['Staff', 'Maine News Today', 'Nathan Reardon'].includes(post.entry.author || '')
   }));
-
-  const formattedScrapedPosts = scrapedPosts.map(post => ({
-    id: post.slug,
-    title: post.entry.title as string,
-    slug: post.slug,
-    image: (post.entry.image as unknown as string) || undefined,
-    category: post.entry.category as string,
-    publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
-    author: post.entry.author as string || 'Staff',
-    isOriginal: false,
-  }));
-
-  const allPosts = [...formattedManualPosts, ...formattedScrapedPosts];
 
   // Sort by date (descending) initially
-  allPosts.sort((a, b) => {
-    const dateA = new Date(a.publishedDate).getTime();
-    const dateB = new Date(b.publishedDate).getTime();
+  formattedPosts.sort((a, b) => {
+    const dateA = new Date(a.publishedDate || '').getTime();
+    const dateB = new Date(b.publishedDate || '').getTime();
     return dateB - dateA;
   });
 
   return (
-    <main className={styles.container}>
-      <HomeFeed initialPosts={allPosts} />
-    </main>
+    <div style={{ marginTop: '2rem' }}>
+      <HomeFeed initialPosts={formattedPosts} />
+    </div>
   );
 }

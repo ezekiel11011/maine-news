@@ -7,32 +7,27 @@ export async function GET(request: Request) {
         const slug = searchParams.get('slug');
 
         if (slug) {
-            const post = await reader.collections.posts.read(slug) ||
-                await reader.collections.scraped.read(slug);
+            const post = await reader.collections.posts.read(slug);
             if (!post) {
                 return NextResponse.json({ error: 'Post not found' }, { status: 404 });
             }
             return NextResponse.json({
                 ...post,
                 slug,
-                title: post.title as string,
-                content: (await (post.content as any)()).node
+                content: (await post.content()).node
             });
         }
 
-        const [manualPosts, scrapedPosts] = await Promise.all([
-            reader.collections.posts.all(),
-            reader.collections.scraped.all(),
-        ]);
+        const posts = await reader.collections.posts.all();
 
-        const formattedPosts = [...manualPosts, ...scrapedPosts].map(post => ({
+        const formattedPosts = posts.map(post => ({
             id: post.slug,
-            title: post.entry.title as string,
+            title: post.entry.title,
             slug: post.slug,
-            image: (post.entry.image as any),
-            category: post.entry.category as string,
-            publishedDate: post.entry.publishedDate as string,
-            author: post.entry.author as string,
+            image: post.entry.image,
+            category: post.entry.category,
+            publishedDate: post.entry.publishedDate,
+            author: post.entry.author,
         }));
 
         // Sort by date descending

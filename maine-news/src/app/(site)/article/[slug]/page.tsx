@@ -11,61 +11,44 @@ interface ArticlePageProps {
     params: Promise<{ slug: string }>;
 }
 
-// Generate static params for all stories (both manual and scraped)
+// Generate static params for all posts
 export async function generateStaticParams() {
-    const [manual, scraped] = await Promise.all([
-        reader.collections.posts.list(),
-        reader.collections.scraped.list(),
-    ]);
-    return [...manual, ...scraped].map((slug) => ({ slug }));
+    const posts = await reader.collections.posts.list();
+    return posts.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: ArticlePageProps) {
     const { slug } = await params;
-    // Check both collections
-    const post = await (reader.collections.posts.read(slug)) ||
-        await (reader.collections.scraped.read(slug));
+    const post = await reader.collections.posts.read(slug);
 
     if (!post) return {};
 
-    const title = post.title as string;
-    const author = post.author as string;
-    const publishedDate = post.publishedDate as string;
-    const image = post.image as any;
-
     return {
-        title,
+        title: post.title,
         openGraph: {
-            title,
-            images: image ? [image] : ['/hero-fallback.jpeg'],
+            title: post.title,
+            images: post.image ? [post.image] : ['/hero-fallback.jpeg'],
             type: 'article',
-            authors: [author],
-            publishedTime: publishedDate,
+            authors: [post.author],
+            publishedTime: post.publishedDate,
         },
         twitter: {
             card: 'summary_large_image',
-            title,
-            images: image ? [image] : ['/hero-fallback.jpeg'],
+            title: post.title,
+            images: post.image ? [post.image] : ['/hero-fallback.jpeg'],
         }
     };
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
     const { slug } = await params;
-
-    // Check both collections
-    const post = await (reader.collections.posts.read(slug)) ||
-        await (reader.collections.scraped.read(slug));
+    const post = await reader.collections.posts.read(slug);
 
     if (!post) {
         notFound();
     }
 
-    const title = post.title as string;
-    const author = post.author as string;
-    const publishedDate = post.publishedDate as string;
-    const image = post.image as any;
-    const content = post.content as any;
+    const { title, author, publishedDate, image, content } = post;
 
     // Format date if needed
     const dateStr = new Date(publishedDate?.toString() || '').toLocaleDateString('en-US', {
@@ -78,6 +61,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         <article className={styles.articleContainer}>
             <header className={styles.header}>
                 <h1 className={styles.headline}>{title}</h1>
+                {/* Subtitle is not in schema yet, skipping or could add to schema */}
 
                 <div className={styles.metadata}>
                     <span className={styles.author}>By {author}</span>
@@ -89,7 +73,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             {image && (
                 <figure className={styles.imageWrapper}>
                     <Image
-                        src={typeof image === 'string' ? image : '/hero-fallback.jpeg'}
+                        src={image}
                         alt={title}
                         fill
                         className={styles.image}

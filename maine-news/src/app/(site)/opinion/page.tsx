@@ -3,20 +3,15 @@ import { reader } from '@/lib/reader';
 import styles from './Opinion.module.css';
 
 export default async function OpinionPage() {
-    const [manualPosts, scrapedPosts] = await Promise.all([
-        reader.collections.posts.all(),
-        reader.collections.scraped.all(),
-    ]);
-
-    const allPosts = [...manualPosts, ...scrapedPosts];
+    const posts = await reader.collections.posts.all();
 
     // Filter for Opinion and sort by date
-    const opinionPosts = allPosts
-        .filter(post => (post.entry.category as string) === 'opinion')
+    const opinionPosts = posts
+        .filter(post => post.entry.category === 'opinion')
         .sort((a, b) => {
-            const dateA = new Date((a.entry.publishedDate as string) || '').getTime();
-            const dateB = new Date((b.entry.publishedDate as string) || '').getTime();
-            return dateB - dateA;
+            const dateA = new Date(a.entry.publishedDate || '');
+            const dateB = new Date(b.entry.publishedDate || '');
+            return dateB.getTime() - dateA.getTime();
         });
 
     return (
@@ -35,8 +30,8 @@ export default async function OpinionPage() {
                                 <div className={styles.avatarPlaceholder} />
                             </div>
                             <div className={styles.content}>
-                                <h2 className={styles.headline}>{post.entry.title as string}</h2>
-                                <p className={styles.author}>By {post.entry.author as string}</p>
+                                <h2 className={styles.headline}>{post.entry.title}</h2>
+                                <p className={styles.author}>{post.entry.author}</p>
                             </div>
                         </Link>
                     ))

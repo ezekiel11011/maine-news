@@ -8,7 +8,6 @@ export default config({
                 owner: 'ezekiel11011',
                 name: 'maine-news',
             },
-            pathPrefix: 'maine-news',
         }
         : {
             kind: 'local',
@@ -57,21 +56,6 @@ export default config({
                 }),
             },
         }),
-        scraped: collection({
-            label: 'Scraped (Hidden)',
-            slugField: 'title',
-            path: 'src/content/scraped/*',
-            format: { contentField: 'content' },
-            schema: {
-                title: fields.slug({ name: { label: 'Title' } }),
-                image: fields.text({ label: 'Image URL' }),
-                author: fields.text({ label: 'Author' }),
-                publishedDate: fields.date({ label: 'Published Date' }),
-                category: fields.text({ label: 'Category' }),
-                sourceUrl: fields.text({ label: 'Source URL' }),
-                content: fields.markdoc({ label: 'Content' }),
-            },
-        }),
         authors: collection({
             label: 'Authors',
             slugField: 'name',
@@ -115,11 +99,5 @@ export default config({
                 description: fields.text({ label: 'Description', multiline: true }),
             }
         })
-    },
-    ui: {
-        navigation: {
-            'Content': ['posts', 'videos'],
-            'Settings': ['authors'],
-        },
     },
 });
