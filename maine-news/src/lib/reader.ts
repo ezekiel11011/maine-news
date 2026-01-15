@@ -15,15 +15,15 @@ const readerConfig = {
         ...config.collections,
         posts: {
             ...config.collections.posts,
-            path: 'public/content/posts/*',
+            path: 'src/content/posts/*',
         },
         authors: {
             ...config.collections.authors,
-            path: 'public/content/authors/*',
+            path: 'src/content/authors/*',
         },
         videos: {
             ...config.collections.videos,
-            path: 'public/content/videos/*',
+            path: 'src/content/videos/*',
         }
     }
 };
