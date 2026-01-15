@@ -41,18 +41,12 @@ export default function TabsLayout() {
                 options={{
                     headerTitleAlign: 'left',
                     headerTitle: () => (
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                        <View style={{ alignItems: 'center' }}>
                             <Image
-                                source={require('../../assets/icon.png')}
-                                style={{ width: 32, height: 32, borderRadius: 6 }}
+                                source={require('../../assets/maine-news-now.png')}
+                                style={{ width: 160, height: 40 }}
                                 resizeMode="contain"
                             />
-                            <Text style={{
-                                fontFamily: 'Oswald_700Bold',
-                                fontSize: 20,
-                                color: colors.text,
-                                letterSpacing: 0.5
-                            }}>MAINE NEWS</Text>
                         </View>
                     ),
                     tabBarLabel: 'Home',
