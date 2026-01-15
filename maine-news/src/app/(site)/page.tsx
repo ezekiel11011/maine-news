@@ -19,7 +19,10 @@ export default async function Home() {
     category: post.entry.category,
     publishedDate: post.entry.publishedDate || new Date().toISOString(),
     author: post.entry.author || 'Staff',
-    isOriginal: !post.entry.sourceUrl // If no sourceUrl, it's original content
+    // It's original if:
+    // 1. No sourceUrl (new scraped posts will have this)
+    // 2. AND Author is one of our internal authors (fixes existing scraped posts)
+    isOriginal: !post.entry.sourceUrl && ['Staff', 'Maine News Today', 'Nathan Reardon'].includes(post.entry.author || '')
   }));
 
   // Sort by date (descending) initially
