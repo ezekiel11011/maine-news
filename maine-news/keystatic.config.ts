@@ -8,7 +8,6 @@ export default config({
                 owner: 'ezekiel11011',
                 name: 'maine-news',
             },
-            pathPrefix: 'maine-news',
         }
         : {
             kind: 'local',
@@ -17,7 +16,7 @@ export default config({
         posts: collection({
             label: 'Posts',
             slugField: 'title',
-            path: 'src/content/posts/*',
+            path: 'maine-news/src/content/posts/*',
             format: { contentField: 'content' },
             schema: {
                 title: fields.slug({ name: { label: 'Title' } }),
@@ -31,6 +30,8 @@ export default config({
                 category: fields.select({
                     label: 'Category',
                     options: [
+                        { label: 'News', value: 'all' },
+                        { label: 'Exclusives', value: 'exclusives' },
                         { label: 'Top Stories', value: 'top-stories' },
                         { label: 'Local', value: 'local' },
                         { label: 'National', value: 'national' },
@@ -58,7 +59,7 @@ export default config({
         authors: collection({
             label: 'Authors',
             slugField: 'name',
-            path: 'src/content/authors/*',
+            path: 'maine-news/src/content/authors/*',
             schema: {
                 name: fields.slug({ name: { label: 'Name' } }),
                 avatar: fields.image({
@@ -72,7 +73,7 @@ export default config({
         videos: collection({
             label: 'Videos',
             slugField: 'title',
-            path: 'src/content/videos/*',
+            path: 'maine-news/src/content/videos/*',
             schema: {
                 title: fields.slug({ name: { label: 'Title' } }),
                 videoUrl: fields.text({ label: 'Video URL' }),
