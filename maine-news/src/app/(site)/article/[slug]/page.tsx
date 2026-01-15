@@ -28,19 +28,24 @@ export async function generateMetadata({ params }: ArticlePageProps) {
 
     if (!post) return {};
 
+    const title = post.title as string;
+    const author = post.author as string;
+    const publishedDate = post.publishedDate as string;
+    const image = post.image as any;
+
     return {
-        title: post.title,
+        title,
         openGraph: {
-            title: post.title,
-            images: post.image ? [post.image] : ['/hero-fallback.jpeg'],
+            title,
+            images: image ? [image] : ['/hero-fallback.jpeg'],
             type: 'article',
-            authors: [post.author],
-            publishedTime: post.publishedDate,
+            authors: [author],
+            publishedTime: publishedDate,
         },
         twitter: {
             card: 'summary_large_image',
-            title: post.title,
-            images: post.image ? [post.image] : ['/hero-fallback.jpeg'],
+            title,
+            images: image ? [image] : ['/hero-fallback.jpeg'],
         }
     };
 }
@@ -56,7 +61,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         notFound();
     }
 
-    const { title, author, publishedDate, image, content } = post;
+    const title = post.title as string;
+    const author = post.author as string;
+    const publishedDate = post.publishedDate as string;
+    const image = post.image as any;
+    const content = post.content as any;
 
     // Format date if needed
     const dateStr = new Date(publishedDate?.toString() || '').toLocaleDateString('en-US', {

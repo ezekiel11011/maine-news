@@ -8,19 +8,25 @@ export const metadata: Metadata = {
 };
 
 export default async function WeatherPage() {
-    const allPosts = await reader.collections.posts.all();
-    const weatherPosts = allPosts
-        .filter(post => post.entry.category === 'weather')
+    const [manualPosts, scrapedPosts] = await Promise.all([
+        reader.collections.posts.all(),
+        reader.collections.scraped.all(),
+    ]);
+
+    const allPostsMerged = [...manualPosts, ...scrapedPosts];
+
+    const weatherPosts = allPostsMerged
+        .filter(post => (post.entry.category as string) === 'weather')
         .map(post => ({
             id: post.slug,
-            title: post.entry.title,
+            title: post.entry.title as string,
             slug: post.slug,
-            image: post.entry.image ?? undefined,
-            category: post.entry.category,
-            publishedDate: post.entry.publishedDate ?? new Date().toISOString(),
-            author: post.entry.author,
+            image: (post.entry.image as any) ?? undefined,
+            category: post.entry.category as string,
+            publishedDate: (post.entry.publishedDate as string) ?? new Date().toISOString(),
+            author: post.entry.author as string,
         }))
-        .sort((a, b) => new Date(b.publishedDate || '').getTime() - new Date(a.publishedDate || '').getTime());
+        .sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
 
     return (
         <main className="container" style={{ padding: '2rem 1rem' }}>

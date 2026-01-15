@@ -13,23 +13,23 @@ export default async function Home() {
 
   const formattedManualPosts = manualPosts.map(post => ({
     id: post.slug,
-    title: post.entry.title,
+    title: post.entry.title as string,
     slug: post.slug,
-    image: post.entry.image || undefined,
-    category: post.entry.category,
-    publishedDate: post.entry.publishedDate || new Date().toISOString(),
-    author: post.entry.author || 'Staff',
+    image: (post.entry.image as any) || undefined,
+    category: post.entry.category as string,
+    publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
+    author: post.entry.author as string || 'Staff',
     isOriginal: true,
   }));
 
   const formattedScrapedPosts = scrapedPosts.map(post => ({
     id: post.slug,
-    title: post.entry.title,
+    title: post.entry.title as string,
     slug: post.slug,
-    image: post.entry.image as unknown as string || undefined,
-    category: post.entry.category,
-    publishedDate: post.entry.publishedDate || new Date().toISOString(),
-    author: post.entry.author || 'Staff',
+    image: (post.entry.image as unknown as string) || undefined,
+    category: post.entry.category as string,
+    publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
+    author: post.entry.author as string || 'Staff',
     isOriginal: false,
   }));
 
@@ -37,8 +37,8 @@ export default async function Home() {
 
   // Sort by date (descending) initially
   allPosts.sort((a, b) => {
-    const dateA = new Date(a.publishedDate || '').getTime();
-    const dateB = new Date(b.publishedDate || '').getTime();
+    const dateA = new Date(a.publishedDate).getTime();
+    const dateB = new Date(b.publishedDate).getTime();
     return dateB - dateA;
   });
 
