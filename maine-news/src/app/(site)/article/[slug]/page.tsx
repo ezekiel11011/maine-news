@@ -119,7 +119,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         notFound();
     }
 
-    const { title, author, publishedDate, image, content } = post;
+    const title = post.title as string;
+    const author = post.author as string;
+    const publishedDate = post.publishedDate as string;
+    const image = post.image as string | undefined;
+    const content = post.content as () => Promise<{ node: any }>;
     const dateStr = new Date(publishedDate?.toString() || '').toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -129,7 +133,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     return (
         <article className={styles.articleContainer}>
             <header className={styles.header}>
-                <h1 className={styles.headline}>{title}</h1>
+                <h1 className={styles.headline}>{title as string}</h1>
                 <div className={styles.metadata}>
                     <span className={styles.author}>By {author}</span>
                     <span>{'///'}</span>

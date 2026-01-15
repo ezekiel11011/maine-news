@@ -31,7 +31,7 @@ export async function GET(request: Request) {
                 return NextResponse.json({
                     ...post,
                     slug,
-                    content: (await post.content()).node
+                    content: (await (post.content as any)()).node
                 });
             }
 
