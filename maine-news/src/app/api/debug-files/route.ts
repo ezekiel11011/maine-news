@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { reader } from '@/lib/reader';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,19 +10,21 @@ export async function GET() {
     const results: any = {
         cwd,
         env: process.env.NODE_ENV,
+        hasGithubToken: !!process.env.KEYSTATIC_GITHUB_TOKEN,
+        hasClientId: !!process.env.KEYSTATIC_GITHUB_CLIENT_ID,
         exists: {},
-        tree: []
+        tree: [],
+        reader: {}
     };
 
     const targetDir = path.join(cwd, 'src/content');
 
-    // Check main directories
+    // Check main directories (for Local mode diagnostics)
     results.exists['src/content'] = fs.existsSync(targetDir);
     results.exists['src/content/posts'] = fs.existsSync(path.join(targetDir, 'posts'));
-    results.exists['src/content/scraped'] = fs.existsSync(path.join(targetDir, 'scraped'));
     results.exists['public/content'] = fs.existsSync(path.join(cwd, 'public/content'));
 
-    // Walk src/content
+    // Walk src/content (for Local mode diagnostics)
     try {
         if (results.exists['src/content']) {
             const walk = (dir: string, filelist: string[] = []) => {
@@ -42,7 +45,22 @@ export async function GET() {
             results.totalFiles = walk(targetDir).length;
         }
     } catch (e: any) {
-        results.error = e.message;
+        results.treeError = e.message;
+    }
+
+    // Check Reader (Keystatic)
+    try {
+        const posts = await reader.collections.posts.all();
+        results.reader.count = posts.length;
+        results.reader.success = true;
+        if (posts.length > 0) {
+            results.reader.firstSlug = posts[0].slug;
+            // Try to read content of first post to verify full access
+            // results.reader.firstContent = (await posts[0].entry.content()).node ? 'Has Node' : 'Empty';
+        }
+    } catch (e: any) {
+        results.reader.error = e.message;
+        results.reader.stack = e.stack;
     }
 
     return NextResponse.json(results);

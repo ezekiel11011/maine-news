@@ -1,7 +1,12 @@
 import { config, fields, collection } from '@keystatic/core';
 
+const shouldUseGithub = process.env.NODE_ENV === 'production' && process.env.KEYSTATIC_GITHUB_CLIENT_ID && process.env.KEYSTATIC_GITHUB_CLIENT_SECRET;
+// The prefix is required because the app is in a subdirectory 'maine-news/' 
+// but the GitHub API sees the repository root.
+const repoPathPrefix = shouldUseGithub ? 'maine-news/' : '';
+
 export default config({
-    storage: (process.env.NODE_ENV === 'production' && process.env.KEYSTATIC_GITHUB_CLIENT_ID && process.env.KEYSTATIC_GITHUB_CLIENT_SECRET)
+    storage: shouldUseGithub
         ? {
             kind: 'github',
             repo: {
@@ -16,7 +21,7 @@ export default config({
         posts: collection({
             label: 'Posts',
             slugField: 'title',
-            path: 'src/content/posts/*',
+            path: `${repoPathPrefix}src/content/posts/*`,
             format: { contentField: 'content' },
             schema: {
                 title: fields.slug({ name: { label: 'Title' } }),
@@ -59,7 +64,7 @@ export default config({
         authors: collection({
             label: 'Authors',
             slugField: 'name',
-            path: 'src/content/authors/*',
+            path: `${repoPathPrefix}src/content/authors/*`,
             schema: {
                 name: fields.slug({ name: { label: 'Name' } }),
                 avatar: fields.image({
@@ -73,7 +78,7 @@ export default config({
         videos: collection({
             label: 'Videos',
             slugField: 'title',
-            path: 'src/content/videos/*',
+            path: `${repoPathPrefix}src/content/videos/*`,
             schema: {
                 title: fields.slug({ name: { label: 'Title' } }),
                 videoUrl: fields.text({ label: 'Video URL' }),
