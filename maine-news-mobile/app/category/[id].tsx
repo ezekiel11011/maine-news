@@ -11,14 +11,17 @@ import {
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { fetchPosts, filterByCategory, Post } from '../../services/api';
 import { colors, typography, spacing, fontSize } from '../../constants/theme';
-import { Clock, ArrowLeft } from 'lucide-react-native';
+import { Clock, ArrowLeft, ChevronUp } from 'lucide-react-native';
 
 export default function CategoryScreen() {
     const { id } = useLocalSearchParams();
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [showScrollTop, setShowScrollTop] = useState(false);
     const router = useRouter();
+
+    const flatListRef = React.useRef<FlatList>(null);
 
     const categoryName = typeof id === 'string' ? id.replace('-', ' ') : '';
 
@@ -42,6 +45,19 @@ export default function CategoryScreen() {
     const onRefresh = () => {
         setRefreshing(true);
         loadPosts();
+    };
+
+    const handleScroll = (event: any) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        if (offsetY > 400 && !showScrollTop) {
+            setShowScrollTop(true);
+        } else if (offsetY <= 400 && showScrollTop) {
+            setShowScrollTop(false);
+        }
+    };
+
+    const scrollToTop = () => {
+        flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
     };
 
     const renderPost = ({ item }: { item: Post }) => (
@@ -80,14 +96,18 @@ export default function CategoryScreen() {
             <Stack.Screen
                 options={{
                     title: categoryName.toUpperCase(),
+                    headerTitleStyle: { fontFamily: 'Oswald_700Bold' },
                 }}
             />
 
             <FlatList
+                ref={flatListRef}
                 data={posts}
                 renderItem={renderPost}
                 keyExtractor={item => item.slug}
                 contentContainerStyle={styles.list}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
@@ -101,6 +121,16 @@ export default function CategoryScreen() {
                     </View>
                 }
             />
+
+            {showScrollTop && (
+                <TouchableOpacity
+                    style={styles.scrollToTopButton}
+                    onPress={scrollToTop}
+                    activeOpacity={0.8}
+                >
+                    <ChevronUp size={24} color={colors.background} />
+                </TouchableOpacity>
+            )}
         </View>
     );
 }
@@ -169,5 +199,22 @@ const styles = StyleSheet.create({
     emptyText: {
         fontFamily: 'Inter_400Regular',
         color: colors.textDim,
+    },
+    scrollToTopButton: {
+        position: 'absolute',
+        bottom: spacing.lg,
+        right: spacing.lg,
+        backgroundColor: colors.accent,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 3,
+        zIndex: 100,
     },
 });

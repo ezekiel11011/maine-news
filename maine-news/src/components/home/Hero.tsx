@@ -97,7 +97,7 @@ export default function Hero({ posts }: HeroProps) {
                             }}
                         >
                             <Image
-                                src={post.image || "/maine-news-now.png"}
+                                src={post.image || "/hero-fallback.jpeg"}
                                 alt={post.title}
                                 fill
                                 className={styles.image}

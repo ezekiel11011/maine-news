@@ -23,7 +23,7 @@ export default function Onboarding() {
                         style={styles.logoImage}
                         resizeMode="contain"
                     />
-                    <Text style={styles.logoText}>MAINE NEWS TODAY</Text>
+                    <Text style={styles.logoText}>MAINE NEWS NOW</Text>
                     <View style={styles.accentBar} />
                 </View>
 

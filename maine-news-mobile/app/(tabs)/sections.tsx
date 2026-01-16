@@ -4,13 +4,16 @@ import { colors, typography, spacing, fontSize } from '../../constants/theme';
 import { LayoutGrid, ChevronRight, PlayCircle, Video } from 'lucide-react-native';
 
 const CATEGORIES = [
+    'Exclusives',
     'Top Stories',
     'Local',
     'Politics',
     'Health',
     'Opinion',
-    'Economy',
-    'Crime',
+    'Sports',
+    'Weather',
+    'Entertainment',
+    'National',
 ];
 
 export default function SectionsScreen() {

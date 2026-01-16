@@ -83,17 +83,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     </div>
                 </header>
 
-                {dbPost.image && (
-                    <figure className={styles.imageWrapper}>
-                        <Image
-                            src={dbPost.image}
-                            alt={dbPost.title}
-                            fill
-                            className={styles.image}
-                            priority
-                        />
-                    </figure>
-                )}
+                <figure className={styles.imageWrapper}>
+                    <Image
+                        src={dbPost.image || '/hero-fallback.jpeg'}
+                        alt={dbPost.title}
+                        fill
+                        className={styles.image}
+                        priority
+                    />
+                </figure>
 
                 <div className={styles.centerContent}>
                     <TextResizer />
@@ -119,6 +117,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         notFound();
     }
 
+    const fallbackImage = "/hero-fallback.jpeg";
     const title = post.title as string;
     const author = post.author as string;
     const publishedDate = post.publishedDate as string;
@@ -141,17 +140,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 </div>
             </header>
 
-            {image && (
-                <figure className={styles.imageWrapper}>
-                    <Image
-                        src={image}
-                        alt={title}
-                        fill
-                        className={styles.image}
-                        priority
-                    />
-                </figure>
-            )}
+            <figure className={styles.imageWrapper}>
+                <Image
+                    src={image || '/hero-fallback.jpeg'}
+                    alt={title}
+                    fill
+                    className={styles.image}
+                    priority
+                />
+            </figure>
 
             <div className={styles.centerContent}>
                 <TextResizer />

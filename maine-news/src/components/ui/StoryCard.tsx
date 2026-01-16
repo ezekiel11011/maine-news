@@ -13,7 +13,7 @@ interface StoryCardProps {
 }
 
 export default function StoryCard({ title, image, slug, category, publishedDate, priority = false }: StoryCardProps) {
-    const fallbackImage = "/maine-news-now.png"; // Assuming this exists or using the one from the project
+    const fallbackImage = "/hero-fallback.jpeg";
 
     return (
         <Link href={`/article/${slug}`} className={styles.card}>

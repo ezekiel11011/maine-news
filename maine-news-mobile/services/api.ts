@@ -16,7 +16,7 @@ const getApiBaseUrl = () => {
     }
 
     // Default to the live production server
-    return 'https://maine-news-temp.vercel.app';
+    return 'https://mainenewsnow.com';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
@@ -30,6 +30,7 @@ export interface Post {
     image?: string;
     excerpt?: string;
     content?: string;
+    isOriginal?: boolean;
 }
 
 export const getImageUrl = (path?: string) => {
@@ -46,19 +47,33 @@ export interface ApiResponse {
 // Fetch all posts
 export async function fetchPosts(): Promise<Post[]> {
     try {
-        const response = await axios.get<Post[]>(`${API_BASE_URL}/api/posts`);
+        const response = await axios.get<any>(`${API_BASE_URL}/api/posts`);
+        const data = response.data;
+
+        // Handle both old array format and new { posts: [] } format
+        let posts: Post[] = [];
+        if (Array.isArray(data)) {
+            posts = data;
+        } else if (data && Array.isArray(data.posts)) {
+            posts = data.posts;
+        }
 
         // Cache posts for offline mode
-        await AsyncStorage.setItem('cached_posts', JSON.stringify(response.data));
+        await AsyncStorage.setItem('cached_posts', JSON.stringify(posts));
 
-        return response.data;
+        return posts;
     } catch (error) {
         console.error('Failed to fetch posts:', error);
 
         // Try to load from cache
         const cached = await AsyncStorage.getItem('cached_posts');
         if (cached) {
-            return JSON.parse(cached);
+            try {
+                const data = JSON.parse(cached);
+                return Array.isArray(data) ? data : (data.posts || []);
+            } catch (e) {
+                return [];
+            }
         }
 
         return [];

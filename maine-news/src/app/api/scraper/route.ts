@@ -185,6 +185,13 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
             const link = item.link || '';
             let content = turndown.turndown(item.content || item.contentSnippet || item.summary || '');
 
+            // Initial image extraction from RSS
+            let image = item.enclosure?.url;
+            const mediaContent = (item as Record<string, unknown>)['media:content'] as { $: { url: string } } | undefined;
+            if (!image && mediaContent) {
+                image = mediaContent.$.url;
+            }
+
             // Attempt to fetch full content if the RSS only has a snippet
             if (link && (content.length < 500 || content.includes('read more') || content.includes('...'))) {
                 try {
@@ -212,6 +219,14 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
                             const fullContent = turndown.turndown(cleanedHtml);
                             if (fullContent.length > content.length) {
                                 content = fullContent;
+
+                                // Extract image from deep content if not already found in RSS
+                                if (!image) {
+                                    const imgMatch = cleanedHtml.match(/<img[^>]+src=["']([^"']+)["']/i);
+                                    if (imgMatch) {
+                                        image = imgMatch[1];
+                                    }
+                                }
                             }
                         }
                     }
@@ -224,13 +239,6 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
 
             // Clean content from repeated characters that break layout (like =========)
             content = content.replace(/([=_-]){5,}/g, '$1$1$1');
-
-            // Extract image
-            let image = item.enclosure?.url;
-            const mediaContent = (item as Record<string, unknown>)['media:content'] as { $: { url: string } } | undefined;
-            if (!image && mediaContent) {
-                image = mediaContent.$.url;
-            }
 
             // Fallback: search for first <img> tag in the original content/summary
             if (!image) {
@@ -252,7 +260,7 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
                 publishedDate: item.pubDate || new Date().toISOString(),
                 urgency: 0,
                 author: item.creator || sourceName,
-                image,
+                image: image || '/hero-fallback.jpeg',
                 feedType,
                 isNational: feedType !== 'maine'
             });
