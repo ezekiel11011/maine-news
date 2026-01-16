@@ -85,7 +85,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
                 <figure className={styles.imageWrapper}>
                     <Image
-                        src={dbPost.image || '/hero-fallback.jpeg'}
+                        src={dbPost.image || '/maine-news-now.png'}
                         alt={dbPost.title}
                         fill
                         className={styles.image}
@@ -117,7 +117,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         notFound();
     }
 
-    const fallbackImage = "/hero-fallback.jpeg";
+    const fallbackImage = "/maine-news-now.png";
     const title = post.title as string;
     const author = post.author as string;
     const publishedDate = post.publishedDate as string;
@@ -142,7 +142,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
             <figure className={styles.imageWrapper}>
                 <Image
-                    src={image || '/hero-fallback.jpeg'}
+                    src={image || '/maine-news-now.png'}
                     alt={title}
                     fill
                     className={styles.image}
