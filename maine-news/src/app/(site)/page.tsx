@@ -62,16 +62,6 @@ export default async function Home() {
 
   return (
     <div style={{ marginTop: '2rem' }}>
-      <div style={{
-        background: '#ff0000',
-        color: 'white',
-        padding: '1rem',
-        textAlign: 'center',
-        fontWeight: 'bold',
-        marginBottom: '1rem'
-      }}>
-        DEBUG DIAGNOSTIC: Keystatic Posts: {keystaticPosts.length} | Database Posts: {authoredPosts.length} | Total: {allPosts.length}
-      </div>
       <HomeFeed initialPosts={allPosts} />
     </div>
   );
