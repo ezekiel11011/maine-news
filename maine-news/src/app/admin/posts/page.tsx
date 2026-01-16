@@ -5,6 +5,7 @@ import { desc } from 'drizzle-orm';
 import { Plus, Newspaper, Calendar, User, Search, Filter, Edit2, Trash2, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import PostActions from '@/components/admin/PostActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,14 +77,7 @@ export default async function PostsListPage() {
                                     <h2 className="text-xl font-bold text-white mb-0" style={{ margin: 0 }}>
                                         {post.title}
                                     </h2>
-                                    <div className="flex gap-1 ml-4">
-                                        <button className="p-2 text-dim hover-white transition-all" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                                            <Edit2 size={16} />
-                                        </button>
-                                        <button className="p-2 text-dim hover-red transition-all" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
+                                    <PostActions postId={post.id} />
                                 </div>
 
                                 <div className="flex flex-wrap items-center gap-6 text-sm text-dim">
