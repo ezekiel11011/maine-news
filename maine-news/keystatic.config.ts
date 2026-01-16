@@ -1,10 +1,7 @@
 import { config, fields, collection } from '@keystatic/core';
 
-const shouldUseGithub = process.env.NODE_ENV === 'production' && process.env.KEYSTATIC_GITHUB_CLIENT_ID && process.env.KEYSTATIC_GITHUB_CLIENT_SECRET;
-const repoPathPrefix = shouldUseGithub ? 'maine-news/' : '';
-
 export default config({
-    storage: shouldUseGithub
+    storage: (process.env.NODE_ENV === 'production' && process.env.KEYSTATIC_GITHUB_CLIENT_ID && process.env.KEYSTATIC_GITHUB_CLIENT_SECRET)
         ? {
             kind: 'github',
             repo: {
@@ -19,7 +16,7 @@ export default config({
         posts: collection({
             label: 'Posts',
             slugField: 'title',
-            path: `${repoPathPrefix}src/content/posts/*`,
+            path: 'src/content/posts/*',
             format: { contentField: 'content' },
             schema: {
                 title: fields.slug({ name: { label: 'Title' } }),
@@ -28,7 +25,7 @@ export default config({
                     directory: 'public/images/posts',
                     publicPath: '/images/posts',
                 }),
-                author: fields.text({ label: 'Author' }), // Linking to authors collection could be better, keeping simple for now
+                author: fields.text({ label: 'Author' }),
                 publishedDate: fields.date({ label: 'Published Date' }),
                 category: fields.select({
                     label: 'Category',
@@ -62,7 +59,7 @@ export default config({
         authors: collection({
             label: 'Authors',
             slugField: 'name',
-            path: `${repoPathPrefix}src/content/authors/*`,
+            path: 'src/content/authors/*',
             schema: {
                 name: fields.slug({ name: { label: 'Name' } }),
                 avatar: fields.image({
@@ -76,7 +73,7 @@ export default config({
         videos: collection({
             label: 'Videos',
             slugField: 'title',
-            path: `${repoPathPrefix}src/content/videos/*`,
+            path: 'src/content/videos/*',
             schema: {
                 title: fields.slug({ name: { label: 'Title' } }),
                 videoUrl: fields.text({ label: 'Video URL' }),
