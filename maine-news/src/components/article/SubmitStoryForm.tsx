@@ -52,7 +52,7 @@ export default function SubmitStoryForm() {
             <div className={styles.successContainer}>
                 <CheckCircle size={64} className={styles.successIcon} />
                 <h2>Submission Received</h2>
-                <p>Thank you for contributing to Maine News Today. Our editorial team will review your tip shortly.</p>
+                <p>Thank you for contributing to Maine News Now. Our editorial team will review your tip shortly.</p>
                 <button onClick={() => setStatus('idle')} className={styles.resetButton}>Submit Another</button>
             </div>
         );

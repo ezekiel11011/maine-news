@@ -14,6 +14,7 @@ interface Post {
     slug: string;
     image?: string;
     category: string;
+    isNational: boolean;
     publishedDate: string;
     author: string;
     isOriginal?: boolean;
@@ -26,14 +27,18 @@ interface HomeFeedProps {
 const CATEGORIES = [
     { id: 'all', label: 'News' },
     { id: 'exclusives', label: 'Exclusives' },
+    { id: 'top-stories', label: 'Top Stories' },
     { id: 'local', label: 'Local' },
     { id: 'national', label: 'National' },
     { id: 'politics', label: 'Politics' },
     { id: 'sports', label: 'Sports' },
     { id: 'health', label: 'Health' },
-    { id: 'opinion', label: 'Opinion' },
     { id: 'weather', label: 'Weather' },
-    { id: 'entertainment', label: 'Entertainment' }
+    { id: 'entertainment', label: 'Entertainment' },
+    { id: 'business', label: 'Business' },
+    { id: 'crime', label: 'Crime' },
+    { id: 'lifestyle', label: 'Lifestyle' },
+    { id: 'obituaries', label: 'Obituaries' }
 ];
 
 export default function HomeFeed({ initialPosts }: HomeFeedProps) {
@@ -44,12 +49,26 @@ export default function HomeFeed({ initialPosts }: HomeFeedProps) {
 
     // Filter and Sort Logic
     const filteredPosts = initialPosts.filter(post => {
-        // Handle Exclusives filter
+        // 1. Obituaries are ALWAYS excluded from the main 'all' feed
+        if (activeCategory === 'all') {
+            return post.category !== 'obituaries';
+        }
+
+        // 2. Handle Exclusives filter
         if (activeCategory === 'exclusives') {
             return post.isOriginal === true;
         }
-        // Handle other category filters
-        return activeCategory === 'all' || post.category === activeCategory;
+
+        // 3. Handle Local/National distinction
+        if (activeCategory === 'local') {
+            return post.isNational === false;
+        }
+        if (activeCategory === 'national') {
+            return post.isNational === true;
+        }
+
+        // 4. Handle other specific category filters
+        return post.category === activeCategory;
     });
 
     const sortedPosts = [...filteredPosts].sort((a, b) => {
@@ -59,7 +78,10 @@ export default function HomeFeed({ initialPosts }: HomeFeedProps) {
     });
 
     const visiblePosts = sortedPosts.slice(0, visibleCount);
-    const tickerHeadlines = initialPosts.slice(0, 5).map(post => post.title);
+
+    // Create ticker items including Lottery mention
+    const newsHeadlines = initialPosts.slice(0, 5).map(post => post.title.toUpperCase());
+    const tickerHeadlines = ["MAINE LOTTERY: LATEST RESULTS IN TOP BAR", ...newsHeadlines];
     const heroPosts = initialPosts.slice(0, 6);
 
     return (

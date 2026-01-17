@@ -5,8 +5,8 @@
   border-bottom: 1px solid var(--border-color-dim);
   height: 40px;
   overflow: hidden;
-  margin-top: -2rem; /* Pull up to join hero if desired, or keep separate. */
-  margin-bottom: 2rem;
+  margin-top: 0;
+  margin-bottom: 0;
   margin-left: -1rem;
   width: calc(100% + 2rem);
   position: relative;

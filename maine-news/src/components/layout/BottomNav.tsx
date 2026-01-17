@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Clock, Grid, Search, MessageSquarePlus } from 'lucide-react';
@@ -16,10 +17,27 @@ export default function BottomNav() {
         { label: 'Search', href: '/search', icon: Search },
     ];
 
+    const [visible, setVisible] = useState(true);
+    const [prevScrollPos, setPrevScrollPos] = useState(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollPos = window.pageYOffset;
+            const isScrollingUp = prevScrollPos > currentScrollPos;
+
+            // Show if scrolling up or at the top
+            setVisible(isScrollingUp || currentScrollPos < 10);
+            setPrevScrollPos(currentScrollPos);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [prevScrollPos]);
+
     return (
         <>
-            <div className={styles.navProxy} aria-hidden="true" />
-            <nav className={styles.bottomNav}>
+            <div className={`${styles.navProxy} ${visible ? '' : styles.hidden}`} aria-hidden="true" />
+            <nav className={`${styles.bottomNav} ${visible ? '' : styles.hidden}`}>
                 {navItems.map((item) => {
                     const isActive = pathname === item.href;
                     return (

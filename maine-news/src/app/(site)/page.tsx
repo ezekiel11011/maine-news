@@ -6,7 +6,7 @@ import { posts as dbPosts } from '@/db/schema';
 import { desc } from 'drizzle-orm';
 
 export const metadata: Metadata = {
-  title: 'Home | Maine News Today',
+  title: 'Home | Maine News Now',
   description: 'The latest news, politics, and stories from across the great state of Maine.',
 };
 
@@ -33,9 +33,10 @@ export default async function Home() {
     slug: post.slug,
     image: (post.entry.image as unknown as string) || undefined,
     category: post.entry.category as string,
+    isNational: post.entry.isNational as boolean,
     publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
     author: post.entry.author as string || 'Staff',
-    isOriginal: !post.entry.sourceUrl && ['Staff', 'Maine News Today', 'Nathan Reardon'].includes(post.entry.author as string || '')
+    isOriginal: !post.entry.sourceUrl && ['Staff', 'Maine News Now', 'Nathan Reardon'].includes(post.entry.author as string || '')
   }));
 
   // Transform database posts (these are always original)
@@ -45,6 +46,7 @@ export default async function Home() {
     slug: post.slug,
     image: post.image || undefined,
     category: post.category,
+    isNational: post.isNational || false,
     publishedDate: post.publishedDate.toISOString(),
     author: post.author,
     isOriginal: true
@@ -61,7 +63,7 @@ export default async function Home() {
   });
 
   return (
-    <div style={{ marginTop: '2rem' }}>
+    <div>
       <HomeFeed initialPosts={allPosts} />
     </div>
   );

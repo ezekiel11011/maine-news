@@ -1,4 +1,4 @@
-# Maine News Today: Admin & Content Management Guide
+# Maine News Now: Admin & Content Management Guide
 
 This document summarizes the changes made to the "Exclusive" content system and provides instructions for managing the site.
 
@@ -37,5 +37,5 @@ The system is currently stable and fully integrated. If you wish to expand furth
 *   **Newsletter Integration**: The custom editor content can be tied into the Resend newsletter system for automatic broadcasts.
 
 ---
-**Maine News Today Implementation Team**
+**Maine News Now Implementation Team**
 *Unbiased. Unafraid. Unfiltered.*

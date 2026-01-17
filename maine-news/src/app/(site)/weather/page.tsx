@@ -6,7 +6,7 @@ import { posts as dbPosts } from '@/db/schema';
 import { desc, eq } from 'drizzle-orm';
 
 export const metadata: Metadata = {
-    title: 'Maine Weather | Maine News Today',
+    title: 'Maine Weather | Maine News Now',
     description: 'Latest weather updates, forecasts, and storm alerts for the Pine Tree State.',
 };
 

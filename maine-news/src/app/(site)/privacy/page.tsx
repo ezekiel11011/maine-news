@@ -11,7 +11,7 @@ export default function PrivacyPage() {
 
                 <section>
                     <h2>Introduction</h2>
-                    <p>This Global Privacy Policy (the “Policy”) describes how Maine News Today (“Company,” “we,” “our,” or “us”) collects, uses, discloses, and safeguards personal information across all current and future websites, subdomains, and online services (collectively, the “Services”). This Policy sets a global standard for privacy compliance and data protection in accordance with the highest international legal frameworks, including but not limited to the General Data Protection Regulation (EU) 2016/679 (“GDPR”), the California Consumer Privacy Act and Privacy Rights Act (CCPA/CPRA), the Virginia Consumer Data Protection Act (VCDPA), the Canadian Personal Information Protection and Electronic Documents Act (PIPEDA), and the Brazilian General Data Protection Law (LGPD). It applies to all users regardless of geographic location.</p>
+                    <p>This Global Privacy Policy (the “Policy”) describes how Maine News Now (“Company,” “we,” “our,” or “us”) collects, uses, discloses, and safeguards personal information across all current and future websites, subdomains, and online services (collectively, the “Services”). This Policy sets a global standard for privacy compliance and data protection in accordance with the highest international legal frameworks, including but not limited to the General Data Protection Regulation (EU) 2016/679 (“GDPR”), the California Consumer Privacy Act and Privacy Rights Act (CCPA/CPRA), the Virginia Consumer Data Protection Act (VCDPA), the Canadian Personal Information Protection and Electronic Documents Act (PIPEDA), and the Brazilian General Data Protection Law (LGPD). It applies to all users regardless of geographic location.</p>
                 </section>
 
                 <section>
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
                     <p>We may update this Policy to reflect legal, technical, or business developments. The latest version will always be available on our website, with a new &apos;Last Updated&apos; date. Continued use of our Services constitutes acceptance of any modifications.</p>
                 </section>
 
-                <p>© 2026 Maine News Today. All rights reserved.</p>
+                <p>© 2026 Maine News Now. All rights reserved.</p>
             </div>
         </main>
     );

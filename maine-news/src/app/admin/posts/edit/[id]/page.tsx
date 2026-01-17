@@ -258,7 +258,7 @@ export default function EditPostPage() {
                                 }}
                             >
                                 <option value="Nathan Reardon">Nathan Reardon</option>
-                                <option value="Maine News Today">Maine News Today</option>
+                                <option value="Maine News Now">Maine News Now</option>
                                 <option value="Staff">Staff</option>
                             </select>
                         </div>

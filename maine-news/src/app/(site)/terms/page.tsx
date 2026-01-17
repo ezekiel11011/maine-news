@@ -11,7 +11,7 @@ export default function TermsPage() {
 
                 <section>
                     <h2>Introduction</h2>
-                    <p>These Terms of Service (the “Terms”) describe how Maine News Today (“Company,” “we,” “our,” or “us”) provides Services across all current and future websites, subdomains, and online services (collectively, the “Services”). These Terms set a global standard for usage compliance and legal protection in accordance with the highest international legal frameworks. By using our Services, you agree to be bound by these Terms.</p>
+                    <p>These Terms of Service (the “Terms”) describe how Maine News Now (“Company,” “we,” “our,” or “us”) provides Services across all current and future websites, subdomains, and online services (collectively, the “Services”). These Terms set a global standard for usage compliance and legal protection in accordance with the highest international legal frameworks. By using our Services, you agree to be bound by these Terms.</p>
                 </section>
 
                 <section>
@@ -84,7 +84,7 @@ export default function TermsPage() {
                     <p>We may update these Terms to reflect legal or business developments. The latest version will always be available on our website.</p>
                 </section>
 
-                <p>© 2026 Maine News Today. All rights reserved.</p>
+                <p>© 2026 Maine News Now. All rights reserved.</p>
             </div>
         </main>
     );

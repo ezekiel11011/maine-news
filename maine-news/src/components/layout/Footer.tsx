@@ -8,7 +8,7 @@ export default function Footer() {
         <footer className={styles.footer}>
             <div className={styles.container}>
                 <div className={styles.brand}>
-                    <h2 className={styles.logo}>MAINE NEWS TODAY</h2>
+                    <h2 className={styles.logo}>Maine News Now</h2>
                     <p className={styles.tagline}>Unbiased. Unafraid. Unfiltered.</p>
 
                     <div className={styles.socialLinks}>
@@ -74,7 +74,7 @@ export default function Footer() {
                 </div>
 
                 <div className={styles.bottomBar}>
-                    <p>© {new Date().getFullYear()} Maine News Today. All rights reserved.</p>
+                    <p>© {new Date().getFullYear()} Maine News Now. All rights reserved.</p>
                 </div>
             </div>
         </footer>

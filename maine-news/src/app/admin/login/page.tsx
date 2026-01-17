@@ -61,7 +61,7 @@ export default function LoginPage() {
                     </div>
                     <h1 className={styles.title}>Admin Portal</h1>
                     <p className={styles.subtitle}>
-                        Enter your credentials or use GitHub to manage Maine News Today.
+                        Enter your credentials or use GitHub to manage Maine News Now.
                     </p>
                 </div>
 
@@ -138,14 +138,14 @@ export default function LoginPage() {
                     </button>
 
                     <p className={styles.footerText}>
-                        Secured by Maine News Today Internal Protocols.
+                        Secured by Maine News Now Internal Protocols.
                         All access attempts are audited.
                     </p>
                 </div>
 
                 <div className={styles.backLinkWrapper}>
                     <Link href="/" className={styles.backLink}>
-                        ← Back to Maine News Today
+                        ← Back to Maine News Now
                     </Link>
                 </div>
             </div>

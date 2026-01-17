@@ -1,11 +1,12 @@
 .hero {
   position: relative;
   width: 100vw;
+  margin-top: 0;
+  margin-bottom: 0;
   margin-left: -1rem; /* Break out of container padding */
   width: calc(100% + 2rem);
   aspect-ratio: 4 / 3; /* Changed from 3/4 to 4/3 to show more of the image */
   max-height: 70vh;
-  margin-bottom: 2rem;
 }
 
 @media (min-width: 768px) {
@@ -83,6 +84,11 @@
   animation: pulse 2s infinite;
 }
 
+.nationalBadge {
+    background-color: #1e3a8a !important;
+    animation: none !important;
+}
+
 .title {
   font-family: var(--font-heading);
   font-size: clamp(1.5rem, 5vw, 3rem); /* Fluid typography */
@@ -92,6 +98,7 @@
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   max-width: 90%;

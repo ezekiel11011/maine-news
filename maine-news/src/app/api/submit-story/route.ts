@@ -30,7 +30,7 @@ export async function POST(request: Request) {
         }
 
         const data = await resend.emails.send({
-            from: 'Maine News Today <info@nathanreardon.com>',
+            from: 'Maine News Now <info@nathanreardon.com>',
             to: ['jamesezekiel039@gmail.com', 'info@mainenewsnow.com', 'nathan@membershipauto.com'],
             subject: `STORY SUBMISSION: ${title || 'New Tip'}`,
             html: `

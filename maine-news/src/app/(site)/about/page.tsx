@@ -5,7 +5,7 @@ import styles from '../privacy/Policy.module.css';
 export default function AboutPage() {
     return (
         <main className={styles.container}>
-            <h1 className={styles.title}>About Maine News Today</h1>
+            <h1 className={styles.title}>About Maine News Now</h1>
             <div className={styles.content}>
                 <div style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
                     <Image
@@ -24,7 +24,7 @@ export default function AboutPage() {
 
                 <section>
                     <h2>Our Mission</h2>
-                    <p>Maine News Today is dedicated to providing high-fidelity, real-time news coverage for the people of Maine and beyond. In an era of increasing misinformation, we stand as a beacon of editorial minimalism and live intelligence.</p>
+                    <p>Maine News Now is dedicated to providing high-fidelity, real-time news coverage for the people of Maine and beyond. In an era of increasing misinformation, we stand as a beacon of editorial minimalism and live intelligence.</p>
                 </section>
 
                 <section>
@@ -42,7 +42,7 @@ export default function AboutPage() {
                     <p>Have a tip or a question? Reach out to our team at <a href="mailto:info@mainenewsnow.com" style={{ color: 'var(--color-accent)' }}>info@mainenewsnow.com</a>.</p>
                 </section>
 
-                <p>© 2026 Maine News Today. All rights reserved.</p>
+                <p>© 2026 Maine News Now. All rights reserved.</p>
             </div>
         </main>
     );

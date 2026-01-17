@@ -63,16 +63,19 @@ interface ScrapedVideo {
     source: string;
 }
 
-// Topic keywords for auto-categorization
+// Topic keywords for auto-categorization - NOW BASED ON TITLE ONLY
 const TOPIC_KEYWORDS = {
-    'local': ['town', 'city', 'community', 'local', 'municipal', 'school', 'county'],
-    'politics': ['legislature', 'governor', 'election', 'vote', 'policy', 'bill', 'senate', 'house', 'congress', 'white house'],
-    'opinion': ['editorial', 'opinion', 'commentary', 'letter to editor'],
-    'top-stories': ['breaking', 'urgent', 'alert', 'major', 'emergency'],
-    'health': ['health', 'medical', 'disease', 'vaccine', 'cdc', 'fda', 'medicine', 'hospital'],
-    'sports': ['team', 'player', 'game', 'score', 'coach', 'championship', 'tournament', 'basketball', 'football', 'hockey', 'baseball'],
-    'entertainment': ['movie', 'film', 'music', 'actor', 'celebrity', 'concert', 'theater', 'arts', 'culture'],
-    'weather': ['storm', 'forecast', 'snow', 'rain', 'temperature', 'wind', 'warning', 'advisory', 'climate']
+    'politics': ['legislature', 'governor', 'election', 'vote', 'policy', 'bill', 'senate', 'house', 'congress', 'white house', 'biden', 'trump', 'mills', 'ballot'],
+    'opinion': ['editorial', 'opinion', 'commentary', 'letter to editor', 'columnist', 'perspective'],
+    'top-stories': ['breaking', 'urgent', 'alert', 'major', 'emergency', 'fatality', 'crash', 'police', 'arrested'],
+    'health': ['health', 'medical', 'disease', 'vaccine', 'cdc', 'fda', 'medicine', 'hospital', 'virus', 'pandemic', 'flu'],
+    'sports': ['team', 'player', 'game', 'score', 'coach', 'championship', 'tournament', 'basketball', 'football', 'hockey', 'baseball', 'bruins', 'celtics', 'patriots'],
+    'entertainment': ['movie', 'film', 'music', 'actor', 'celebrity', 'concert', 'theater', 'arts', 'culture', 'festival'],
+    'business': ['economy', 'market', 'jobs', 'unemployment', 'revenue', 'profit', 'industry', 'retail', 'company', 'startup', 'bank', 'interest rates', 'inflation'],
+    'crime': ['police', 'arrest', 'shooting', ' robbery', 'theft', 'burglary', 'murder', 'assault', 'jail', 'prison', 'sentenced', 'charged', 'court', 'investigation'],
+    'lifestyle': ['recipe', 'cooking', 'travel', 'home', 'garden', 'fashion', 'outdoors', 'fishing', 'hunting', 'hiking', 'nature', 'community'],
+    'weather': ['weather forecast', 'winter storm', 'snow totals', 'snowfall', 'rain shower', 'wind chill', 'weather warning', 'weather advisory', 'meteorologist', 'weather radar', 'weather report', 'ice storm', 'icy roads', 'black ice', 'blizzard warning', 'temperature', 'snow forecast', 'lake effect snow', 'snowstorm', 'rainstorm', 'lightning', 'thunderstorm', 'humidity', 'wind gusts', 'icy conditions', 'snow sleet'],
+    'obituaries': ['obituary', 'death notice']
 };
 
 interface ScrapedStory {
@@ -81,7 +84,7 @@ interface ScrapedStory {
     content: string;
     source: string;
     sourceUrl: string;
-    category: 'local' | 'national' | 'politics' | 'opinion' | 'top-stories' | 'health' | 'sports' | 'weather' | 'entertainment';
+    category: 'local' | 'national' | 'politics' | 'opinion' | 'top-stories' | 'health' | 'sports' | 'weather' | 'entertainment' | 'obituaries' | 'business' | 'crime' | 'lifestyle';
     region?: string;
     locations: string[];
     publishedDate: string;
@@ -116,8 +119,13 @@ function detectRegion(locations: string[]): string | undefined {
     return undefined;
 }
 
-function categorizeStory(text: string, feedType: string): 'local' | 'national' | 'politics' | 'opinion' | 'top-stories' | 'health' | 'sports' | 'weather' | 'entertainment' {
-    const lowerText = text.toLowerCase();
+function categorizeStory(title: string, feedType: string): 'local' | 'national' | 'politics' | 'opinion' | 'top-stories' | 'health' | 'sports' | 'weather' | 'entertainment' | 'obituaries' {
+    const lowerTitle = title.toLowerCase();
+
+    // STRICT CHECK FOR OBITUARIES FIRST
+    if (lowerTitle.includes('obituary') || lowerTitle.includes('death notice')) {
+        return 'obituaries';
+    }
 
     // If from health feed, default to health category
     if (feedType === 'health') {
@@ -125,13 +133,15 @@ function categorizeStory(text: string, feedType: string): 'local' | 'national' |
     }
 
     let maxScore = 0;
-    let category: 'local' | 'national' | 'politics' | 'opinion' | 'top-stories' | 'health' | 'sports' | 'weather' | 'entertainment' = feedType === 'national' ? 'national' : 'local';
+    let category: 'local' | 'national' | 'politics' | 'opinion' | 'top-stories' | 'health' | 'sports' | 'weather' | 'entertainment' | 'obituaries' = feedType === 'national' ? 'national' : 'local';
 
     for (const [cat, keywords] of Object.entries(TOPIC_KEYWORDS)) {
-        const score = keywords.filter(kw => lowerText.includes(kw)).length;
+        if (cat === 'obituaries') continue; // Handled above
+
+        const score = keywords.filter(kw => lowerTitle.includes(kw)).length;
         if (score > maxScore) {
             maxScore = score;
-            category = cat as "national" | "local" | "opinion" | "health" | "politics" | "top-stories" | "sports" | "weather" | "entertainment";
+            category = cat as any;
         }
     }
 
@@ -494,6 +504,7 @@ image: ${story.image ? JSON.stringify(story.image) : 'null'}
 author: ${JSON.stringify(story.author || story.source)}
 publishedDate: ${new Date(story.publishedDate).toISOString().split('T')[0]}
 category: ${story.category}
+isNational: ${story.isNational}
 sourceUrl: ${JSON.stringify(story.sourceUrl)}
 ---
 
@@ -560,7 +571,7 @@ export async function runScraper(options: { save: boolean, includeNational: bool
         const enrichedMaineStories = maineStories.map(story => {
             const locations = detectLocations(story.title + ' ' + story.excerpt + ' ' + story.content);
             const region = detectRegion(locations);
-            const category = categorizeStory(story.title + ' ' + story.excerpt, story.feedType);
+            const category = categorizeStory(story.title, story.feedType);
             const urgency = calculateUrgency(story.title + ' ' + story.excerpt);
 
             return {
@@ -576,7 +587,7 @@ export async function runScraper(options: { save: boolean, includeNational: bool
         const enrichedNationalStories = nationalStories
             .map(story => ({
                 ...story,
-                category: categorizeStory(story.title + ' ' + story.excerpt, story.feedType),
+                category: categorizeStory(story.title, story.feedType),
                 urgency: calculateUrgency(story.title + ' ' + story.excerpt)
             }))
             .sort((a, b) => b.urgency - a.urgency)

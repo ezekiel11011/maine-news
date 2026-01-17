@@ -3,17 +3,14 @@
 }
 
 .stickyNav {
-    position: sticky;
-    top: var(--header-height-desktop);
+    position: relative;
     background-color: var(--color-bg);
-    z-index: 900; /* Stays below main header (1000) */
     border-bottom: 1px solid var(--border-color-dim);
+    margin-top: 0;
+    margin-bottom: 2rem;
     margin-left: -1rem;
     width: calc(100% + 2rem);
     padding: 0 1rem;
-    margin-top: -2rem; /* Negate the Ticker's margin to sit flush */
-    margin-bottom: 2rem;
-    will-change: transform;
 }
 
 .categoryTabs {
@@ -210,7 +207,7 @@
 
 @media (max-width: 768px) {
     .stickyNav {
-        top: calc(var(--header-height-mobile) + 32px); /* Account for header + social bar */
+        top: auto;
     }
     .categoryTabs {
         padding: 0.75rem 0;

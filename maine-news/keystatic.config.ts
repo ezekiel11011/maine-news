@@ -46,8 +46,17 @@ export default config({
                         { label: 'Sports', value: 'sports' },
                         { label: 'Weather', value: 'weather' },
                         { label: 'Entertainment', value: 'entertainment' },
+                        { label: 'Business', value: 'business' },
+                        { label: 'Crime', value: 'crime' },
+                        { label: 'Lifestyle', value: 'lifestyle' },
+                        { label: 'Obituaries', value: 'obituaries' },
                     ],
                     defaultValue: 'local'
+                }),
+                isNational: fields.checkbox({
+                    label: 'Is National News?',
+                    description: 'Check this if the news is national/not specific to Maine',
+                    defaultValue: false
                 }),
                 sourceUrl: fields.text({ label: 'Source URL (Scraped Only)', description: 'Leave empty for original content' }),
                 content: fields.markdoc({

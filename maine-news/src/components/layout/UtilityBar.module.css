@@ -1,0 +1,121 @@
+.utilityBar {
+    background-color: #000;
+    color: #fff;
+    height: 32px;
+    border-bottom: 1px solid #333;
+    font-size: 10px;
+    font-family: var(--font-body-sans);
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1001;
+}
+
+.container {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.left {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.right {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.icon {
+    margin-right: 8px;
+    color: var(--color-accent);
+}
+
+.lottoLabel {
+    color: var(--color-accent);
+    margin-right: 15px;
+    font-weight: 800;
+}
+
+.center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.lottoItem {
+    display: flex;
+    align-items: center;
+    animation: slideInRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.gameName {
+    color: #fff;
+    margin-right: 10px;
+    opacity: 0.9;
+}
+
+.numbers {
+    display: flex;
+    gap: 4px;
+    margin: 0 5px;
+}
+
+.number {
+    background: #222;
+    color: #fff;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 9px;
+    border: 1px solid #444;
+}
+
+.number.extra {
+    background: var(--color-accent);
+    color: #000;
+    border-color: var(--color-accent);
+}
+
+.jackpot {
+    color: var(--color-accent);
+    margin-left: 12px;
+    font-weight: 700;
+}
+
+.date {
+    opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+    .right, .lottoLabel {
+        display: none;
+    }
+    
+    .left {
+        margin-right: 10px;
+    }
+
+    .container {
+        padding: 0 10px;
+    }
+}

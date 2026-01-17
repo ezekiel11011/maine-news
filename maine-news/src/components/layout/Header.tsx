@@ -9,13 +9,13 @@ export default function Header() {
             <Link href="/" className={styles.logoWrapper}>
                 <Image
                     src="/maine-news-now.png"
-                    alt="Maine News Today"
+                    alt="Maine News Now"
                     width={180}
                     height={40}
                     className={styles.logoImage}
                     priority
                 />
-                <span className={styles.siteName}>Maine News</span>
+                <span className={styles.siteName}>Maine News Now</span>
             </Link>
 
             <nav className={styles.desktopNav}>
@@ -27,11 +27,11 @@ export default function Header() {
 
             <div className={styles.headerRightSection}>
                 <div className={styles.topActionsRow}>
-                    <Link href="/weather" className={styles.iconButton} aria-label="Weather">
-                        <CloudSun size={24} strokeWidth={1.5} color="var(--color-accent)" />
-                    </Link>
                     <Link href="/submit" className={styles.tipButton} id="send-tip-header">
                         <span>Send News Tip</span>
+                    </Link>
+                    <Link href="/weather" className={styles.iconButton} aria-label="Weather">
+                        <CloudSun size={22} strokeWidth={1.5} />
                     </Link>
                     <Link href="/search" className={styles.iconButton} aria-label="Search">
                         <Search size={22} strokeWidth={1.5} />

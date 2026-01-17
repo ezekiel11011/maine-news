@@ -12,6 +12,7 @@ interface HeroPost {
     slug: string;
     image?: string;
     category: string;
+    isNational: boolean;
     author: string;
     publishedDate: string;
 }
@@ -46,7 +47,7 @@ export default function Hero({ posts }: HeroProps) {
                 <div className={styles.imageWrapper}>
                     <Image
                         src="/maine-news-longer-img.jpeg"
-                        alt="Maine News Today"
+                        alt="Maine News Now"
                         fill
                         className={styles.image}
                         priority
@@ -54,7 +55,7 @@ export default function Hero({ posts }: HeroProps) {
                     <div className={styles.overlay} />
                 </div>
                 <div className={styles.content}>
-                    <h1 className={styles.title}>Maine News Today</h1>
+                    <h1 className={styles.title}>Maine News Now</h1>
                     <p className={styles.subtitle}>Unbiased. Unafraid. Unfiltered.</p>
                 </div>
             </section>
@@ -112,6 +113,7 @@ export default function Hero({ posts }: HeroProps) {
 
                 <div className={styles.content}>
                     <div className={styles.badges}>
+                        {currentPost.isNational && <span className={`${styles.badge} ${styles.nationalBadge}`}>NATIONAL</span>}
                         <span className={styles.badge}>{currentPost.category}</span>
                     </div>
                     <h1 className={styles.title}>{currentPost.title}</h1>

@@ -8,6 +8,7 @@ interface Story {
     slug: string;
     publishedDate: string;
     category?: string;
+    isNational?: boolean;
 }
 
 interface SectionProps {
@@ -31,6 +32,7 @@ export default function SectionList({ title, stories }: SectionProps) {
                         slug={story.slug}
                         publishedDate={story.publishedDate}
                         category={story.category}
+                        isNational={story.isNational}
                     />
                 ))}
             </div>

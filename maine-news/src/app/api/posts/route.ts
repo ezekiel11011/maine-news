@@ -52,8 +52,10 @@ export async function GET(request: Request) {
             slug: post.slug,
             image: (post.entry.image as unknown as string) || undefined,
             category: post.entry.category as string,
+            isNational: post.entry.isNational as boolean || false,
             publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
             author: post.entry.author as string || 'Staff',
+            isOriginal: false
         }));
 
         const formattedAuthored = authoredPosts.map(post => ({
@@ -62,8 +64,10 @@ export async function GET(request: Request) {
             slug: post.slug,
             image: post.image || undefined,
             category: post.category,
+            isNational: post.isNational || false,
             publishedDate: post.publishedDate.toISOString(),
             author: post.author,
+            isOriginal: true
         }));
 
         const allPosts = [...formattedAuthored, ...formattedKeystatic];

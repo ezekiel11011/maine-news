@@ -2,7 +2,7 @@ import SubmitStoryForm from '@/components/article/SubmitStoryForm';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Submit a Story | Maine News Today',
+    title: 'Submit a Story | Maine News Now',
     description: 'Help us tell Maine’s stories. Submit a tip, photo, or story to our newsroom.',
 };
 

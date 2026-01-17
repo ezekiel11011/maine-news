@@ -11,6 +11,7 @@ export const posts = pgTable('posts', {
     content: text('content').notNull(), // Markdown or HTML content
     sourceUrl: text('source_url'),
     isOriginal: boolean('is_original').default(true).notNull(),
+    isNational: boolean('is_national').default(false).notNull(),
     metadata: jsonb('metadata').default({}), // For extra fields like SEO tags
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -35,4 +36,14 @@ export const videos = pgTable('videos', {
     publishedDate: timestamp('published_date').defaultNow().notNull(),
     description: text('description'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const lotteryResults = pgTable('lottery_results', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    game: text('game').notNull().unique(), // e.g., 'powerball', 'pick-3'
+    numbers: text('numbers').notNull(), // Comma separated or JSON string
+    extra: text('extra'), // Powerball or Bonus ball
+    jackpot: text('jackpot'),
+    drawDate: text('draw_date').notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

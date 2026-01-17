@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-    title: "Maine News Today",
+    title: "Maine News Now",
     description: "Editorial Minimalism with Live Intelligence.",
 };
 
