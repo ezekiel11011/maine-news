@@ -3,6 +3,8 @@ import fs from 'fs/promises';
 import path from 'path';
 import matter from 'gray-matter';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
     try {
         const videosDir = path.join(process.cwd(), 'src/content/videos');

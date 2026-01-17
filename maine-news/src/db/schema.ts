@@ -47,3 +47,11 @@ export const lotteryResults = pgTable('lottery_results', {
     drawDate: text('draw_date').notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+export const maineMinute = pgTable('maine_minute', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    date: text('date').notNull().unique(), // YYYY-MM-DD
+    tagline: text('tagline').notNull().default('Everything that matters. One minute.'),
+    stories: jsonb('stories').notNull().default([]), // Array of { postSlug: string, summary: string }
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+});

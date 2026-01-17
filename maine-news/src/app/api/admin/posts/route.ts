@@ -4,6 +4,8 @@ import { posts } from '@/db/schema';
 import { desc } from 'drizzle-orm';
 import { uploadToS3 } from '@/lib/s3';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
     try {
         const allPosts = await db.query.posts.findMany({

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { reader } from '@/lib/reader';
 import { db } from '@/db';
-import { posts as dbPosts } from '@/db/schema';
+import { posts as dbPosts, authors as dbAuthors } from '@/db/schema';
 import { desc } from 'drizzle-orm';
 
 export const dynamic = 'force-dynamic';

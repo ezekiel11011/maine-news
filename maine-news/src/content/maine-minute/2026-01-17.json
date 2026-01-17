@@ -1,0 +1,18 @@
+{
+  "date": "2026-01-17",
+  "tagline": "Everything that matters. One minute.",
+  "stories": [
+    {
+      "post": "woman-found-dead-in-skowhegan-home-state-police-investigating",
+      "summary": "State police are investigating the death of a woman found in her Skowhegan home on Saturday morning. Authorities have not yet released the victim's identity or details on the cause of death."
+    },
+    {
+      "post": "snowfall-brings-wintry-scenes-across-maine",
+      "summary": "A fresh blanket of snow covered much of Maine today, creating picturesque winter landscapes from Portland to Bangor. Travel remains slow but steady as road crews continue to clear primary routes."
+    },
+    {
+      "post": "former-saco-mayor-wins-city-council-special-election-by-3-votes",
+      "summary": "In a razor-thin contest, Saco’s former mayor secured a seat on the City Council by a margin of just three votes. The recount confirmed the victory late Friday evening after a high-turnout special election."
+    }
+  ]
+}

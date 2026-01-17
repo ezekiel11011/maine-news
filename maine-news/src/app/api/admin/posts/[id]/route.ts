@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { posts } from '@/db/schema';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ id: string }> }

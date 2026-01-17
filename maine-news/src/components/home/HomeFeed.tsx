@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Hero from '@/components/home/Hero';
 import LiveTicker from '@/components/home/LiveTicker';
+import MaineMinuteCard from '@/components/home/MaineMinuteCard';
 import SectionList from '@/components/home/SectionList';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import { Filter, ArrowUpDown, X } from 'lucide-react';
@@ -22,6 +23,13 @@ interface Post {
 
 interface HomeFeedProps {
     initialPosts: Post[];
+    latestMinute?: {
+        tagline: string;
+        stories: {
+            title: string;
+            slug: string;
+        }[];
+    } | null;
 }
 
 const CATEGORIES = [
@@ -41,7 +49,7 @@ const CATEGORIES = [
     { id: 'obituaries', label: 'Obituaries' }
 ];
 
-export default function HomeFeed({ initialPosts }: HomeFeedProps) {
+export default function HomeFeed({ initialPosts, latestMinute }: HomeFeedProps) {
     const [activeCategory, setActiveCategory] = useState('all');
     const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
     const [visibleCount, setVisibleCount] = useState(15);
@@ -89,6 +97,13 @@ export default function HomeFeed({ initialPosts }: HomeFeedProps) {
             <Hero posts={heroPosts} />
 
             <LiveTicker headlines={tickerHeadlines} />
+
+            {latestMinute && (
+                <MaineMinuteCard
+                    tagline={latestMinute.tagline}
+                    stories={latestMinute.stories}
+                />
+            )}
 
             <div className={styles.stickyNav}>
                 <div className={styles.categoryTabs}>

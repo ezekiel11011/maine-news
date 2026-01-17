@@ -20,6 +20,7 @@ export default function Header() {
 
             <nav className={styles.desktopNav}>
                 <Link href="/" className={styles.desktopNavLink}>Home</Link>
+                <Link href="/news/maine-minute" className={styles.desktopNavLink}>The Maine Minute®️</Link>
                 <Link href="/latest" className={styles.desktopNavLink}>Latest</Link>
                 <Link href="/sections" className={styles.desktopNavLink}>Sections</Link>
                 <Link href="/opinion" className={styles.desktopNavLink}>Opinion</Link>

@@ -112,6 +112,27 @@ export default config({
                 isLive: fields.checkbox({ label: 'Is Live Now?' }),
                 description: fields.text({ label: 'Description', multiline: true }),
             }
+        }),
+        maineMinute: collection({
+            label: 'The Maine Minute',
+            slugField: 'date',
+            path: `${repoPathPrefix}src/content/maine-minute/*`,
+            format: { data: 'json' },
+            schema: {
+                date: fields.slug({ name: { label: 'Date (YYYY-MM-DD)' } }),
+                tagline: fields.text({ label: 'Tagline', defaultValue: 'Everything that matters. One minute.' }),
+                stories: fields.array(
+                    fields.object({
+                        post: fields.relationship({ label: 'Original Article', collection: 'posts' }),
+                        summary: fields.text({ label: 'Snapshot Summary (2 sentences max)', multiline: true }),
+                    }),
+                    {
+                        label: 'Stories',
+                        itemLabel: props => props.fields.summary.value || 'New StoryDigest',
+                        validation: { length: { max: 6 } }
+                    }
+                ),
+            }
         })
     },
 });

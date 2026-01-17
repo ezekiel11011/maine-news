@@ -22,6 +22,10 @@ const readerConfig = {
         videos: {
             ...config.collections.videos,
             path: 'src/content/videos/*',
+        },
+        maineMinute: {
+            ...config.collections.maineMinute,
+            path: 'src/content/maine-minute/*',
         }
     }
 };

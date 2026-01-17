@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { runScraper } from '../route';
 
+export const dynamic = 'force-dynamic';
+
 // This endpoint is called by Vercel Cron daily
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);

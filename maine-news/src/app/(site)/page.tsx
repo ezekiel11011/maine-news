@@ -2,8 +2,8 @@ import HomeFeed from '@/components/home/HomeFeed';
 import { reader } from '@/lib/reader';
 import { Metadata } from 'next';
 import { db } from '@/db';
-import { posts as dbPosts } from '@/db/schema';
-import { desc } from 'drizzle-orm';
+import { posts as dbPosts, maineMinute } from '@/db/schema';
+import { desc, eq } from 'drizzle-orm';
 
 export const metadata: Metadata = {
   title: 'Home | Maine News Now',
@@ -62,9 +62,62 @@ export default async function Home() {
     return dateB - dateA;
   });
 
+  // Fetch Maine Minute (Priority: Database)
+  let latestMinute = null;
+  const dbMinutes = await db.query.maineMinute.findMany({
+    orderBy: [desc(maineMinute.date)],
+    limit: 1
+  });
+
+  if (dbMinutes.length > 0) {
+    const entry = dbMinutes[0];
+    const stories = await Promise.all((entry.stories as any[]).map(async (s: any) => {
+      // Resolve post title from either source
+      let title = 'Untitled Story';
+      const post = await reader.collections.posts.read(s.postSlug);
+      if (post) {
+        title = post.title as string;
+      } else {
+        const dbPost = await db.query.posts.findFirst({
+          where: eq(dbPosts.slug, s.postSlug)
+        });
+        if (dbPost) title = dbPost.title as string;
+      }
+      return { title, slug: s.postSlug };
+    }));
+    latestMinute = {
+      tagline: entry.tagline as string,
+      stories
+    };
+  } else {
+    // Fallback: Keystatic
+    const minutes = await reader.collections.maineMinute.all();
+    const sortedMinutes = minutes.sort((a, b) => b.slug.localeCompare(a.slug));
+    const latestMinuteEntry = sortedMinutes[0];
+
+    if (latestMinuteEntry) {
+      const stories = await Promise.all(((latestMinuteEntry.entry as any).stories as any[]).map(async (s: any) => {
+        if (!s.post) return null;
+        const post = await reader.collections.posts.read(s.post);
+        return {
+          title: (post as any)?.title || 'Untitled Story',
+          slug: s.post as string
+        };
+      }));
+
+      latestMinute = {
+        tagline: (latestMinuteEntry.entry as any).tagline as string,
+        stories: stories.filter((s): s is { title: string; slug: string } => s !== null)
+      };
+    }
+  }
+
   return (
     <div>
-      <HomeFeed initialPosts={allPosts} />
+      <HomeFeed
+        initialPosts={allPosts}
+        latestMinute={latestMinute}
+      />
     </div>
   );
 }

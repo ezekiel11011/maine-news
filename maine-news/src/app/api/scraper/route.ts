@@ -4,6 +4,8 @@ import fs from 'fs/promises';
 import path from 'path';
 import TurndownService from 'turndown';
 
+export const dynamic = 'force-dynamic';
+
 const parser = new Parser();
 const turndown = new TurndownService();
 

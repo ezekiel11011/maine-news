@@ -3,6 +3,8 @@ import { db } from '@/db';
 import { lotteryResults } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
+export const dynamic = 'force-dynamic';
+
 export const revalidate = 7200; // 2 hours
 
 async function getDbResult(game: string) {

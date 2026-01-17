@@ -14,7 +14,7 @@ export default function BottomNav() {
         { label: 'Latest', href: '/latest', icon: Clock },
         { label: 'Submit', href: '/submit', icon: MessageSquarePlus },
         { label: 'Sections', href: '/sections', icon: Grid },
-        { label: 'Search', href: '/search', icon: Search },
+        { label: 'Minute', href: '/news/maine-minute', isMinute: true },
     ];
 
     const [visible, setVisible] = useState(true);
@@ -44,10 +44,21 @@ export default function BottomNav() {
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+                            className={`${styles.navItem} ${isActive ? styles.navItemActive : ''} ${item.isMinute ? styles.minuteLink : ''}`}
                         >
-                            <item.icon size={20} strokeWidth={isActive ? 2 : 1.5} />
-                            {isActive && <span className={styles.navLabel}>{item.label}</span>}
+                            {item.isMinute ? (
+                                <div className={`${styles.minuteLogoWrapper} ${isActive ? styles.minuteLogoActive : ''}`}>
+                                    <img
+                                        src="/maine-minutes.png"
+                                        alt="Minute"
+                                        className={styles.minuteLogo}
+                                    />
+                                </div>
+                            ) : (
+                                item.icon && <item.icon size={20} strokeWidth={isActive ? 2 : 1.5} />
+                            )}
+                            {isActive && !item.isMinute && <span className={styles.navLabel}>{item.label}</span>}
+                            {item.isMinute && <span className={styles.navLabel}>{item.label}</span>}
                         </Link>
                     );
                 })}
