@@ -27,7 +27,7 @@ export default function MoreScreen() {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: 'Stay informed with Maine News Today - Unbiased. Unafraid. Unfiltered. Download the app now!',
+        message: 'Stay informed with Maine News Now - Unbiased. Unafraid. Unfiltered. Download the app now!',
         url: 'https://mainenewstoday.com',
       });
     } catch (error) {

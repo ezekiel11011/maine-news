@@ -13,7 +13,7 @@ export default function TermsScreen() {
 
             <View style={styles.section}>
                 <Text style={styles.heading}>Introduction</Text>
-                <Text style={styles.text}>These Terms of Service (the “Terms”) describe how Maine News Today (“Company,” “we,” “our,” or “us”) provides Services across all websites and online platforms. These Terms set a global standard for usage compliance. By using our Services, you agree to these Terms.</Text>
+                <Text style={styles.text}>These Terms of Service (the “Terms”) describe how Maine News Now (“Company,” “we,” “our,” or “us”) provides Services across all websites and online platforms. These Terms set a global standard for usage compliance. By using our Services, you agree to these Terms.</Text>
             </View>
 
             <View style={styles.section}>
@@ -36,7 +36,7 @@ export default function TermsScreen() {
                 <Text style={styles.text}>Any disputes regarding these Terms should be directed to privacy@mainenewstoday.com or our registered office in Florida, USA.</Text>
             </View>
 
-            <Text style={styles.footerText}>© 2026 Maine News Today. All rights reserved.</Text>
+            <Text style={styles.footerText}>© 2026 Maine News Now. All rights reserved.</Text>
         </ScrollView>
     );
 }

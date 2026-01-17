@@ -1,6 +1,6 @@
-# Maine News Today - Mobile App
+# Maine News Now - Mobile App
 
-A React Native mobile app for Maine News Today, built with Expo.
+A React Native mobile app for Maine News Now, built with Expo.
 
 ## Features
 - 📰 Real-time news feed from Maine News API
@@ -61,7 +61,7 @@ maine-news-mobile/
 
 ## Design System
 
-Matches the Maine News Today website:
+Matches the Maine News Now website:
 - **Background**: #0a0a0a (deep near-black)
 - **Text**: #f5f5f5 (off-white)
 - **Accent**: #bf9b30 (muted gold)

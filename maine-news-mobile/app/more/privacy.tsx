@@ -13,7 +13,7 @@ export default function PrivacyScreen() {
 
             <View style={styles.section}>
                 <Text style={styles.heading}>Introduction</Text>
-                <Text style={styles.text}>This Global Privacy Policy (the “Policy”) describes how Maine News Today (“Company,” “we,” “our,” or “us”) collects, uses, discloses, and safeguards personal information across all current and future websites, subdomains, and online services (collectively, the “Services”). This Policy sets a global standard for privacy compliance and data protection in accordance with high international legal frameworks (GDPR, CCPA/CPRA, etc.).</Text>
+                <Text style={styles.text}>This Global Privacy Policy (the “Policy”) describes how Maine News Now (“Company,” “we,” “our,” or “us”) collects, uses, discloses, and safeguards personal information across all current and future websites, subdomains, and online services (collectively, the “Services”). This Policy sets a global standard for privacy compliance and data protection in accordance with high international legal frameworks (GDPR, CCPA/CPRA, etc.).</Text>
             </View>
 
             <View style={styles.section}>
@@ -46,7 +46,7 @@ export default function PrivacyScreen() {
                 <Text style={styles.text}>We maintain a designated Data Protection Officer. Exercise your rights via email at privacy@mainenewstoday.com or by mail to our registered office in Florida, USA.</Text>
             </View>
 
-            <Text style={styles.footerText}>© 2026 Maine News Today. All rights reserved.</Text>
+            <Text style={styles.footerText}>© 2026 Maine News Now. All rights reserved.</Text>
         </ScrollView>
     );
 }

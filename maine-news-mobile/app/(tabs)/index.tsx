@@ -371,7 +371,7 @@ export default function HomeFeed() {
                     </View>
                     <Text style={styles.title} numberOfLines={3}>{post.title}</Text>
                     <Text style={styles.excerpt} numberOfLines={2}>
-                        {post.excerpt || "Tap to read the full story on Maine News Today..."}
+                        {post.excerpt || "Tap to read the full story on Maine News Now..."}
                     </Text>
                     <View style={styles.cardFooter}>
                         <Text style={styles.authorText}>By {post.author}</Text>
