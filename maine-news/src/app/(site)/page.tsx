@@ -62,17 +62,21 @@ export default async function Home() {
     return dateB - dateA;
   });
 
-  // Fetch Maine Minute (Priority: Database)
+  // Fetch Maine Minute Config
   let latestMinute = null;
+
+  // 1. Check for manual DB entry for TODAY
+  const today = new Date().toISOString().split('T')[0];
   const dbMinutes = await db.query.maineMinute.findMany({
     orderBy: [desc(maineMinute.date)],
     limit: 1
   });
 
-  if (dbMinutes.length > 0) {
+  const isManualEntry = dbMinutes.length > 0 && dbMinutes[0].date === today;
+
+  if (isManualEntry) {
     const entry = dbMinutes[0];
     const stories = await Promise.all((entry.stories as any[]).map(async (s: any) => {
-      // Resolve post title from either source
       let title = 'Untitled Story';
       const post = await reader.collections.posts.read(s.postSlug);
       if (post) {
@@ -90,24 +94,22 @@ export default async function Home() {
       stories
     };
   } else {
-    // Fallback: Keystatic
-    const minutes = await reader.collections.maineMinute.all();
-    const sortedMinutes = minutes.sort((a, b) => b.slug.localeCompare(a.slug));
-    const latestMinuteEntry = sortedMinutes[0];
+    // 2. Auto-Generate from recent posts (Last 24h)
+    // We already have 'allPosts' sorted by date from above
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
 
-    if (latestMinuteEntry) {
-      const stories = await Promise.all(((latestMinuteEntry.entry as any).stories as any[]).map(async (s: any) => {
-        if (!s.post) return null;
-        const post = await reader.collections.posts.read(s.post);
-        return {
-          title: (post as any)?.title || 'Untitled Story',
-          slug: s.post as string
-        };
-      }));
+    const recentPosts = allPosts.filter(post =>
+      new Date(post.publishedDate) >= yesterday
+    ).slice(0, 10); // Take top 10
 
+    if (recentPosts.length > 0) {
       latestMinute = {
-        tagline: (latestMinuteEntry.entry as any).tagline as string,
-        stories: stories.filter((s): s is { title: string; slug: string } => s !== null)
+        tagline: `Live daily digest. ${recentPosts.length} stories from the last 24 hours.`,
+        stories: recentPosts.map(p => ({
+          title: p.title,
+          slug: p.slug
+        }))
       };
     }
   }

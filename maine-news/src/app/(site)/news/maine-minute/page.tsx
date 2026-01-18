@@ -51,18 +51,20 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MaineMinuteTodayPage() {
-    // Check DB first
+    // 1. Check for manual override in DB first
     const dbMinutes = await db.query.maineMinute.findMany({
         orderBy: [desc(maineMinute.date)],
         limit: 1
     });
 
-    let entry: any = null;
-    let date: string = '';
-    let tagline: string = '';
+    const isManualEntry = dbMinutes.length > 0 && dbMinutes[0].date === new Date().toISOString().split('T')[0];
+
+    let date: string = new Date().toISOString().split('T')[0];
+    let tagline: string = 'Everything that matters. One minute.';
     let stories: any[] = [];
 
-    if (dbMinutes.length > 0) {
+    if (isManualEntry) {
+        // Render Manual Entry
         const dbEntry = dbMinutes[0];
         date = dbEntry.date;
         tagline = dbEntry.tagline as string;
@@ -80,31 +82,55 @@ export default async function MaineMinuteTodayPage() {
             return { title, slug: s.postSlug, summary: s.summary };
         }));
     } else {
-        // Fallback: Keystatic
-        const minutes = await reader.collections.maineMinute.all();
-        if (minutes.length > 0) {
-            const sorted = minutes.sort((a, b) => b.slug.localeCompare(a.slug))[0];
-            date = sorted.slug;
-            tagline = (sorted.entry as any).tagline as string;
-            stories = await Promise.all(((sorted.entry as any).stories as any[]).map(async (s: any) => {
-                const post = await reader.collections.posts.read(s.post);
-                return {
-                    title: (post as any)?.title || 'Untitled Story',
-                    slug: s.post as string,
-                    summary: s.summary as string
-                };
+        // 2. Auto-Generate Digest from Last 24 Hours
+        const [keystaticPosts, authoredPosts] = await Promise.all([
+            reader.collections.posts.all(),
+            db.query.posts.findMany({
+                orderBy: [desc(dbPosts.publishedDate)],
+            })
+        ]);
+
+        const formattedKeystatic = keystaticPosts.map(post => ({
+            title: post.entry.title as string,
+            slug: post.slug,
+            publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
+        }));
+
+        const formattedAuthored = authoredPosts.map(post => ({
+            title: post.title,
+            slug: post.slug,
+            publishedDate: post.publishedDate.toISOString(),
+        }));
+
+        const allPosts = [...formattedAuthored, ...formattedKeystatic];
+
+        // Filter last 24h
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const recentPosts = allPosts.filter(post =>
+            new Date(post.publishedDate) >= yesterday
+        ).sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime())
+            .slice(0, 10); // Take top 10 to ensure we have content
+
+        if (recentPosts.length > 0) {
+            stories = recentPosts.map(post => ({
+                title: post.title,
+                slug: post.slug,
+                summary: post.title // Use title as summary for auto-generated
             }));
+            tagline = `Live daily digest. ${recentPosts.length} stories from the last 24 hours.`;
         }
     }
 
-    if (!date) {
+    if (stories.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-32 text-center animate-in fade-in">
                 <div className="w-24 h-24 mb-8 grayscale opacity-20">
                     <img src="/maine-minutes.png" alt="Minute Logo" className="w-full h-full object-contain" />
                 </div>
-                <h1 className="text-3xl font-bold text-white mb-4">The Maine Minute®️</h1>
-                <p className="text-dim text-xl max-w-md">Our daily news digest is coming soon. Check back later today for everything that matters, in under a minute.</p>
+                <h1 className="text-3xl font-bold text-white mb-4">Quiet Day in Maine</h1>
+                <p className="text-dim text-xl max-w-md">No major stories found for today yet. Check back later.</p>
                 <Link href="/" className="mt-12 text-accent font-bold uppercase tracking-widest hover:text-white transition-colors">
                     ← Back to Newsroom
                 </Link>

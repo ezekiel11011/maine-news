@@ -14,20 +14,20 @@
 }
 
 .logoWrapper {
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
+    position: relative;
+    width: 300px;
+    height: 80px;
 }
 
 .logo {
     max-width: 100%;
     height: auto;
+    object-fit: contain;
 }
 
 .brand {
-    font-family: var(--font-heading);
-    color: var(--color-accent);
-    font-size: 1.25rem;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.5rem;
+    display: none; /* Hide text brand if logo is present */
 }
 
 .title {
@@ -138,4 +138,46 @@
     .storyBlock {
         padding-left: 1.5rem;
     }
+
+    .lotteryGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.lotteryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.lotteryItem {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color-dim);
+    padding: 1rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.lottoLabel {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-accent);
+    font-weight: 700;
+}
+
+.lottoNumbers {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    letter-spacing: 0.05em;
+    color: white;
+}
+
+.jackpot {
+    font-size: 0.9rem;
+    color: #4ade80; /* Green-400 */
+    font-weight: 600;
 }

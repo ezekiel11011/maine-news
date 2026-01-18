@@ -36,6 +36,26 @@ export default async function NewMaineMinutePage() {
         new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime()
     );
 
+    // Filter for posts from the last 48 hours to ensure we catch all of "yesterday"
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 2); // 48 hours ago
+    cutoff.setHours(0, 0, 0, 0); // Start of that day
+
+    const recentPosts = allPosts.filter(post =>
+        new Date(post.publishedDate) >= cutoff
+    ).slice(0, 6); // Take up to 6 most recent
+
+    // Pre-fill stories with placeholders
+    const initialStories = recentPosts.map(post => ({
+        postSlug: post.slug,
+        summary: post.title
+    }));
+
+    // If no recent stories, ensure at least one empty slot
+    if (initialStories.length === 0) {
+        initialStories.push({ postSlug: '', summary: '' });
+    }
+
     return (
         <div className="space-y-8 animate-in fade-in">
             <div className="flex items-center gap-4">
@@ -47,11 +67,22 @@ export default async function NewMaineMinutePage() {
                 </Link>
                 <div>
                     <h1 className="text-3xl font-bold text-white tracking-tight">Create Maine Minute</h1>
-                    <p className="text-dim mt-1">Select stories and write summaries for today&apos;s digest.</p>
+                    <p className="text-dim mt-1">
+                        {recentPosts.length > 0
+                            ? `Auto-selected ${recentPosts.length} stories from the last 48 hours.`
+                            : "No stories found from the last 48 hours. Select manually below."}
+                    </p>
                 </div>
             </div>
 
-            <MaineMinuteForm availablePosts={allPosts} />
+            <MaineMinuteForm
+                availablePosts={allPosts}
+                initialData={{
+                    date: new Date().toISOString().split('T')[0],
+                    tagline: 'Everything that matters. One minute.',
+                    stories: initialStories
+                }}
+            />
         </div>
     );
 }
