@@ -95,18 +95,44 @@ export default async function Home() {
     };
   } else {
     // 2. Auto-Generate from recent posts (Last 24h)
-    // We already have 'allPosts' sorted by date from above
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
+    // Get all recent posts
     const recentPosts = allPosts.filter(post =>
       new Date(post.publishedDate) >= yesterday
-    ).slice(0, 10); // Take top 10
+    ); // 'allPosts' is already sorted by date
 
-    if (recentPosts.length > 0) {
+    // Ensure Category Diversity
+    const uniqueCategories = Array.from(new Set(recentPosts.map(p => p.category || 'general')));
+    const selectedStories: any[] = [];
+    const selectedSlugs = new Set();
+
+    // Pick top story from each category first
+    uniqueCategories.forEach(cat => {
+      const topForCat = recentPosts.find(p => (p.category || 'general') === cat);
+      if (topForCat) {
+        selectedStories.push(topForCat);
+        selectedSlugs.add(topForCat.slug);
+      }
+    });
+
+    // Fill remaining slots up to 15
+    for (const post of recentPosts) {
+      if (selectedStories.length >= 15) break;
+      if (!selectedSlugs.has(post.slug)) {
+        selectedStories.push(post);
+        selectedSlugs.add(post.slug);
+      }
+    }
+
+    // Sort final selection by date descending
+    selectedStories.sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
+
+    if (selectedStories.length > 0) {
       latestMinute = {
-        tagline: `Live daily digest. ${recentPosts.length} stories from the last 24 hours.`,
-        stories: recentPosts.map(p => ({
+        tagline: `Live daily digest. ${selectedStories.length} headlines from across Maine.`,
+        stories: selectedStories.map(p => ({
           title: p.title,
           slug: p.slug
         }))

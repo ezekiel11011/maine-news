@@ -50,76 +50,155 @@ export async function generateMetadata(): Promise<Metadata> {
     };
 }
 
+// 1. Try to fetch Lottery Results (Non-blocking)
+import { lotteryResults } from '@/db/schema';
+
 export default async function MaineMinuteTodayPage() {
-    // 1. Check for manual override in DB first
-    const dbMinutes = await db.query.maineMinute.findMany({
-        orderBy: [desc(maineMinute.date)],
-        limit: 1
-    });
-
-    const isManualEntry = dbMinutes.length > 0 && dbMinutes[0].date === new Date().toISOString().split('T')[0];
-
     let date: string = new Date().toISOString().split('T')[0];
     let tagline: string = 'Everything that matters. One minute.';
     let stories: any[] = [];
+    let lotteryData: any = {};
+
+    try {
+        const lottoGames = ['powerball', 'megabucks', 'gimme-5', 'pic-3', 'pic-4'];
+        const results = await Promise.all(
+            lottoGames.map(game => db.query.lotteryResults.findFirst({
+                where: eq(lotteryResults.game, game)
+            }).catch(() => null))
+        );
+
+        results.forEach(res => {
+            if (res) {
+                lotteryData[res.game] = {
+                    numbers: res.numbers,
+                    extra: res.extra,
+                    jackpot: res.jackpot,
+                    drawDate: res.drawDate
+                };
+            }
+        });
+    } catch (e) {
+        console.warn('Failed to fetch lottery results:', e);
+    }
+
+    // 2. Check for manual override in DB first
+    let isManualEntry = false;
+    let dbMinutes: any[] = [];
+
+    try {
+        dbMinutes = await db.query.maineMinute.findMany({
+            orderBy: [desc(maineMinute.date)],
+            limit: 1
+        });
+        isManualEntry = dbMinutes.length > 0 && dbMinutes[0].date === date;
+    } catch (e) {
+        console.warn('DB Minute fetch failed, using auto-gen only:', e);
+    }
 
     if (isManualEntry) {
         // Render Manual Entry
         const dbEntry = dbMinutes[0];
         date = dbEntry.date;
         tagline = dbEntry.tagline as string;
-        stories = await Promise.all((dbEntry.stories as any[]).map(async (s: any) => {
-            let title = 'Untitled Story';
-            const post = await reader.collections.posts.read(s.postSlug);
-            if (post) {
-                title = post.title as string;
-            } else {
-                const dbPost = await db.query.posts.findFirst({
-                    where: eq(dbPosts.slug, s.postSlug)
-                });
-                if (dbPost) title = dbPost.title as string;
-            }
-            return { title, slug: s.postSlug, summary: s.summary };
-        }));
-    } else {
-        // 2. Auto-Generate Digest from Last 24 Hours
-        const [keystaticPosts, authoredPosts] = await Promise.all([
-            reader.collections.posts.all(),
-            db.query.posts.findMany({
-                orderBy: [desc(dbPosts.publishedDate)],
-            })
-        ]);
+        try {
+            stories = await Promise.all((dbEntry.stories as any[]).map(async (s: any) => {
+                let title = 'Untitled Story';
+                // Try Keystatic first
+                try {
+                    const post = await reader.collections.posts.read(s.postSlug);
+                    if (post) title = post.title as string;
+                } catch (err) { /* ignore */ }
 
-        const formattedKeystatic = keystaticPosts.map(post => ({
-            title: post.entry.title as string,
-            slug: post.slug,
-            publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
-        }));
+                // Try DB if still untitled
+                if (title === 'Untitled Story') {
+                    try {
+                        const dbPost = await db.query.posts.findFirst({
+                            where: eq(dbPosts.slug, s.postSlug)
+                        });
+                        if (dbPost) title = dbPost.title as string;
+                    } catch (err) { /* ignore */ }
+                }
+                return { title, slug: s.postSlug, summary: s.summary };
+            }));
+        } catch (e) {
+            console.error('Error hydrating manual stories:', e);
+            stories = [];
+        }
+    }
 
-        const formattedAuthored = authoredPosts.map(post => ({
-            title: post.title,
-            slug: post.slug,
-            publishedDate: post.publishedDate.toISOString(),
-        }));
+    // 3. Auto-Generate if Manual Entry is missing or failed
+    if (stories.length === 0) {
+        let allPosts: any[] = [];
+        try {
+            const [keystaticPosts, authoredPosts] = await Promise.all([
+                reader.collections.posts.all(),
+                db.query.posts.findMany({
+                    orderBy: [desc(dbPosts.publishedDate)],
+                })
+            ]);
 
-        const allPosts = [...formattedAuthored, ...formattedKeystatic];
+            const formattedKeystatic = keystaticPosts.map(post => ({
+                title: post.entry.title as string,
+                slug: post.slug,
+                publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
+                category: (post.entry.category as string) || 'General'
+            }));
 
-        // Filter last 24h
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-
-        const recentPosts = allPosts.filter(post =>
-            new Date(post.publishedDate) >= yesterday
-        ).sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime())
-            .slice(0, 10); // Take top 10 to ensure we have content
-
-        if (recentPosts.length > 0) {
-            stories = recentPosts.map(post => ({
+            const formattedAuthored = authoredPosts.map(post => ({
                 title: post.title,
                 slug: post.slug,
-                summary: post.title // Use title as summary for auto-generated
+                publishedDate: post.publishedDate.toISOString(),
+                category: (post.category as string) || 'General'
             }));
-            tagline = `Live daily digest. ${recentPosts.length} stories from the last 24 hours.`;
+
+            allPosts = [...formattedAuthored, ...formattedKeystatic];
+        } catch (e) {
+            console.error('Failed to fetch posts for auto-gen:', e);
+        }
+
+        // Filter last 48h to ensure coverage
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 2);
+
+        // 1. Get all recent posts
+        let recentPosts = allPosts.filter(post =>
+            new Date(post.publishedDate) >= yesterday
+        ).sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
+
+        // 2. Ensure Category Diversity
+        const uniqueCategories = Array.from(new Set(recentPosts.map(p => (p as any).category || 'General')));
+        const selectedStories: any[] = [];
+        const selectedSlugs = new Set();
+
+        // Pick top story from each category first
+        uniqueCategories.forEach(cat => {
+            const topForCat = recentPosts.find(p => ((p as any).category || 'General') === cat);
+            if (topForCat) {
+                selectedStories.push(topForCat);
+                selectedSlugs.add(topForCat.slug);
+            }
+        });
+
+        // 3. Fill remaining slots up to 15
+        for (const post of recentPosts) {
+            if (selectedStories.length >= 15) break;
+            if (!selectedSlugs.has(post.slug)) {
+                selectedStories.push(post);
+                selectedSlugs.add(post.slug);
+            }
+        }
+
+        // 4. Sort final selection by date
+        selectedStories.sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
+
+        if (selectedStories.length > 0) {
+            stories = selectedStories.map(post => ({
+                title: post.title,
+                slug: post.slug,
+                summary: post.title,
+                category: post.category
+            }));
+            tagline = `Live daily digest. ${selectedStories.length} headlines from across Maine.`;
         }
     }
 
@@ -160,6 +239,7 @@ export default async function MaineMinuteTodayPage() {
                 date={date}
                 tagline={tagline}
                 stories={stories}
+                lottery={lotteryData}
             />
         </>
     );

@@ -16,18 +16,24 @@
 .logoWrapper {
     margin-bottom: 2rem;
     position: relative;
-    width: 300px;
-    height: 80px;
+    /* Remove fixed dimensions to allow natural flow */
+    display: flex;
+    justify-content: center;
 }
 
 .logo {
-    max-width: 100%;
+    max-width: 300px;
     height: auto;
     object-fit: contain;
 }
 
 .brand {
-    display: none; /* Hide text brand if logo is present */
+    font-family: var(--font-heading);
+    color: var(--color-accent);
+    font-size: 2rem; 
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
 }
 
 .title {
@@ -49,99 +55,169 @@
     margin: 0 auto;
 }
 
+/* Gallery Layout */
+.galleryWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.scrollBtn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--color-bg-offset);
+    border: 1px solid var(--border-color-dim);
+    color: var(--color-text);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.scrollBtn:hover {
+    background: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
+}
+
+.scrollBtnLeft {
+    left: -20px;
+}
+
+.scrollBtnRight {
+    right: -20px;
+}
+
 .content {
     display: flex;
-    flex-direction: column;
-    gap: 4rem;
+    overflow-x: auto;
+    gap: 1.5rem;
+    padding: 1rem 0 2rem 0; /* Space for scrollbar/shadows */
+    scroll-snap-type: x mandatory;
+    margin: 0 calc(-50vw + 50%); /* Break out of container on mobile if needed, or just keep wide */
+    width: 100%;
+    
+    /* Hide Scrollbar but allow scroll */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.content::-webkit-scrollbar {
+    display: none;
 }
 
 .storyBlock {
-    border-left: 2px solid var(--border-color-dim);
-    padding-left: 2rem;
+    flex: 0 0 350px; /* Fixed width cards */
+    max-width: 85vw; /* Responsive on mobile */
+    background: var(--color-bg-offset); /* Subtle card bg */
+    border: 1px solid var(--border-color-dim);
+    border-radius: 16px;
+    padding: 2rem;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.storyBlock:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-accent);
 }
 
 .storyHeader {
     display: flex;
-    align-items: flex-start;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
     margin-bottom: 1rem;
 }
 
-.index {
+.categoryTag {
     font-family: var(--font-heading);
-    color: var(--color-accent);
-    font-size: 1.25rem;
+    font-size: 0.7rem;
     font-weight: 700;
-    line-height: 1.2;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    opacity: 0.9;
 }
 
 .storyTitle {
-    font-size: 1.75rem;
+    font-size: 1.25rem;
+    font-weight: 700;
     margin: 0;
-    text-transform: none; /* Headlines can be mixed case in detail view */
+    line-height: 1.3;
 }
 
 .summary {
     font-family: var(--font-body);
-    font-size: 1.15rem;
+    font-size: 1rem;
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--color-text-dim);
     margin-bottom: 1.5rem;
-    max-width: 65ch;
+    display: -webkit-box;
+    -webkit-line-clamp: 4; /* Limit spacing */
+    line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex-grow: 1; /* Push footer down */
 }
 
 .readMore {
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
     font-family: var(--font-heading);
     font-weight: 700;
     color: var(--color-accent);
     text-transform: uppercase;
-    font-size: 0.9rem;
-    display: inline-block;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.2s ease;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
 }
 
 .readMore:hover {
-    border-color: var(--color-accent);
-    opacity: 1;
+    background: var(--color-accent);
+    color: white;
 }
 
-.footer {
-    margin-top: 6rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-color-dim);
-    text-align: center;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.9rem;
-}
-
-.footerBrand {
-    font-family: var(--font-heading);
-    color: var(--color-accent);
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-}
-
-.copyright {
-    margin-top: 1rem;
-}
-
+/* Mobile Adjustments */
 @media (max-width: 768px) {
-    .title {
-        font-size: 2.25rem;
-    }
-    
-    .storyTitle {
-        font-size: 1.5rem;
+    .content {
+        padding-left: 1rem; /* Start padding */
+        padding-right: 1rem;
     }
     
     .storyBlock {
-        padding-left: 1.5rem;
+        flex: 0 0 300px;
+        padding: 1.5rem;
+    }
+
+    .title {
+        font-size: 2.25rem;
     }
 
     .lotteryGrid {
         grid-template-columns: 1fr;
     }
+
+    .scrollBtn {
+        display: none;
+    }
+}
+
+.lotteryContainer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color-dim);
+    width: 100%;
 }
 
 .lotteryGrid {

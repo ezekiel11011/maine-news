@@ -36,14 +36,41 @@ export default async function NewMaineMinutePage() {
         new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime()
     );
 
-    // Filter for posts from the last 48 hours to ensure we catch all of "yesterday"
+    // Filter for posts from the last 24 hours
     const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - 2); // 48 hours ago
-    cutoff.setHours(0, 0, 0, 0); // Start of that day
+    cutoff.setDate(cutoff.getDate() - 1);
 
-    const recentPosts = allPosts.filter(post =>
+    let recentPosts = allPosts.filter(post =>
         new Date(post.publishedDate) >= cutoff
-    ).slice(0, 6); // Take up to 6 most recent
+    );
+
+    // Apply diversity logic (match auto-gen)
+    // Ensure Category Diversity
+    const uniqueCategories = Array.from(new Set(recentPosts.map(p => (p as any).category || 'general')));
+    const selectedStories: any[] = [];
+    const selectedSlugs = new Set();
+
+    // Pick top story from each category first
+    uniqueCategories.forEach(cat => {
+        const topForCat = recentPosts.find(p => ((p as any).category || 'general') === cat);
+        if (topForCat) {
+            selectedStories.push(topForCat);
+            selectedSlugs.add(topForCat.slug);
+        }
+    });
+
+    // Fill remaining slots up to 15
+    for (const post of recentPosts) {
+        if (selectedStories.length >= 15) break;
+        if (!selectedSlugs.has(post.slug)) {
+            selectedStories.push(post);
+            selectedSlugs.add(post.slug);
+        }
+    }
+
+    // Sort
+    selectedStories.sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
+    recentPosts = selectedStories;
 
     // Pre-fill stories with placeholders
     const initialStories = recentPosts.map(post => ({
@@ -69,8 +96,8 @@ export default async function NewMaineMinutePage() {
                     <h1 className="text-3xl font-bold text-white tracking-tight">Create Maine Minute</h1>
                     <p className="text-dim mt-1">
                         {recentPosts.length > 0
-                            ? `Auto-selected ${recentPosts.length} stories from the last 48 hours.`
-                            : "No stories found from the last 48 hours. Select manually below."}
+                            ? `Auto-selected ${recentPosts.length} headlines from the last 24 hours.`
+                            : "No stories found from the last 24 hours. Select manually below."}
                     </p>
                 </div>
             </div>

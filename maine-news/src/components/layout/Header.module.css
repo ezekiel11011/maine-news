@@ -27,10 +27,11 @@
 .siteName {
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 0.95rem; /* Slightly smaller for mobile fit */
   letter-spacing: -0.02em;
-  margin-left: 0.75rem;
+  margin-left: 0.5rem;
   color: var(--color-text);
+  white-space: nowrap; /* Prevent wrapping */
 }
 
 /* Removed text logo styles */
@@ -67,7 +68,7 @@
 .topActionsRow {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem; /* Reduce gap on mobile */
 }
 
 .socialIconWrapper {
@@ -95,17 +96,18 @@
   background: transparent;
   border: 2px solid #ff0000;
   color: #ffffff;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.6rem; /* Tighter padding for mobile */
   border-radius: 4px;
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: 0.7rem; /* Slightly smaller */
   text-transform: uppercase;
   letter-spacing: 0.05em;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap; /* Prevent wrapping */
 }
 
 .tipButton:hover {
