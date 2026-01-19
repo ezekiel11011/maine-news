@@ -23,6 +23,7 @@ export default function AuthorForm({ initialData, isEditing = false }: AuthorFor
         avatar: initialData?.avatar || '',
         bio: initialData?.bio || '',
     });
+    const [imageFile, setImageFile] = useState<File | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,15 +31,22 @@ export default function AuthorForm({ initialData, isEditing = false }: AuthorFor
         setError(null);
 
         try {
+            const data = new FormData();
+            data.append('name', formData.name);
+            data.append('bio', formData.bio);
+            data.append('avatarUrl', formData.avatar);
+            if (imageFile) {
+                data.append('image', imageFile);
+            }
+
             const res = await fetch('/api/admin/authors', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: data, // Browser handles multipart/form-data
             });
 
             if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || 'Failed to save author');
+                const result = await res.json();
+                throw new Error(result.error || 'Failed to save author');
             }
 
             router.push('/admin/authors');
@@ -46,6 +54,15 @@ export default function AuthorForm({ initialData, isEditing = false }: AuthorFor
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Something went wrong');
             setLoading(false);
+        }
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setImageFile(e.target.files[0]);
+            // Create a preview URL locally
+            const previewUrl = URL.createObjectURL(e.target.files[0]);
+            setFormData(prev => ({ ...prev, avatar: previewUrl }));
         }
     };
 
@@ -73,25 +90,51 @@ export default function AuthorForm({ initialData, isEditing = false }: AuthorFor
                             />
                         </label>
 
-                        <label className="block">
-                            <span className="text-sm font-bold text-dim uppercase tracking-widest mb-2 block">Avatar URL</span>
-                            <div className="flex gap-4 items-center">
-                                <div className="h-12 w-12 rounded-full bg-dim flex items-center justify-center flex-shrink-0 overflow-hidden relative">
+                        <div className="block">
+                            <span className="text-sm font-bold text-dim uppercase tracking-widest mb-2 block">Avatar</span>
+                            <div className="flex gap-6 items-center bg-muted p-4 rounded-xl border-all">
+                                <div className="h-24 w-24 rounded-full bg-dim flex items-center justify-center flex-shrink-0 overflow-hidden relative shadow-lg">
                                     {formData.avatar ? (
                                         <img src={formData.avatar} alt="Avatar Preview" className="h-full w-full object-cover" />
                                     ) : (
-                                        <User size={20} className="text-dim" />
+                                        <User size={32} className="text-dim" />
                                     )}
                                 </div>
-                                <input
-                                    type="url"
-                                    value={formData.avatar}
-                                    onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
-                                    className="w-full bg-muted border-all rounded-xl px-4 py-3 text-white focus-accent outline-none"
-                                    placeholder="https://example.com/photo.jpg"
-                                />
+                                <div className="flex-1 space-y-3">
+                                    <div className="flex items-center gap-3">
+                                        <label className="cursor-pointer bg-accent hover:bg-white text-black font-bold py-2 px-4 rounded-lg transition-all text-sm">
+                                            Upload Image
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={handleFileChange}
+                                            />
+                                        </label>
+                                        {imageFile && (
+                                            <span className="text-xs text-dim italic truncate max-w-[150px]">
+                                                {imageFile.name}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                                            <span className="text-xs text-dim">OR URL:</span>
+                                        </div>
+                                        <input
+                                            type="url"
+                                            value={formData.avatar.startsWith('blob:') ? '' : formData.avatar}
+                                            onChange={(e) => {
+                                                setImageFile(null);
+                                                setFormData({ ...formData, avatar: e.target.value });
+                                            }}
+                                            className="w-full bg-dark border-all rounded-lg pl-16 pr-4 py-2 text-xs text-white focus-accent outline-none"
+                                            placeholder="https://example.com/photo.jpg"
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                        </label>
+                        </div>
 
                         <label className="block">
                             <span className="text-sm font-bold text-dim uppercase tracking-widest mb-2 block">Biography</span>
