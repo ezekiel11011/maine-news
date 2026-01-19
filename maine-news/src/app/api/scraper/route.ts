@@ -204,52 +204,18 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
                 image = mediaContent.$.url;
             }
 
-            // Attempt to fetch full content if the RSS only has a snippet
-            if (link && (content.length < 500 || content.includes('read more') || content.includes('...'))) {
-                try {
-                    const pageRes = await fetch(link, {
-                        headers: {
-                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                            'Accept': 'text/html,application/xhtml+xml,application/xml,application/rss+xml;q=0.9,*/*;q=0.8',
-                            'Referer': 'https://www.google.com/'
-                        }
-                    });
-                    if (pageRes.ok) {
-                        const html = await pageRes.text();
-                        // Basic extraction: Look for the main article content (common patterns)
-                        // This is a naive heuristic but works well for most news sites
-                        const articleMatch = html.match(/<article[\s\S]*?>([\s\S]*?)<\/article>/i) ||
-                            html.match(/<div class="[^"]*article[^"]*"[\s\S]*?>([\s\S]*?)<\/div>/i) ||
-                            html.match(/<div class="[^"]*story[^"]*"[\s\S]*?>([\s\S]*?)<\/div>/i);
-
-                        if (articleMatch) {
-                            const cleanedHtml = articleMatch[1]
-                                .replace(/<script[\s\S]*?<\/script>/gi, '')
-                                .replace(/<style[\s\S]*?<\/style>/gi, '')
-                                .replace(/<div class="newsletter-signup"[\s\S]*?<\/div>/gi, '');
-
-                            const fullContent = turndown.turndown(cleanedHtml);
-                            if (fullContent.length > content.length) {
-                                content = fullContent;
-
-                                // Extract image from deep content if not already found in RSS
-                                if (!image) {
-                                    const imgMatch = cleanedHtml.match(/<img[^>]+src=["']([^"']+)["']/i);
-                                    if (imgMatch) {
-                                        image = imgMatch[1];
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } catch {
-                    console.log(`Failed to fetch deep content for ${link}`);
-                }
+            // We skip deep scraping of full article bodies to comply with Terms of Service 
+            // of source sites regarding "unauthorized reproduction".
+            // We only use the snippet/excerpt provided in the RSS feed itself, 
+            // and we truncate it to ensure we are only providing a summary.
+            let excerpt = content.substring(0, 300).replace(/[\\#\\*]/g, '') + (content.length > 300 ? '...' : '');
+            
+            // Limit stored content to 500 chars to ensure it's a summary/fair use
+            if (content.length > 500) {
+                content = content.substring(0, 500) + '...';
             }
 
-            const excerpt = content.substring(0, 200).replace(/[\\#\\*]/g, '') + (content.length > 200 ? '...' : '');
-
-            // Clean content from repeated characters that break layout (like =========)
+            // Clean content from repeated characters
             content = content.replace(/([=_-]){5,}/g, '$1$1$1');
 
             // Fallback: search for first <img> tag in the original content/summary
