@@ -60,7 +60,7 @@ export default function Footer() {
                                     <span className={styles.badgeLarge}>App Store</span>
                                 </div>
                             </a>
-                            <a href="https://play.google.com" target="_blank" rel="noopener noreferrer" className={styles.storeBadge}>
+                            <a href="https://play.google.com/store/apps/details?id=com.mainenewstoday.app" target="_blank" rel="noopener noreferrer" className={styles.storeBadge}>
                                 <div className={styles.badgeIcon}>
                                     <Image src="/Google_Play.svg" alt="Google Play" width={24} height={24} />
                                 </div>

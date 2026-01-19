@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.mainenewstoday.app",
+      "sha256_cert_fingerprints": [
+        "1C:2A:C0:C3:B8:CE:80:D2:15:02:D1:9E:2C:56:69:82:12:47:4D:EE:74:3A:D3:BF:B4:3C:0B:AD:68:74:A1:95"
+      ]
+    }
+  }
+]
