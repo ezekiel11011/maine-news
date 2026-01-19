@@ -21,14 +21,14 @@ export default async function AuthorsListPage() {
                     <h1 className="text-3xl font-bold text-white tracking-tight">Authors</h1>
                     <p className="text-dim mt-1">Manage contributors and staff profiles.</p>
                 </div>
-                <button
-                    className="btn-primary opacity-50 cursor-not-allowed"
+                <Link
+                    href="/admin/authors/new"
+                    className="btn-primary"
                     style={{ alignSelf: 'flex-start' }}
-                    disabled
                 >
                     <Plus size={20} />
                     Add New Author
-                </button>
+                </Link>
             </div>
 
             {/* Filters and search placeholder */}
