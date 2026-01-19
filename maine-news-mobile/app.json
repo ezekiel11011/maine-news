@@ -35,7 +35,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "maine-news-temp.vercel.app",
+              "host": "mainenewsnow.com",
               "pathPrefix": "/article"
             }
           ],
@@ -49,7 +49,7 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "privacyPolicyUrl": "https://maine-news-temp.vercel.app/privacy",
+    "privacyPolicyUrl": "https://mainenewsnow.com/privacy",
     "plugins": [
       "expo-router",
       "expo-font",
