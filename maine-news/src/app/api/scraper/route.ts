@@ -239,6 +239,10 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
                 // 4. Remove ONLY UI/Icon images, KEEP story images
                 cleaned = cleaned.replace(/!\[.*?\]\((?:\/assets\/|http).*?(?:icon|logo|badge|close-menu|amp|shared-images).*?\)/gi, '');
 
+                // 5. Remove widowed bullet points and fragments
+                cleaned = cleaned.replace(/^\s*[\*\-]\s*$/gm, '');
+                cleaned = cleaned.replace(/^\s*[\*\-]\s*!\[\].*?$/gm, '');
+
                 return cleaned.trim();
             };
 
