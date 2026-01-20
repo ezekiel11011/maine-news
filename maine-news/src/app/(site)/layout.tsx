@@ -4,6 +4,7 @@ import Header from "@/components/layout/Header";
 import UtilityBar from "@/components/layout/UtilityBar";
 import BottomNav from "@/components/layout/BottomNav";
 import Footer from "@/components/layout/Footer";
+import SmartBanner from "@/components/ui/SmartBanner";
 import "../globals.css";
 
 const oswald = Oswald({
@@ -61,6 +62,7 @@ export default function RootLayout({
 }>) {
   return (
     <div className={`${oswald.variable} ${inter.variable}`}>
+      <SmartBanner />
       <UtilityBar />
       <Header />
       <main className="container" style={{ minHeight: '100vh', paddingBottom: '80px' }}>
