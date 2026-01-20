@@ -197,26 +197,71 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
             const link = item.link || '';
             let content = turndown.turndown(item.content || item.contentSnippet || item.summary || '');
 
+            // Robust cleaning for future scrapes
+            const cleanText = (text: string, storyTitle: string) => {
+                let cleaned = text;
+
+                // 1. Remove specific junk blocks by pattern
+                const junkPatterns = [
+                    /\[Local News\]\(.*?\)/gi,
+                    /!\[x\]\(.*?\)/gi,
+                    /!\[WCSH\]\(.*?\)/gi,
+                    /Download the NCM app/g,
+                    /stream NCM on your phone/g,
+                    /\[!\[Download on the App Store\].*?\]\(.*?\)/g,
+                    /\[!\[Get it on Google Play\].*?\]\(.*?\)/g,
+                    /#### More Videos[\s\S]*?Next up in 5/g,
+                    /Example video title will go here/g,
+                    /\[!\[Facebook\].*?\]\(.*?\)/g,
+                    /Author:.*?Staff/gi,
+                    /Published:.*?\d{4}/gi,
+                    /Updated:.*?\d{4}/gi,
+                    /Related Articles[\s\S]*?$/i, // Cut off everything after Related Articles
+                    /Close Ad/gi,
+                    /\[\s*\]\(\/\)/g, // Remove empty links
+                    /\*\*\*+/g, // Remove horizontal rules with too many stars
+                    /===+/g, // Remove excessive headers
+                ];
+
+                junkPatterns.forEach(pattern => {
+                    cleaned = cleaned.replace(pattern, '');
+                });
+
+                // 2. Remove ALL markdown images from body for a cleaner text-only summary
+                cleaned = cleaned.replace(/!\[.*?\]\(.*?\)/g, '');
+
+                // 3. Remove redundant title at the start
+                const escapedTitle = storyTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                cleaned = cleaned.replace(new RegExp(`^\\s*${escapedTitle}\\s*`, 'i'), '');
+
+                // 4. Remove excessive punctuation/formatting
+                cleaned = cleaned.replace(/([\.=-]){2,}/g, '$1');
+
+                // 5. Remove leftover UI/Icon images
+                cleaned = cleaned.replace(/!\[\]\(.*?(icon|logo|badge|close-menu).*?\)/gi, '');
+
+                return cleaned.trim();
+            };
+
+            content = cleanText(content, title);
+
+            let excerpt = content.substring(0, 300).replace(/[\\#\\*]/g, '') + (content.length > 300 ? '...' : '');
+
+            // Limit stored content to 500 chars for fair use / summary only
+            if (content.length > 500) {
+                content = content.substring(0, 500).trim() + '...';
+            }
+
+            // Final polish to ensure no trailing junk or weird formatting
+            content = content.replace(/\s+/g, ' ').trim();
+            excerpt = excerpt.replace(/\s+/g, ' ').trim();
+
             // Initial image extraction from RSS
             let image = item.enclosure?.url;
             const mediaContent = (item as Record<string, unknown>)['media:content'] as { $: { url: string } } | undefined;
             if (!image && mediaContent) {
                 image = mediaContent.$.url;
             }
-
-            // We skip deep scraping of full article bodies to comply with Terms of Service 
-            // of source sites regarding "unauthorized reproduction".
-            // We only use the snippet/excerpt provided in the RSS feed itself, 
-            // and we truncate it to ensure we are only providing a summary.
-            let excerpt = content.substring(0, 300).replace(/[\\#\\*]/g, '') + (content.length > 300 ? '...' : '');
-            
-            // Limit stored content to 500 chars to ensure it's a summary/fair use
-            if (content.length > 500) {
-                content = content.substring(0, 500) + '...';
-            }
-
-            // Clean content from repeated characters
-            content = content.replace(/([=_-]){5,}/g, '$1$1$1');
 
             // Fallback: search for first <img> tag in the original content/summary
             if (!image) {
