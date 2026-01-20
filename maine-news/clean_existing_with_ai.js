@@ -4,7 +4,24 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 require('dotenv').config({ path: '.env.local' });
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-flash-lite-latest" });
+
+const PROGRESS_FILE = 'cleaning_progress.json';
+
+function loadProgress() {
+    if (fs.existsSync(PROGRESS_FILE)) {
+        return JSON.parse(fs.readFileSync(PROGRESS_FILE, 'utf-8'));
+    }
+    return { cleanedSlugs: [] };
+}
+
+function saveProgress(slug) {
+    const progress = loadProgress();
+    if (!progress.cleanedSlugs.includes(slug)) {
+        progress.cleanedSlugs.push(slug);
+        fs.writeFileSync(PROGRESS_FILE, JSON.stringify(progress, null, 2));
+    }
+}
 
 async function aiSummarize(text, title) {
     try {
@@ -35,6 +52,7 @@ async function aiSummarize(text, title) {
 async function processFiles() {
     const directories = ['src/content/posts', 'src/content/scraped'];
     let count = 0;
+    const progress = loadProgress();
 
     for (const dir of directories) {
         const fullDir = path.join(process.cwd(), dir);
@@ -44,6 +62,12 @@ async function processFiles() {
         console.log(`Processing ${files.length} files in ${dir}...`);
 
         for (const file of files) {
+            const slug = file.replace('.mdoc', '');
+            if (progress.cleanedSlugs.includes(slug)) {
+                // Skiping already cleaned files
+                continue;
+            }
+
             const filePath = path.join(fullDir, file);
             const content = fs.readFileSync(filePath, 'utf-8');
 
@@ -56,27 +80,25 @@ async function processFiles() {
             const titleMatch = frontmatter.match(/title:\s*"(.*?)"/) || frontmatter.match(/title:\s*'(.*?)'/);
             const title = titleMatch ? titleMatch[1] : "";
 
-            // Skip if it looks like it's already well summarized/short (optional)
-            // But here we want to re-summarize everything properly with AI
-
             console.log(`[${++count}] Summarizing: ${title}...`);
             const summary = await aiSummarize(body, title);
 
             if (summary) {
                 const newContent = `---${frontmatter}---\n\n${summary}\n\n---\n\n*Note: This is a summarized excerpt. Click the source link above to read the full story.*`;
                 fs.writeFileSync(filePath, newContent);
+                saveProgress(slug);
             }
 
-            // Respect rate limits of free tier (15 requests per minute usually, or 1500 per day)
-            // Flash 1.5 free tier is 15 RPM
-            await new Promise(r => setTimeout(r, 4000));
+            // Respect rate limits of free tier (~15 RPM)
+            await new Promise(r => setTimeout(r, 6000));
 
-            if (count >= 50) {
-                console.log("Stopping after 10 files for safety/testing.");
+            if (count >= 100) {
+                console.log("Stopping batch after 100 files for safety.");
                 return;
             }
         }
     }
+    console.log("Full database reached.");
 }
 
 if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {

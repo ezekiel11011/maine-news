@@ -11,7 +11,7 @@ const parser = new Parser();
 const turndown = new TurndownService();
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || "");
-const aiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+const aiModel = genAI.getGenerativeModel({ model: "gemini-flash-lite-latest" });
 
 async function aiSummarize(text: string, title: string): Promise<string> {
     if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
