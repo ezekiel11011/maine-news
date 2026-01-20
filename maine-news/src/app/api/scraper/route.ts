@@ -3,11 +3,47 @@ import Parser from 'rss-parser';
 import fs from 'fs/promises';
 import path from 'path';
 import TurndownService from 'turndown';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export const dynamic = 'force-dynamic';
 
 const parser = new Parser();
 const turndown = new TurndownService();
+
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || "");
+const aiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+async function aiSummarize(text: string, title: string): Promise<string> {
+    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+        console.log("Skipping AI summary: No API key found.");
+        return text;
+    }
+
+    try {
+        const prompt = `
+            You are an editorial assistant for "Maine News Now", a news site focused on "Editorial Minimalism".
+            
+            TASK: Clean and summarize the following news article.
+            1. Remove all navigation artifacts, "Download our app" ads, social media links, and website clutter.
+            2. Preserve the factual core of the story.
+            3. Write a professional, unbiased, and clear summary of the article.
+            4. If the content is too short to summarize, just clean it up.
+            5. Keep the length between 150 and 300 words usually.
+            6. Return ONLY the cleaned summary text. Use proper paragraphs.
+            
+            ARTICLE TITLE: ${title}
+            RAW CONTENT:
+            ${text}
+        `;
+
+        const result = await aiModel.generateContent(prompt);
+        const response = await result.response;
+        return response.text().trim();
+    } catch (error) {
+        console.error("Gemini summarization failed:", error);
+        return text;
+    }
+}
 
 // Maine towns/cities database for geographic filtering
 const MAINE_LOCATIONS = [
@@ -248,12 +284,11 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
 
             content = cleanText(content, title);
 
-            let excerpt = content.replace(/!\[.*?\]\(.*?\)/g, '').substring(0, 300).replace(/[\\#\\*]/g, '') + (content.length > 300 ? '...' : '');
+            // Apply AI Summarization
+            console.log(`[AI] Summarizing: ${title}...`);
+            content = await aiSummarize(content, title);
 
-            // Limit stored content to 1500 chars (more generous summary)
-            if (content.length > 1500) {
-                content = content.substring(0, 1500).trim() + '...';
-            }
+            let excerpt = content.replace(/!\[.*?\]\(.*?\)/g, '').substring(0, 300).replace(/[\\#\\*]/g, '') + (content.length > 300 ? '...' : '');
 
             // Final polish to ensure no trailing junk or weird formatting
             content = content.replace(/\n{3,}/g, '\n\n').trim();
