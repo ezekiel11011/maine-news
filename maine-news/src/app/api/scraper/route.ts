@@ -201,16 +201,17 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
             const cleanText = (text: string, storyTitle: string) => {
                 let cleaned = text;
 
-                // 1. Remove specific junk blocks by pattern
+                // 1. Remove specific junk blocks by pattern (ads, app links, etc)
                 const junkPatterns = [
                     /\[Local News\]\(.*?\)/gi,
                     /!\[x\]\(.*?\)/gi,
                     /!\[WCSH\]\(.*?\)/gi,
                     /Download the NCM app/g,
+                    /To stream NCM on your phone, you need the (NCM|NEWS CENTER Maine) app\.?/g,
                     /stream NCM on your phone/g,
                     /\[!\[Download on the App Store\].*?\]\(.*?\)/g,
                     /\[!\[Get it on Google Play\].*?\]\(.*?\)/g,
-                    /#### More Videos[\s\S]*?Next up in 5/g,
+                    /#### More Videos[\s\S]*?Next up in \d+/g,
                     /Example video title will go here/g,
                     /\[!\[Facebook\].*?\]\(.*?\)/g,
                     /Author:.*?Staff/gi,
@@ -221,39 +222,37 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
                     /\[\s*\]\(\/\)/g, // Remove empty links
                     /\*\*\*+/g, // Remove horizontal rules with too many stars
                     /===+/g, // Remove excessive headers
+                    /For the latest breaking news, weather, and traffic alerts, download the NEWS CENTER Maine mobile app\./gi
                 ];
 
                 junkPatterns.forEach(pattern => {
                     cleaned = cleaned.replace(pattern, '');
                 });
 
-                // 2. Remove ALL markdown images from body for a cleaner text-only summary
-                cleaned = cleaned.replace(/!\[.*?\]\(.*?\)/g, '');
-
-                // 3. Remove redundant title at the start
+                // 2. Remove redundant title at the start
                 const escapedTitle = storyTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 cleaned = cleaned.replace(new RegExp(`^\\s*${escapedTitle}\\s*`, 'i'), '');
 
-                // 4. Remove excessive punctuation/formatting
+                // 3. Remove excessive punctuation/formatting
                 cleaned = cleaned.replace(/([\.=-]){2,}/g, '$1');
 
-                // 5. Remove leftover UI/Icon images
-                cleaned = cleaned.replace(/!\[\]\(.*?(icon|logo|badge|close-menu).*?\)/gi, '');
+                // 4. Remove ONLY UI/Icon images, KEEP story images
+                cleaned = cleaned.replace(/!\[.*?\]\((?:\/assets\/|http).*?(?:icon|logo|badge|close-menu|amp|shared-images).*?\)/gi, '');
 
                 return cleaned.trim();
             };
 
             content = cleanText(content, title);
 
-            let excerpt = content.substring(0, 300).replace(/[\\#\\*]/g, '') + (content.length > 300 ? '...' : '');
+            let excerpt = content.replace(/!\[.*?\]\(.*?\)/g, '').substring(0, 300).replace(/[\\#\\*]/g, '') + (content.length > 300 ? '...' : '');
 
-            // Limit stored content to 500 chars for fair use / summary only
-            if (content.length > 500) {
-                content = content.substring(0, 500).trim() + '...';
+            // Limit stored content to 1500 chars (more generous summary)
+            if (content.length > 1500) {
+                content = content.substring(0, 1500).trim() + '...';
             }
 
             // Final polish to ensure no trailing junk or weird formatting
-            content = content.replace(/\s+/g, ' ').trim();
+            content = content.replace(/\n{3,}/g, '\n\n').trim();
             excerpt = excerpt.replace(/\s+/g, ' ').trim();
 
             // Initial image extraction from RSS
