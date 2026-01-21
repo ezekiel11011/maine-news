@@ -156,49 +156,29 @@ export default async function MaineMinuteTodayPage() {
             console.error('Failed to fetch posts for auto-gen:', e);
         }
 
-        // Filter last 48h to ensure coverage
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 2);
+        // Filter last 24 hours for the daily digest
+        const cutoff = new Date();
+        cutoff.setHours(cutoff.getHours() - 24);
 
-        // 1. Get all recent posts
-        let recentPosts = allPosts.filter(post =>
-            new Date(post.publishedDate) >= yesterday
-        ).sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
+        const recentPosts = allPosts
+            .filter(post => new Date(post.publishedDate) >= cutoff)
+            .sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
 
-        // 2. Ensure Category Diversity
-        const uniqueCategories = Array.from(new Set(recentPosts.map(p => (p as any).category || 'General')));
-        const selectedStories: any[] = [];
-        const selectedSlugs = new Set();
-
-        // Pick top story from each category first
-        uniqueCategories.forEach(cat => {
-            const topForCat = recentPosts.find(p => ((p as any).category || 'General') === cat);
-            if (topForCat) {
-                selectedStories.push(topForCat);
-                selectedSlugs.add(topForCat.slug);
-            }
+        const seenSlugs = new Set<string>();
+        const dedupedPosts = recentPosts.filter(post => {
+            if (seenSlugs.has(post.slug)) return false;
+            seenSlugs.add(post.slug);
+            return true;
         });
 
-        // 3. Fill remaining slots up to 15
-        for (const post of recentPosts) {
-            if (selectedStories.length >= 15) break;
-            if (!selectedSlugs.has(post.slug)) {
-                selectedStories.push(post);
-                selectedSlugs.add(post.slug);
-            }
-        }
-
-        // 4. Sort final selection by date
-        selectedStories.sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
-
-        if (selectedStories.length > 0) {
-            stories = selectedStories.map(post => ({
+        if (dedupedPosts.length > 0) {
+            stories = dedupedPosts.map(post => ({
                 title: post.title,
                 slug: post.slug,
-                summary: post.title,
+                summary: '',
                 category: post.category
             }));
-            tagline = `Live daily digest. ${selectedStories.length} headlines from across Maine.`;
+            tagline = `Last 24 hours. ${dedupedPosts.length} headlines in under a minute.`;
         }
     }
 

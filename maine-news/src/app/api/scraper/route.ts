@@ -3,65 +3,10 @@ import Parser from 'rss-parser';
 import fs from 'fs/promises';
 import path from 'path';
 import TurndownService from 'turndown';
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import OpenAI from "openai";
-
 export const dynamic = 'force-dynamic';
 
 const parser = new Parser();
 const turndown = new TurndownService();
-
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || "");
-const aiModel = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
-
-const deepseek = process.env.DEEPSEEK_API_KEY ? new OpenAI({
-    apiKey: process.env.DEEPSEEK_API_KEY,
-    baseURL: 'https://api.deepseek.com',
-}) : null;
-
-async function aiSummarize(text: string, title: string): Promise<string> {
-    const prompt = `
-        You are an editorial assistant for "Maine News Now", a news site focused on "Editorial Minimalism".
-        
-        TASK: Clean and summarize the following news article.
-        1. Remove all navigation artifacts, "Download our app" ads, social media links, and website clutter.
-        2. Preserve the factual core of the story.
-        3. Write a professional, unbiased, and clear summary.
-        4. If content is too short, just polish it.
-        5. Length: 150-300 words.
-        6. Return ONLY cleaned summary text. Use paragraphs.
-        
-        ARTICLE TITLE: ${title}
-        RAW CONTENT:
-        ${text}
-    `;
-
-    // Try DeepSeek first if available (Very cheap/reliable)
-    if (deepseek) {
-        try {
-            const completion = await deepseek.chat.completions.create({
-                messages: [{ role: "system", content: "You are a professional news editor assistant." }, { role: "user", content: prompt }],
-                model: "deepseek-chat",
-            });
-            return completion.choices[0].message.content?.trim() || text;
-        } catch (error) {
-            console.error("DeepSeek failing, falling back to Gemini...", (error as any).message);
-        }
-    }
-
-    // Fallback to Gemini
-    if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
-        try {
-            const result = await aiModel.generateContent(prompt);
-            const response = await result.response;
-            return response.text().trim();
-        } catch (error) {
-            console.error("Gemini summarization failed:", (error as any).message);
-        }
-    }
-
-    return text;
-}
 
 // Maine towns/cities database for geographic filtering
 const MAINE_LOCATIONS = [
@@ -217,6 +162,27 @@ function sanitizeForFilename(text: string): string {
         .replace(/^-+|-+$/g, '');
 }
 
+function extractFirstImageFromHtml(html: string): string | undefined {
+    if (!html) return undefined;
+
+    const imgTags = html.match(/<img[^>]+>/gi) || [];
+    const badPatterns = /(logo|icon|sprite|badge|avatar|tracking|pixel)/i;
+
+    for (const tag of imgTags) {
+        const srcMatch = tag.match(/\s(?:src|data-src|data-original|data-lazy-src)=["']([^"']+)["']/i);
+        if (!srcMatch) continue;
+
+        const url = srcMatch[1].trim();
+        if (!url || url.startsWith('data:')) continue;
+        if (badPatterns.test(url)) continue;
+        if (!/\.(jpg|jpeg|png|webp|gif)(\?|#|$)/i.test(url)) continue;
+
+        return url;
+    }
+
+    return undefined;
+}
+
 async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'maine' | 'national' | 'health'): Promise<ScrapedStory[]> {
     try {
         // Use fetch with a browser-like User-Agent to avoid bot-blocking 404s
@@ -248,6 +214,12 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
         for (const item of feed.items) {
             const title = item.title || 'Untitled';
             const link = item.link || '';
+            const rawHtml = [
+                item['content:encoded'],
+                item.content,
+                item.summary,
+                item.contentSnippet
+            ].filter(Boolean).join(' ');
             let content = turndown.turndown(item.content || item.contentSnippet || item.summary || '');
 
             // Robust cleaning for future scrapes
@@ -301,10 +273,6 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
 
             content = cleanText(content, title);
 
-            // Apply AI Summarization
-            console.log(`[AI] Summarizing: ${title}...`);
-            content = await aiSummarize(content, title);
-
             let excerpt = content.replace(/!\[.*?\]\(.*?\)/g, '').substring(0, 300).replace(/[\\#\\*]/g, '') + (content.length > 300 ? '...' : '');
 
             // Final polish to ensure no trailing junk or weird formatting
@@ -318,13 +286,9 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
                 image = mediaContent.$.url;
             }
 
-            // Fallback: search for first <img> tag in the original content/summary
+            // Fallback: use first real image from raw HTML before cleaning
             if (!image) {
-                const searchArea = (item.content || item.summary || item.contentSnippet || '') + (item['content:encoded'] || '');
-                const imgMatch = searchArea.match(/<img[^>]+src=["']([^"']+)["']/i);
-                if (imgMatch) {
-                    image = imgMatch[1];
-                }
+                image = extractFirstImageFromHtml(rawHtml);
             }
 
             stories.push({

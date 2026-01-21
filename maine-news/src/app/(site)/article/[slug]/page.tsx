@@ -9,6 +9,7 @@ import styles from './Article.module.css';
 import { db } from '@/db';
 import { posts as dbPosts } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { EDITORIAL_DISCLAIMER_PARAGRAPHS } from '@/lib/editorialDisclaimer';
 
 interface ArticlePageProps {
     params: Promise<{ slug: string }>;
@@ -72,6 +73,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     }
 
     if (dbPost) {
+        const isEditorial = dbPost.category === 'editorial';
         return (
             <article className={styles.articleContainer}>
                 <header className={styles.header}>
@@ -102,6 +104,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     <div dangerouslySetInnerHTML={{ __html: dbPost.content }} />
                 </div>
 
+                {isEditorial && (
+                    <aside className={styles.editorialDisclaimer}>
+                        <h2 className={styles.editorialDisclaimerTitle}>Editorial Disclaimer</h2>
+                        {EDITORIAL_DISCLAIMER_PARAGRAPHS.map((paragraph, index) => (
+                            <p key={index}>{paragraph}</p>
+                        ))}
+                    </aside>
+                )}
+
                 <ArticleActions
                     title={dbPost.title}
                     url={`${process.env.NEXT_PUBLIC_SITE_URL}/article/${slug}`}
@@ -122,6 +133,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     const author = post.author as string;
     const publishedDate = post.publishedDate as string;
     const image = post.image as string | undefined;
+    const category = post.category as string | undefined;
     const content = post.content as () => Promise<{ node: any }>;
     const dateStr = new Date(publishedDate?.toString() || '').toLocaleDateString('en-US', {
         year: 'numeric',
@@ -157,6 +169,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <div className={styles.body} data-article-body>
                 {Markdoc.renderers.react(Markdoc.transform((await content()).node), React)}
             </div>
+
+            {category === 'editorial' && (
+                <aside className={styles.editorialDisclaimer}>
+                    <h2 className={styles.editorialDisclaimerTitle}>Editorial Disclaimer</h2>
+                    {EDITORIAL_DISCLAIMER_PARAGRAPHS.map((paragraph, index) => (
+                        <p key={index}>{paragraph}</p>
+                    ))}
+                </aside>
+            )}
 
             <ArticleActions
                 title={title}

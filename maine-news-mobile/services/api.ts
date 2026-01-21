@@ -33,6 +33,57 @@ export interface Post {
     isOriginal?: boolean;
 }
 
+export interface ForecastSlice {
+    name: string;
+    shortForecast: string;
+    detailedForecast: string;
+    temperature?: number;
+    temperatureUnit?: string;
+    windSpeed?: string;
+    windDirection?: string;
+    precipitationChance?: number | null;
+}
+
+export interface OutlookDay {
+    name: string;
+    shortForecast: string;
+    temperature?: number;
+    temperatureUnit?: string;
+    precipitationChance?: number | null;
+}
+
+export interface RegionForecast {
+    id: string;
+    label: string;
+    location: string;
+    status: 'ok' | 'error';
+    errorMessage?: string;
+    today?: ForecastSlice;
+    tonight?: ForecastSlice;
+    tomorrow?: ForecastSlice;
+    outlook: OutlookDay[];
+}
+
+export interface WeatherAlert {
+    id: string;
+    event: string;
+    headline: string;
+    severity: string;
+    description: string;
+    effective?: string;
+    ends?: string;
+}
+
+export interface WeatherReport {
+    date: string;
+    displayDate: string;
+    generatedAt: string;
+    permalinkPath: string;
+    source: string;
+    regions: RegionForecast[];
+    alerts: WeatherAlert[];
+}
+
 export const getImageUrl = (path?: string) => {
     if (!path) return null;
     if (path.startsWith('http')) return path;
@@ -77,6 +128,33 @@ export async function fetchPosts(): Promise<Post[]> {
         }
 
         return [];
+    }
+}
+
+export async function fetchWeatherReport(date?: string): Promise<WeatherReport | null> {
+    const cacheKey = date ? `cached_weather_report_${date}` : 'cached_weather_report_latest';
+    const url = date ? `${API_BASE_URL}/api/weather?date=${date}` : `${API_BASE_URL}/api/weather`;
+
+    try {
+        const response = await axios.get<WeatherReport>(url);
+        const report = response.data;
+        if (report) {
+            await AsyncStorage.setItem(cacheKey, JSON.stringify(report));
+        }
+        return report || null;
+    } catch (error) {
+        console.error('Failed to fetch weather report:', error);
+
+        const cached = await AsyncStorage.getItem(cacheKey);
+        if (cached) {
+            try {
+                return JSON.parse(cached) as WeatherReport;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        return null;
     }
 }
 

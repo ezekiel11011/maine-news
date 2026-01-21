@@ -73,6 +73,29 @@
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
+.editorialDisclaimer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color-dim);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.editorialDisclaimerTitle {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-accent);
+  margin-bottom: 1rem;
+}
+
+.editorialDisclaimer p {
+  margin-bottom: 1rem;
+}
+
 .imageWrapper {
   position: relative;
   width: 100vw;

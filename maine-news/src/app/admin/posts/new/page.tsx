@@ -221,6 +221,7 @@ export default function NewPostPage() {
                                 <option value="local">Local News</option>
                                 <option value="politics">Politics</option>
                                 <option value="opinion">Opinion</option>
+                                <option value="editorial">Editorial</option>
                                 <option value="weather">Weather</option>
                                 <option value="exclusives">Exclusives</option>
                             </select>

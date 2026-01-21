@@ -10,6 +10,7 @@ const CATEGORIES = [
     'Politics',
     'Health',
     'Opinion',
+    'Editorial',
     'Sports',
     'Weather',
     'Entertainment',

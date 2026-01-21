@@ -24,6 +24,7 @@ export default function Header() {
                 <Link href="/latest" className={styles.desktopNavLink}>Latest</Link>
                 <Link href="/sections" className={styles.desktopNavLink}>Sections</Link>
                 <Link href="/opinion" className={styles.desktopNavLink}>Opinion</Link>
+                <Link href="/editorial" className={styles.desktopNavLink}>Editorial</Link>
             </nav>
 
             <div className={styles.headerRightSection}>

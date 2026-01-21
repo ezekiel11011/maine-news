@@ -32,6 +32,9 @@ const XIcon = ({ color }: { color: string }) => (
     </Svg>
 );
 
+const EDITORIAL_DISCLAIMER_SHORT =
+    "This editorial reflects the author's opinions and commentary on matters of public concern. Statements are expressions of opinion, not assertions of fact, and are protected under the First Amendment.";
+
 export default function ArticleDetail() {
     const { slug } = useLocalSearchParams();
     const [post, setPost] = useState<any>(null);
@@ -362,6 +365,12 @@ export default function ArticleDetail() {
                     {renderNode(post.content, 0)}
                 </View>
 
+                {post.category === 'editorial' && (
+                    <View style={styles.disclaimer}>
+                        <Text style={styles.disclaimerText}>{EDITORIAL_DISCLAIMER_SHORT}</Text>
+                    </View>
+                )}
+
                 {renderSocialBar()}
 
                 <View style={styles.footer}>
@@ -525,6 +534,18 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter_400Regular',
         color: colors.text,
         flex: 1,
+    },
+    disclaimer: {
+        marginHorizontal: spacing.lg,
+        paddingTop: spacing.lg,
+        borderTopWidth: 1,
+        borderTopColor: colors.borderDim,
+    },
+    disclaimerText: {
+        fontFamily: 'Inter_400Regular',
+        fontSize: 11,
+        color: colors.textDim,
+        lineHeight: 16,
     },
     footer: {
         marginTop: spacing.xxl,

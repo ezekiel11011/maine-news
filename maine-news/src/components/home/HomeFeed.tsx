@@ -42,6 +42,7 @@ const CATEGORIES = [
     { id: 'sports', label: 'Sports' },
     { id: 'health', label: 'Health' },
     { id: 'weather', label: 'Weather' },
+    { id: 'editorial', label: 'Editorial' },
     { id: 'entertainment', label: 'Entertainment' },
     { id: 'business', label: 'Business' },
     { id: 'crime', label: 'Crime' },

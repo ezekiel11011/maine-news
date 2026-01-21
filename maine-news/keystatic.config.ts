@@ -42,6 +42,7 @@ export default config({
                         { label: 'National', value: 'national' },
                         { label: 'Politics', value: 'politics' },
                         { label: 'Opinion', value: 'opinion' },
+                        { label: 'Editorial', value: 'editorial' },
                         { label: 'Health', value: 'health' },
                         { label: 'Sports', value: 'sports' },
                         { label: 'Weather', value: 'weather' },

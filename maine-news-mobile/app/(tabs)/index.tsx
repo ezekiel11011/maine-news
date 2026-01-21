@@ -22,7 +22,7 @@ import { Clock, ArrowUpDown, ChevronUp, Facebook, Instagram, Youtube } from 'luc
 import { Svg, Path } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
-const CATEGORIES = ['all', 'exclusives', 'top-stories', 'local', 'national', 'politics', 'opinion', 'health', 'sports', 'weather', 'entertainment'];
+const CATEGORIES = ['all', 'exclusives', 'top-stories', 'local', 'national', 'politics', 'opinion', 'editorial', 'health', 'sports', 'weather', 'entertainment'];
 
 const XIcon = ({ color }: { color: string }) => (
     <Svg width="18" height="18" viewBox="0 0 24 24" fill="none">

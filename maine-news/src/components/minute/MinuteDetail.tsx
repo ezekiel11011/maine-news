@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './MinuteDetail.module.css';
 
 interface MinuteStoryDetail {
@@ -29,7 +28,6 @@ export default function MinuteDetail({ date, tagline, stories, lottery }: Minute
 
     const [logoError, setLogoError] = React.useState(false);
     const [currentTime, setCurrentTime] = useState('');
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         // Hydration mismatch avoidance: only show time after mount
@@ -49,15 +47,10 @@ export default function MinuteDetail({ date, tagline, stories, lottery }: Minute
         return () => clearInterval(timer);
     }, []);
 
-    const scroll = (direction: 'left' | 'right') => {
-        if (scrollContainerRef.current) {
-            const scrollAmount = 350; // Approx card width
-            const currentScroll = scrollContainerRef.current.scrollLeft;
-            scrollContainerRef.current.scrollTo({
-                left: direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount,
-                behavior: 'smooth'
-            });
-        }
+    const shouldShowSummary = (summary: string, title: string) => {
+        const cleanSummary = summary?.trim();
+        if (!cleanSummary) return false;
+        return cleanSummary.toLowerCase() !== title.trim().toLowerCase();
     };
 
     return (
@@ -87,40 +80,26 @@ export default function MinuteDetail({ date, tagline, stories, lottery }: Minute
                 <div className={styles.divider} />
             </header>
 
-            <div className={styles.galleryWrapper}>
-                <button
-                    onClick={() => scroll('left')}
-                    className={`${styles.scrollBtn} ${styles.scrollBtnLeft}`}
-                    aria-label="Scroll Left"
-                >
-                    <ChevronLeft size={24} />
-                </button>
-
-                <div className={styles.content} ref={scrollContainerRef}>
-                    {/* News Stories - Scrolling Gallery */}
-                    {stories.map((story, i) => (
-                        <div key={i} className={styles.storyBlock}>
-                            <div className={styles.storyHeader}>
-                                {story.category && (
-                                    <span className={styles.categoryTag}>{story.category}</span>
-                                )}
-                                <h2 className={styles.storyTitle}>{story.title}</h2>
-                            </div>
-                            <p className={styles.summary}>{story.summary}</p>
-                            <Link href={`/article/${story.slug}`} className={styles.readMore}>
-                                Full Internal Article →
-                            </Link>
+            <div className={styles.list}>
+                {stories.map((story, i) => (
+                    <div key={i} className={styles.listItem}>
+                        <div className={styles.storyHeader}>
+                            {story.category && (
+                                <span className={styles.categoryTag}>{story.category}</span>
+                            )}
+                            <span className={styles.storyIndex}>{String(i + 1).padStart(2, '0')}</span>
                         </div>
-                    ))}
-                </div>
-
-                <button
-                    onClick={() => scroll('right')}
-                    className={`${styles.scrollBtn} ${styles.scrollBtnRight}`}
-                    aria-label="Scroll Right"
-                >
-                    <ChevronRight size={24} />
-                </button>
+                        <Link href={`/article/${story.slug}`} className={styles.storyTitle}>
+                            {story.title}
+                        </Link>
+                        {shouldShowSummary(story.summary, story.title) && (
+                            <p className={styles.summary}>{story.summary}</p>
+                        )}
+                        <Link href={`/article/${story.slug}`} className={styles.readMore}>
+                            Read full story →
+                        </Link>
+                    </div>
+                ))}
             </div>
 
             {/* Lottery Results - Separate Section */}
