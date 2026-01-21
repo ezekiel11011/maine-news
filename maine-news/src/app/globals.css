@@ -13,6 +13,8 @@
   --font-body: var(--font-body-sans);
   
   /* Spacing & Layout */
+  --utility-bar-height: 32px;
+  --social-bar-height: 32px;
   --header-height-mobile: 80px;
   --header-height-desktop: 100px;
   --bottom-nav-height: 60px;

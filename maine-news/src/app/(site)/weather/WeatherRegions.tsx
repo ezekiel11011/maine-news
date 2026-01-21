@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { CloudSun, Droplets, Moon, Sunrise, Sun, Wind } from 'lucide-react';
 import type { RegionForecast } from '@/lib/weather';
 import styles from './WeatherReport.module.css';
 
@@ -66,39 +67,69 @@ export default function WeatherRegions({ regions }: WeatherRegionsProps) {
                         <div className={styles.forecastGrid}>
                             {activeRegion.today && (
                                 <div className={styles.forecastCard}>
-                                    <div className={styles.forecastLabel}>Today</div>
+                                    <div className={styles.forecastLabelRow}>
+                                        <Sun size={16} className={styles.forecastIcon} />
+                                        <span>Today</span>
+                                    </div>
                                     <div className={styles.forecastTemp}>
                                         {formatTemp(activeRegion.today.temperature, activeRegion.today.temperatureUnit)}
                                     </div>
                                     <div className={styles.forecastSummary}>{activeRegion.today.shortForecast}</div>
                                     <div className={styles.forecastDetails}>
-                                        {formatWind(activeRegion.today.windSpeed, activeRegion.today.windDirection)} · {formatPrecip(activeRegion.today.precipitationChance)}
+                                        <span className={styles.detailItem}>
+                                            <Wind size={14} />
+                                            {formatWind(activeRegion.today.windSpeed, activeRegion.today.windDirection)}
+                                        </span>
+                                        <span className={styles.detailItem}>
+                                            <Droplets size={14} />
+                                            {formatPrecip(activeRegion.today.precipitationChance)}
+                                        </span>
                                     </div>
                                 </div>
                             )}
 
                             {activeRegion.tonight && (
                                 <div className={styles.forecastCard}>
-                                    <div className={styles.forecastLabel}>Tonight</div>
+                                    <div className={styles.forecastLabelRow}>
+                                        <Moon size={16} className={styles.forecastIcon} />
+                                        <span>Tonight</span>
+                                    </div>
                                     <div className={styles.forecastTemp}>
                                         {formatTemp(activeRegion.tonight.temperature, activeRegion.tonight.temperatureUnit)}
                                     </div>
                                     <div className={styles.forecastSummary}>{activeRegion.tonight.shortForecast}</div>
                                     <div className={styles.forecastDetails}>
-                                        {formatWind(activeRegion.tonight.windSpeed, activeRegion.tonight.windDirection)} · {formatPrecip(activeRegion.tonight.precipitationChance)}
+                                        <span className={styles.detailItem}>
+                                            <Wind size={14} />
+                                            {formatWind(activeRegion.tonight.windSpeed, activeRegion.tonight.windDirection)}
+                                        </span>
+                                        <span className={styles.detailItem}>
+                                            <Droplets size={14} />
+                                            {formatPrecip(activeRegion.tonight.precipitationChance)}
+                                        </span>
                                     </div>
                                 </div>
                             )}
 
                             {activeRegion.tomorrow && (
                                 <div className={styles.forecastCard}>
-                                    <div className={styles.forecastLabel}>Tomorrow</div>
+                                    <div className={styles.forecastLabelRow}>
+                                        <Sunrise size={16} className={styles.forecastIcon} />
+                                        <span>Tomorrow</span>
+                                    </div>
                                     <div className={styles.forecastTemp}>
                                         {formatTemp(activeRegion.tomorrow.temperature, activeRegion.tomorrow.temperatureUnit)}
                                     </div>
                                     <div className={styles.forecastSummary}>{activeRegion.tomorrow.shortForecast}</div>
                                     <div className={styles.forecastDetails}>
-                                        {formatWind(activeRegion.tomorrow.windSpeed, activeRegion.tomorrow.windDirection)} · {formatPrecip(activeRegion.tomorrow.precipitationChance)}
+                                        <span className={styles.detailItem}>
+                                            <Wind size={14} />
+                                            {formatWind(activeRegion.tomorrow.windSpeed, activeRegion.tomorrow.windDirection)}
+                                        </span>
+                                        <span className={styles.detailItem}>
+                                            <Droplets size={14} />
+                                            {formatPrecip(activeRegion.tomorrow.precipitationChance)}
+                                        </span>
                                     </div>
                                 </div>
                             )}
@@ -110,13 +141,19 @@ export default function WeatherRegions({ regions }: WeatherRegionsProps) {
                                 <div className={styles.outlookGrid}>
                                     {activeRegion.outlook.map(day => (
                                         <div key={day.name} className={styles.outlookCard}>
-                                            <div className={styles.outlookLabel}>{day.name}</div>
+                                            <div className={styles.outlookLabelRow}>
+                                                <CloudSun size={14} className={styles.forecastIcon} />
+                                                <span>{day.name}</span>
+                                            </div>
                                             <div className={styles.outlookTemp}>
                                                 {formatTemp(day.temperature, day.temperatureUnit)}
                                             </div>
                                             <div className={styles.outlookSummary}>{day.shortForecast}</div>
                                             <div className={styles.forecastDetails}>
-                                                {formatPrecip(day.precipitationChance)}
+                                                <span className={styles.detailItem}>
+                                                    <Droplets size={14} />
+                                                    {formatPrecip(day.precipitationChance)}
+                                                </span>
                                             </div>
                                         </div>
                                     ))}

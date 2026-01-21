@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import Link from 'next/link';
 import Hero from '@/components/home/Hero';
 import LiveTicker from '@/components/home/LiveTicker';
 import MaineMinuteCard from '@/components/home/MaineMinuteCard';
@@ -34,6 +35,7 @@ interface HomeFeedProps {
 
 const CATEGORIES = [
     { id: 'all', label: 'News' },
+    { id: 'editorial', label: 'Editorial' },
     { id: 'exclusives', label: 'Exclusives' },
     { id: 'top-stories', label: 'Top Stories' },
     { id: 'local', label: 'Local' },
@@ -42,7 +44,6 @@ const CATEGORIES = [
     { id: 'sports', label: 'Sports' },
     { id: 'health', label: 'Health' },
     { id: 'weather', label: 'Weather' },
-    { id: 'editorial', label: 'Editorial' },
     { id: 'entertainment', label: 'Entertainment' },
     { id: 'business', label: 'Business' },
     { id: 'crime', label: 'Crime' },
@@ -55,6 +56,23 @@ export default function HomeFeed({ initialPosts, latestMinute }: HomeFeedProps) 
     const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
     const [visibleCount, setVisibleCount] = useState(15);
     const [showFilters, setShowFilters] = useState(false);
+    const [showEditorialAlert, setShowEditorialAlert] = useState(false);
+
+    const latestEditorial = useMemo(() => {
+        return initialPosts.find(post => post.category === 'editorial');
+    }, [initialPosts]);
+
+    useEffect(() => {
+        if (!latestEditorial) return;
+        const publishedAt = new Date(latestEditorial.publishedDate).getTime();
+        const lastSeen = typeof window !== 'undefined'
+            ? Number(window.localStorage.getItem('editorialAlertSeenAt') || 0)
+            : 0;
+
+        if (!Number.isNaN(publishedAt) && publishedAt > lastSeen) {
+            setShowEditorialAlert(true);
+        }
+    }, [latestEditorial]);
 
     // Filter and Sort Logic
     const filteredPosts = initialPosts.filter(post => {
@@ -106,6 +124,32 @@ export default function HomeFeed({ initialPosts, latestMinute }: HomeFeedProps) 
                 />
             )}
 
+            {showEditorialAlert && latestEditorial && (
+                <div className={styles.editorialAlert} role="status">
+                    <div className={styles.editorialAlertBody}>
+                        <span className={styles.editorialAlertKicker}>New Editorial</span>
+                        <Link href={`/article/${latestEditorial.slug}`} className={styles.editorialAlertTitle}>
+                            {latestEditorial.title}
+                        </Link>
+                        <span className={styles.editorialAlertMeta}>
+                            Published {new Date(latestEditorial.publishedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                    </div>
+                    <button
+                        type="button"
+                        className={styles.editorialAlertClose}
+                        onClick={() => {
+                            const publishedAt = new Date(latestEditorial.publishedDate).getTime();
+                            window.localStorage.setItem('editorialAlertSeenAt', String(publishedAt || Date.now()));
+                            setShowEditorialAlert(false);
+                        }}
+                        aria-label="Dismiss editorial alert"
+                    >
+                        <X size={16} />
+                    </button>
+                </div>
+            )}
+
             <div className={styles.stickyNav}>
                 <div className={styles.categoryTabs}>
                     {CATEGORIES.map(cat => (
@@ -115,7 +159,7 @@ export default function HomeFeed({ initialPosts, latestMinute }: HomeFeedProps) 
                                 setActiveCategory(cat.id);
                                 setVisibleCount(15); // Reset count on category change
                             }}
-                            className={`${styles.tabButton} ${activeCategory === cat.id ? styles.activeTab : ''}`}
+                            className={`${styles.tabButton} ${activeCategory === cat.id ? styles.activeTab : ''} ${cat.id === 'editorial' ? styles.editorialTab : ''} ${activeCategory === cat.id && cat.id === 'editorial' ? styles.editorialTabActive : ''}`}
                         >
                             {cat.label}
                         </button>
@@ -162,7 +206,7 @@ export default function HomeFeed({ initialPosts, latestMinute }: HomeFeedProps) 
                                     setVisibleCount(15);
                                     setShowFilters(false);
                                 }}
-                                className={`${styles.filterChip} ${activeCategory === cat.id ? styles.activeChip : ''}`}
+                                className={`${styles.filterChip} ${activeCategory === cat.id ? styles.activeChip : ''} ${cat.id === 'editorial' ? styles.editorialChip : ''} ${activeCategory === cat.id && cat.id === 'editorial' ? styles.editorialChipActive : ''}`}
                             >
                                 {cat.label}
                             </button>

@@ -125,6 +125,30 @@
   color: var(--color-accent);
 }
 
+.socialRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.socialButton {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color-dim);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.socialButton:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+}
+
 .tabRow {
   display: flex;
   flex-wrap: wrap;
@@ -181,12 +205,19 @@
   padding: 1.25rem;
 }
 
-.forecastLabel {
+.forecastLabelRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.08rem;
   color: var(--color-accent);
   margin-bottom: 0.5rem;
+}
+
+.forecastIcon {
+  color: var(--color-accent);
 }
 
 .forecastTemp {
@@ -203,6 +234,15 @@
   margin-top: 0.75rem;
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.65);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.detailItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .outlook {
@@ -229,7 +269,10 @@
   padding: 1rem;
 }
 
-.outlookLabel {
+.outlookLabelRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.08rem;

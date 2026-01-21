@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Facebook, Instagram, Youtube } from 'lucide-react';
 import styles from './Footer.module.css';
+import StoreBadges from './StoreBadges';
 
 export default function Footer() {
     return (
@@ -51,26 +52,7 @@ export default function Footer() {
 
                     <div className={styles.linkGroup}>
                         <h3>Download Our App</h3>
-                        <div className={styles.appLinksGroup}>
-                            <a href="https://apps.apple.com" target="_blank" rel="noopener noreferrer" className={styles.storeBadge}>
-                                <div className={styles.badgeIcon}>
-                                    <Image src="/App_Store.svg" alt="App Store" width={24} height={24} />
-                                </div>
-                                <div className={styles.badgeText}>
-                                    <span className={styles.badgeSmall}>Download on</span>
-                                    <span className={styles.badgeLarge}>App Store</span>
-                                </div>
-                            </a>
-                            <a href="https://play.google.com/store/apps/details?id=com.mainenewstoday.app" target="_blank" rel="noopener noreferrer" className={styles.storeBadge}>
-                                <div className={styles.badgeIcon}>
-                                    <Image src="/Google_Play.svg" alt="Google Play" width={24} height={24} />
-                                </div>
-                                <div className={styles.badgeText}>
-                                    <span className={styles.badgeSmall}>Get it on</span>
-                                    <span className={styles.badgeLarge}>Google Play</span>
-                                </div>
-                            </a>
-                        </div>
+                        <StoreBadges />
                     </div>
                 </div>
 
