@@ -40,7 +40,7 @@ export default function Footer() {
                                 src="/maine-minutes.png"
                                 alt="The Maine Minute"
                                 width={110}
-                                height={32}
+                                height={48}
                                 className={styles.minuteLogoImage}
                             />
                         </span>
