@@ -75,6 +75,53 @@
     align-items: center;
 }
 
+.footerCta {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.minuteCta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 999px;
+    border: 1px solid rgba(191, 155, 48, 0.6);
+    background: rgba(191, 155, 48, 0.08);
+    color: var(--color-text);
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 18px rgba(191, 155, 48, 0.35);
+    animation: minuteGlow 2.6s ease-in-out infinite;
+}
+
+.minuteCta:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 26px rgba(191, 155, 48, 0.6);
+    transform: translateY(-2px);
+}
+
+.minuteLogo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.minuteLogoImage {
+    width: auto;
+    height: 28px;
+    object-fit: contain;
+}
+
+.minuteCtaText {
+    color: var(--color-text);
+}
+
 .linkGroup {
     display: flex;
     flex-direction: column;
@@ -177,6 +224,13 @@
         flex: 0 0 auto;
     }
 
+    .footerCta {
+        justify-content: flex-start;
+        align-self: flex-start;
+        padding-top: 1.25rem;
+        min-width: 200px;
+    }
+
     .socialLinks {
         justify-content: flex-start;
     }
@@ -202,5 +256,20 @@
     .bottomBar {
         width: 100%;
         margin-top: 2rem;
+    }
+}
+
+@keyframes minuteGlow {
+    0%, 100% {
+        box-shadow: 0 0 12px rgba(191, 155, 48, 0.25);
+    }
+    50% {
+        box-shadow: 0 0 22px rgba(191, 155, 48, 0.5);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .minuteCta {
+        animation: none;
     }
 }

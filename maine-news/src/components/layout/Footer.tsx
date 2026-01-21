@@ -33,6 +33,21 @@ export default function Footer() {
                     </div>
                 </div>
 
+                <div className={styles.footerCta}>
+                    <Link href="/news/maine-minute" className={styles.minuteCta}>
+                        <span className={styles.minuteLogo}>
+                            <Image
+                                src="/maine-minutes.png"
+                                alt="The Maine Minute"
+                                width={110}
+                                height={32}
+                                className={styles.minuteLogoImage}
+                            />
+                        </span>
+                        <span className={styles.minuteCtaText}>Read The Maine Minute</span>
+                    </Link>
+                </div>
+
                 <div className={styles.links}>
                     <div className={styles.linkGroup}>
                         <h3>Platform</h3>
