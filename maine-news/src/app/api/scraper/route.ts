@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import TurndownService from 'turndown';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 
 export const dynamic = 'force-dynamic';
 
@@ -11,38 +12,55 @@ const parser = new Parser();
 const turndown = new TurndownService();
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || "");
-const aiModel = genAI.getGenerativeModel({ model: "gemini-flash-lite-latest" });
+const aiModel = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+
+const deepseek = process.env.DEEPSEEK_API_KEY ? new OpenAI({
+    apiKey: process.env.DEEPSEEK_API_KEY,
+    baseURL: 'https://api.deepseek.com',
+}) : null;
 
 async function aiSummarize(text: string, title: string): Promise<string> {
-    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
-        console.log("Skipping AI summary: No API key found.");
-        return text;
+    const prompt = `
+        You are an editorial assistant for "Maine News Now", a news site focused on "Editorial Minimalism".
+        
+        TASK: Clean and summarize the following news article.
+        1. Remove all navigation artifacts, "Download our app" ads, social media links, and website clutter.
+        2. Preserve the factual core of the story.
+        3. Write a professional, unbiased, and clear summary.
+        4. If content is too short, just polish it.
+        5. Length: 150-300 words.
+        6. Return ONLY cleaned summary text. Use paragraphs.
+        
+        ARTICLE TITLE: ${title}
+        RAW CONTENT:
+        ${text}
+    `;
+
+    // Try DeepSeek first if available (Very cheap/reliable)
+    if (deepseek) {
+        try {
+            const completion = await deepseek.chat.completions.create({
+                messages: [{ role: "system", content: "You are a professional news editor assistant." }, { role: "user", content: prompt }],
+                model: "deepseek-chat",
+            });
+            return completion.choices[0].message.content?.trim() || text;
+        } catch (error) {
+            console.error("DeepSeek failing, falling back to Gemini...", (error as any).message);
+        }
     }
 
-    try {
-        const prompt = `
-            You are an editorial assistant for "Maine News Now", a news site focused on "Editorial Minimalism".
-            
-            TASK: Clean and summarize the following news article.
-            1. Remove all navigation artifacts, "Download our app" ads, social media links, and website clutter.
-            2. Preserve the factual core of the story.
-            3. Write a professional, unbiased, and clear summary of the article.
-            4. If the content is too short to summarize, just clean it up.
-            5. Keep the length between 150 and 300 words usually.
-            6. Return ONLY the cleaned summary text. Use proper paragraphs.
-            
-            ARTICLE TITLE: ${title}
-            RAW CONTENT:
-            ${text}
-        `;
-
-        const result = await aiModel.generateContent(prompt);
-        const response = await result.response;
-        return response.text().trim();
-    } catch (error) {
-        console.error("Gemini summarization failed:", error);
-        return text;
+    // Fallback to Gemini
+    if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+        try {
+            const result = await aiModel.generateContent(prompt);
+            const response = await result.response;
+            return response.text().trim();
+        } catch (error) {
+            console.error("Gemini summarization failed:", (error as any).message);
+        }
     }
+
+    return text;
 }
 
 // Maine towns/cities database for geographic filtering
@@ -68,7 +86,6 @@ const MAINE_FEEDS = [
     { url: 'https://www.pressherald.com/feed/', name: 'Press Herald', type: 'maine' },
     // { url: 'https://www.bangordailynews.com/feed/', name: 'Bangor Daily News', type: 'maine' },
     { url: 'https://www.maine.gov/tools/whatsnew/rss.php?id=portal-news', name: 'Maine.gov', type: 'maine' },
-    { url: 'https://www.newscentermaine.com/feeds/syndication/rss/weather', name: 'NCM Weather', type: 'maine' },
     { url: 'https://www.wabi.tv/feeds/syndication/rss/sports', name: 'WABI Sports', type: 'maine' },
 ];
 

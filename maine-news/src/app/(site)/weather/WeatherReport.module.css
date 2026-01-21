@@ -1,0 +1,304 @@
+.page {
+  padding: 2.5rem 0 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.hero {
+  border-radius: 28px;
+  border: 1px solid var(--border-color-dim);
+  background: radial-gradient(circle at top left, rgba(191, 155, 48, 0.18), transparent 55%),
+    linear-gradient(140deg, rgba(17, 24, 39, 0.95), rgba(10, 10, 10, 0.95));
+  padding: 2.5rem;
+}
+
+.heroRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 2rem;
+  align-items: center;
+}
+
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--color-accent);
+}
+
+.title {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  margin-bottom: 0.5rem;
+}
+
+.meta {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.source {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.heroCard {
+  border-radius: 20px;
+  border: 1px solid var(--border-color-dim);
+  background: rgba(8, 8, 8, 0.8);
+  padding: 1.5rem;
+}
+
+.heroCardLabel {
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.18rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.75rem;
+}
+
+.heroTemp {
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+.heroSummary {
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+.heroDetails {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.shareBox {
+  border-radius: 18px;
+  border: 1px solid var(--border-color-dim);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shareTitle {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.shareLink {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.65);
+  word-break: break-all;
+}
+
+.shareActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.shareButton,
+.copyButton {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--border-color-dim);
+  background: transparent;
+  color: var(--color-text);
+  padding: 0.55rem 1rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.shareButton:hover,
+.copyButton:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.tabRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.tabButton {
+  border-radius: 999px;
+  border: 1px solid var(--border-color-dim);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.6rem 1.1rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.tabButtonActive {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(191, 155, 48, 0.08);
+}
+
+.regionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1.5rem;
+}
+
+.regionName {
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06rem;
+}
+
+.regionLocation {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.forecastGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.forecastCard {
+  border-radius: 18px;
+  border: 1px solid var(--border-color-dim);
+  background: rgba(17, 17, 17, 0.9);
+  padding: 1.25rem;
+}
+
+.forecastLabel {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+  color: var(--color-accent);
+  margin-bottom: 0.5rem;
+}
+
+.forecastTemp {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.forecastSummary {
+  margin-top: 0.35rem;
+  font-size: 1rem;
+}
+
+.forecastDetails {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.outlook {
+  margin-top: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+  margin-bottom: 1rem;
+}
+
+.outlookGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.outlookCard {
+  border-radius: 16px;
+  border: 1px solid var(--border-color-dim);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1rem;
+}
+
+.outlookLabel {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 0.35rem;
+}
+
+.outlookTemp {
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.outlookSummary {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 0.35rem;
+}
+
+.alerts {
+  border-radius: 18px;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.08);
+  padding: 1.5rem;
+}
+
+.alertItem {
+  padding-top: 1rem;
+  margin-top: 1rem;
+  border-top: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.alertTitle {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+}
+
+.alertHeadline {
+  margin-top: 0.5rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.alertMeta {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.disclaimer {
+  border-top: 1px solid var(--border-color-dim);
+  padding-top: 1.5rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.errorState {
+  border-radius: 16px;
+  border: 1px solid var(--border-color-dim);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 2rem;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .heroRow {
+    grid-template-columns: 1fr;
+  }
+
+  .heroCard {
+    width: 100%;
+  }
+}

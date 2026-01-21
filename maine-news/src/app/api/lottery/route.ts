@@ -7,6 +7,9 @@ export const dynamic = 'force-dynamic';
 
 export const revalidate = 7200; // 2 hours
 
+const DRAW_WINDOW_MINUTES = 60; // Draw time + 1 hour
+const DRAW_WINDOW_FETCH_TTL_MS = 15 * 60 * 1000; // Throttle during window
+
 async function getDbResult(game: string) {
     try {
         const results = await db.select().from(lotteryResults).where(eq(lotteryResults.game, game)).limit(1);
@@ -106,6 +109,50 @@ async function fetchMUSLGame(gameCode: string) {
     return null;
 }
 
+function getEasternParts(date: Date) {
+    const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York',
+        weekday: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+    });
+    const parts = formatter.formatToParts(date);
+    const getPart = (type: string) => parts.find(part => part.type === type)?.value || '';
+    const weekday = getPart('weekday');
+    const hour = Number(getPart('hour'));
+    const minute = Number(getPart('minute'));
+
+    return { weekday, hour, minute };
+}
+
+function isWithinDrawWindow(game: 'powerball' | 'megamillions', now: Date) {
+    const { weekday, hour, minute } = getEasternParts(now);
+    const minutesSinceMidnight = hour * 60 + minute;
+
+    const schedule = game === 'powerball'
+        ? { days: ['Mon', 'Wed', 'Sat'], drawMinutes: 22 * 60 + 59 }
+        : { days: ['Tue', 'Fri'], drawMinutes: 23 * 60 };
+
+    if (!schedule.days.includes(weekday)) return false;
+
+    const windowStart = schedule.drawMinutes;
+    const windowEnd = schedule.drawMinutes + DRAW_WINDOW_MINUTES;
+    return minutesSinceMidnight >= windowStart && minutesSinceMidnight <= windowEnd;
+}
+
+function formatDbResult(res: any) {
+    if (!res) return null;
+    return {
+        game: res.game,
+        numbers: res.numbers.split(','),
+        extra: res.extra,
+        jackpot: res.jackpot,
+        date: res.drawDate,
+        source: 'db'
+    };
+}
+
 async function getGameResult(game: string, fetchFn: () => Promise<any>, force: boolean = false) {
     const dbRes = await getDbResult(game);
     if (dbRes && !force) {
@@ -124,6 +171,25 @@ async function getGameResult(game: string, fetchFn: () => Promise<any>, force: b
     return await fetchFn();
 }
 
+async function getDrawGameResult(game: 'powerball' | 'megamillions', fetchFn: () => Promise<any>, force: boolean) {
+    const dbRes = await getDbResult(game);
+    const now = new Date();
+    const withinWindow = isWithinDrawWindow(game, now);
+
+    if (!force && !withinWindow) {
+        return formatDbResult(dbRes);
+    }
+
+    if (dbRes && !force) {
+        const age = now.getTime() - new Date(dbRes.updatedAt).getTime();
+        if (age < DRAW_WINDOW_FETCH_TTL_MS) {
+            return formatDbResult(dbRes);
+        }
+    }
+
+    return await fetchFn();
+}
+
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const force = searchParams.get('force') === 'true';
@@ -135,8 +201,8 @@ export async function GET(req: Request) {
     ]);
 
     const [pb, mm] = await Promise.all([
-        getGameResult('powerball', () => fetchApiVerve('powerball'), force),
-        getGameResult('megamillions', () => fetchApiVerve('megamillions'), force),
+        getDrawGameResult('powerball', () => fetchApiVerve('powerball'), force),
+        getDrawGameResult('megamillions', () => fetchApiVerve('megamillions'), force),
     ]);
 
     const [mb, g5, p4, p3] = await Promise.all([
@@ -146,24 +212,15 @@ export async function GET(req: Request) {
         getDbResult('pick-3'),
     ]);
 
-    const formatDb = (res: any) => res ? ({
-        game: res.game,
-        numbers: res.numbers.split(','),
-        extra: res.extra,
-        jackpot: res.jackpot,
-        date: res.drawDate,
-        source: 'db'
-    }) : null;
-
     return NextResponse.json({
         powerball: pb,
         megamillions: mm,
         luckyForLife: lfl,
         lottoAmerica: la,
         doublePlay: dp,
-        megabucks: formatDb(mb),
-        gimme5: formatDb(g5),
-        pick4: formatDb(p4),
-        pick3: formatDb(p3)
+        megabucks: formatDbResult(mb),
+        gimme5: formatDbResult(g5),
+        pick4: formatDbResult(p4),
+        pick3: formatDbResult(p3)
     });
 }
