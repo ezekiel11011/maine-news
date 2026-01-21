@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { db } from '@/db';
 import { posts as dbPosts, lotteryResults } from '@/db/schema';
 import { desc, eq, gte } from 'drizzle-orm';
+import { reader } from '@/lib/reader';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,12 +52,80 @@ function buildSummary(content: string, title: string): string {
     return summary;
 }
 
+function extractTextFromMarkdocNode(node: any): string {
+    if (!node) return '';
+    if (typeof node === 'string') return node;
+
+    if (Array.isArray(node)) {
+        return node.map(child => extractTextFromMarkdocNode(child)).join(' ');
+    }
+
+    if (node.attributes?.content) {
+        return String(node.attributes.content);
+    }
+
+    if (node.children) {
+        return node.children.map((child: any) => extractTextFromMarkdocNode(child)).join(' ');
+    }
+
+    return '';
+}
+
 async function getRecentPosts() {
     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    return db.query.posts.findMany({
-        where: gte(dbPosts.publishedDate, cutoff),
-        orderBy: [desc(dbPosts.publishedDate)],
-    });
+
+    const [dbPostsResult, keystaticPosts] = await Promise.all([
+        db.query.posts.findMany({
+            where: gte(dbPosts.publishedDate, cutoff),
+            orderBy: [desc(dbPosts.publishedDate)],
+        }),
+        reader.collections.posts.all(),
+    ]);
+
+    const merged = new Map<string, {
+        title: string;
+        slug: string;
+        content: string;
+        category?: string;
+        publishedDate: Date;
+    }>();
+
+    for (const post of dbPostsResult) {
+        merged.set(post.slug, {
+            title: post.title,
+            slug: post.slug,
+            content: post.content || '',
+            category: post.category,
+            publishedDate: post.publishedDate,
+        });
+    }
+
+    for (const post of keystaticPosts) {
+        if (merged.has(post.slug)) continue;
+        const publishedDate = new Date((post.entry.publishedDate as string) || '');
+        if (Number.isNaN(publishedDate.getTime()) || publishedDate < cutoff) continue;
+
+        let contentText = '';
+        try {
+            const contentValue = post.entry.content as unknown as () => Promise<{ node: any }>;
+            if (typeof contentValue === 'function') {
+                const contentNode = await contentValue();
+                contentText = extractTextFromMarkdocNode(contentNode?.node ?? contentNode);
+            }
+        } catch (error) {
+            console.warn('Failed to read Keystatic content for minute:', post.slug, error);
+        }
+
+        merged.set(post.slug, {
+            title: post.entry.title as string,
+            slug: post.slug,
+            content: contentText,
+            category: post.entry.category as string | undefined,
+            publishedDate,
+        });
+    }
+
+    return Array.from(merged.values()).sort((a, b) => b.publishedDate.getTime() - a.publishedDate.getTime());
 }
 
 export default async function MaineMinuteTodayPage() {
