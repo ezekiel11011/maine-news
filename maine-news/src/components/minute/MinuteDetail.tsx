@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from './MinuteDetail.module.css';
@@ -10,6 +10,7 @@ interface MinuteStoryDetail {
     slug: string;
     summary: string;
     category?: string;
+    publishedDate?: string;
 }
 
 interface MinuteDetailProps {
@@ -20,14 +21,9 @@ interface MinuteDetailProps {
 }
 
 export default function MinuteDetail({ date, tagline, stories, lottery }: MinuteDetailProps) {
-    const formattedDate = new Date(date).toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric'
-    });
-
     const [logoError, setLogoError] = React.useState(false);
     const [currentTime, setCurrentTime] = useState('');
+    const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
     useEffect(() => {
         // Hydration mismatch avoidance: only show time after mount
@@ -47,60 +43,120 @@ export default function MinuteDetail({ date, tagline, stories, lottery }: Minute
         return () => clearInterval(timer);
     }, []);
 
+    const formattedDate = useMemo(() => (
+        new Date(date).toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        })
+    ), [date]);
+    const headlineLabel = date === today ? 'Last 24 Hours' : formattedDate;
+
     const shouldShowSummary = (summary: string, title: string) => {
         const cleanSummary = summary?.trim();
         if (!cleanSummary) return false;
         return cleanSummary.toLowerCase() !== title.trim().toLowerCase();
     };
 
+    const formatTimeAgo = (dateString?: string) => {
+        if (!dateString) return '';
+        const now = new Date();
+        const past = new Date(dateString);
+        const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+        if (Number.isNaN(diffInSeconds) || diffInSeconds < 0) return '';
+        if (diffInSeconds < 60) return 'Just now';
+        if (diffInSeconds < 3600) {
+            const minutes = Math.floor(diffInSeconds / 60);
+            return `${minutes}m ago`;
+        }
+        if (diffInSeconds < 86400) {
+            const hours = Math.floor(diffInSeconds / 3600);
+            return `${hours}h ago`;
+        }
+        const days = Math.floor(diffInSeconds / 86400);
+        return `${days}d ago`;
+    };
+
     return (
         <article className={styles.container}>
-            <header className={styles.header}>
-                <div className={styles.logoWrapper}>
-                    <Image
-                        src="/maine-minutes.png"
-                        alt="The Maine Minute"
-                        width={300}
-                        height={80}
-                        className={styles.logo}
-                        onError={() => setLogoError(true)}
-                        style={{ display: logoError ? 'none' : 'block' }}
-                    />
-                    {logoError && <div className={styles.brand}>The Maine Minute<sup style={{ fontSize: '0.6em', verticalAlign: 'top' }}>®</sup></div>}
+            <header className={styles.hero}>
+                <div className={styles.heroTop}>
+                    <div className={styles.heroCopy}>
+                        <span className={styles.kicker}>The Maine Minute</span>
+                        <h1 className={styles.title}>{headlineLabel}</h1>
+                        <p className={styles.tagline}>{tagline}</p>
+                        <p className={styles.dateStamp}>{formattedDate}</p>
+                    </div>
+                    <div className={styles.heroLogo}>
+                        <Image
+                            src="/maine-minutes.png"
+                            alt="The Maine Minute"
+                            width={240}
+                            height={70}
+                            className={styles.logo}
+                            onError={() => setLogoError(true)}
+                            style={{ display: logoError ? 'none' : 'block' }}
+                        />
+                        {logoError && (
+                            <div className={styles.brand}>
+                                The Maine Minute<sup style={{ fontSize: '0.6em', verticalAlign: 'top' }}>®</sup>
+                            </div>
+                        )}
+                    </div>
                 </div>
-                <h1 className={styles.title}>{formattedDate}</h1>
-                {currentTime && <div className={styles.clock} style={{
-                    fontFamily: 'var(--font-heading)',
-                    color: 'var(--color-accent)',
-                    fontSize: '1.2rem',
-                    marginBottom: '1rem',
-                    fontWeight: 700
-                }}>{currentTime}</div>}
-                <p className={styles.tagline}>{tagline}</p>
-                <div className={styles.divider} />
+
+                <div className={styles.stats}>
+                    <div className={styles.statCard}>
+                        <span className={styles.statLabel}>Headlines</span>
+                        <span className={styles.statValue}>{stories.length}</span>
+                    </div>
+                    <div className={styles.statCard}>
+                        <span className={styles.statLabel}>Window</span>
+                        <span className={styles.statValue}>24 hrs</span>
+                    </div>
+                    <div className={styles.statCard}>
+                        <span className={styles.statLabel}>Updated</span>
+                        <span className={styles.statValue}>{currentTime || '—'}</span>
+                    </div>
+                </div>
+
+                <p className={styles.heroNote}>
+                    Condensed summaries of everything published in the last day. Tap any headline to expand the full story.
+                </p>
             </header>
 
-            <div className={styles.list}>
-                {stories.map((story, i) => (
-                    <div key={i} className={styles.listItem}>
-                        <div className={styles.storyHeader}>
-                            {story.category && (
-                                <span className={styles.categoryTag}>{story.category}</span>
+            {stories.length === 0 ? (
+                <div className={styles.emptyState}>
+                    <h2>Quiet Day in Maine</h2>
+                    <p>No headlines published in the last 24 hours yet. Check back soon.</p>
+                    <Link href="/" className={styles.readMore}>← Back to Newsroom</Link>
+                </div>
+            ) : (
+                <div className={styles.stories}>
+                    {stories.map((story, i) => (
+                        <article key={story.slug} className={styles.storyCard}>
+                            <div className={styles.storyMeta}>
+                                <span className={styles.storyIndex}>{String(i + 1).padStart(2, '0')}</span>
+                                {story.category && (
+                                    <span className={styles.storyCategory}>{story.category}</span>
+                                )}
+                                {story.publishedDate && (
+                                    <span className={styles.storyTime}>{formatTimeAgo(story.publishedDate)}</span>
+                                )}
+                            </div>
+                            <Link href={`/article/${story.slug}`} className={styles.storyTitle}>
+                                {story.title}
+                            </Link>
+                            {shouldShowSummary(story.summary, story.title) && (
+                                <p className={styles.storySummary}>{story.summary}</p>
                             )}
-                            <span className={styles.storyIndex}>{String(i + 1).padStart(2, '0')}</span>
-                        </div>
-                        <Link href={`/article/${story.slug}`} className={styles.storyTitle}>
-                            {story.title}
-                        </Link>
-                        {shouldShowSummary(story.summary, story.title) && (
-                            <p className={styles.summary}>{story.summary}</p>
-                        )}
-                        <Link href={`/article/${story.slug}`} className={styles.readMore}>
-                            Read full story →
-                        </Link>
-                    </div>
-                ))}
-            </div>
+                            <Link href={`/article/${story.slug}`} className={styles.storyLink}>
+                                Read full story →
+                            </Link>
+                        </article>
+                    ))}
+                </div>
+            )}
 
             {/* Lottery Results - Separate Section */}
             {lottery && Object.keys(lottery).length > 0 && (
