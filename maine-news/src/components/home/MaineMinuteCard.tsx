@@ -35,7 +35,7 @@ export default function MaineMinuteCard({ tagline, stories }: MaineMinuteProps) 
                     </div>
                     <p className={styles.tagline}>{tagline}</p>
                 </div>
-                <Link href="/news/maine-minute" className={styles.ctaDesktop}>
+                <Link href="/the-maine-minute" className={styles.ctaDesktop}>
                     Read the Full Minute →
                 </Link>
             </div>
@@ -55,7 +55,7 @@ export default function MaineMinuteCard({ tagline, stories }: MaineMinuteProps) 
                 </div>
             </div>
 
-            <Link href="/news/maine-minute" className={styles.ctaMobile}>
+            <Link href="/the-maine-minute" className={styles.ctaMobile}>
                 Read the Full Minute →
             </Link>
         </section>

@@ -34,7 +34,7 @@ export default function Footer() {
                 </div>
 
                 <div className={styles.footerCta}>
-                    <Link href="/news/maine-minute" className={styles.minuteCta}>
+                    <Link href="/the-maine-minute" className={styles.minuteCta}>
                         <span className={styles.minuteLogo}>
                             <Image
                                 src="/maine-minutes.png"

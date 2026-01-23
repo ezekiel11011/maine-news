@@ -162,25 +162,84 @@ function sanitizeForFilename(text: string): string {
         .replace(/^-+|-+$/g, '');
 }
 
-function extractFirstImageFromHtml(html: string): string | undefined {
+function normalizeImageUrl(rawUrl?: string, baseUrl?: string): string | undefined {
+    if (!rawUrl) return undefined;
+    const url = rawUrl.trim();
+    if (!url || url.startsWith('data:')) return undefined;
+    if (url.startsWith('//')) return `https:${url}`;
+
+    try {
+        return baseUrl ? new URL(url, baseUrl).toString() : new URL(url).toString();
+    } catch {
+        return baseUrl ? undefined : url;
+    }
+}
+
+function pickUrlFromSrcset(srcset?: string, baseUrl?: string): string | undefined {
+    if (!srcset) return undefined;
+    const first = srcset.split(',')[0]?.trim().split(/\s+/)[0];
+    return normalizeImageUrl(first, baseUrl);
+}
+
+function extractFirstImageFromHtml(html: string, baseUrl?: string): string | undefined {
     if (!html) return undefined;
 
     const imgTags = html.match(/<img[^>]+>/gi) || [];
-    const badPatterns = /(logo|icon|sprite|badge|avatar|tracking|pixel)/i;
+    const badPatterns = /(logo|icon|sprite|badge|avatar|tracking|pixel|spacer)/i;
 
     for (const tag of imgTags) {
         const srcMatch = tag.match(/\s(?:src|data-src|data-original|data-lazy-src)=["']([^"']+)["']/i);
-        if (!srcMatch) continue;
+        const srcsetMatch = tag.match(/\s(?:srcset|data-srcset|data-lazy-srcset)=["']([^"']+)["']/i);
+        const url = srcMatch?.[1]?.trim() || pickUrlFromSrcset(srcsetMatch?.[1], baseUrl);
+        const normalized = normalizeImageUrl(url, baseUrl);
 
-        const url = srcMatch[1].trim();
-        if (!url || url.startsWith('data:')) continue;
-        if (badPatterns.test(url)) continue;
-        if (!/\.(jpg|jpeg|png|webp|gif)(\?|#|$)/i.test(url)) continue;
+        if (!normalized) continue;
+        if (badPatterns.test(normalized)) continue;
+        if (/\.svg(\?|#|$)/i.test(normalized)) continue;
 
-        return url;
+        return normalized;
     }
 
     return undefined;
+}
+
+function extractFirstImageFromMarkdown(markdown: string, baseUrl?: string): string | undefined {
+    if (!markdown) return undefined;
+    const match = markdown.match(/!\[[^\]]*]\(([^)]+)\)/);
+    if (!match) return undefined;
+    return normalizeImageUrl(match[1], baseUrl);
+}
+
+function extractMediaUrl(value: any, baseUrl?: string): string | undefined {
+    if (!value) return undefined;
+    const candidates = Array.isArray(value) ? value : [value];
+
+    for (const entry of candidates) {
+        const url = entry?.$?.url || entry?.url || entry?.href;
+        const normalized = normalizeImageUrl(url, baseUrl);
+        if (normalized) return normalized;
+    }
+
+    return undefined;
+}
+
+function extractStoryImage(item: Record<string, any>, rawHtml: string, baseUrl?: string): string | undefined {
+    const enclosureUrl = normalizeImageUrl(item.enclosure?.url, baseUrl);
+    if (enclosureUrl) return enclosureUrl;
+
+    const mediaContent = extractMediaUrl(item['media:content'], baseUrl);
+    if (mediaContent) return mediaContent;
+
+    const mediaThumbnail = extractMediaUrl(item['media:thumbnail'], baseUrl);
+    if (mediaThumbnail) return mediaThumbnail;
+
+    const imageField = extractMediaUrl(item.image, baseUrl);
+    if (imageField) return imageField;
+
+    const htmlImage = extractFirstImageFromHtml(rawHtml, baseUrl);
+    if (htmlImage) return htmlImage;
+
+    return extractFirstImageFromMarkdown(rawHtml, baseUrl);
 }
 
 async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'maine' | 'national' | 'health'): Promise<ScrapedStory[]> {
@@ -220,7 +279,10 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
                 item.summary,
                 item.contentSnippet
             ].filter(Boolean).join(' ');
-            let content = turndown.turndown(item.content || item.contentSnippet || item.summary || '');
+            const baseUrl = link || feedUrl;
+            const image = extractStoryImage(item as Record<string, any>, rawHtml, baseUrl);
+            const contentSource = item['content:encoded'] || item.content || item.contentSnippet || item.summary || '';
+            let content = turndown.turndown(contentSource);
 
             // Robust cleaning for future scrapes
             const cleanText = (text: string, storyTitle: string) => {
@@ -278,18 +340,6 @@ async function parseRSSFeed(feedUrl: string, sourceName: string, feedType: 'main
             // Final polish to ensure no trailing junk or weird formatting
             content = content.replace(/\n{3,}/g, '\n\n').trim();
             excerpt = excerpt.replace(/\s+/g, ' ').trim();
-
-            // Initial image extraction from RSS
-            let image = item.enclosure?.url;
-            const mediaContent = (item as Record<string, unknown>)['media:content'] as { $: { url: string } } | undefined;
-            if (!image && mediaContent) {
-                image = mediaContent.$.url;
-            }
-
-            // Fallback: use first real image from raw HTML before cleaning
-            if (!image) {
-                image = extractFirstImageFromHtml(rawHtml);
-            }
 
             stories.push({
                 title,

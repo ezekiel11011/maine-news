@@ -62,7 +62,7 @@ export default async function MaineMinuteListPage() {
 
                             <div className="flex items-center gap-3">
                                 <Link
-                                    href={`/news/maine-minute/${minute.date}`}
+                                    href={`/the-maine-minute/${minute.date}`}
                                     target="_blank"
                                     className="p-2 bg-dim text-dim hover-white rounded-lg border-all transition-all"
                                     title="View Live"

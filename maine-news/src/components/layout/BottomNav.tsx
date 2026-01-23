@@ -14,7 +14,7 @@ export default function BottomNav() {
         { label: 'Latest', href: '/latest', icon: Clock },
         { label: 'Submit', href: '/submit', icon: MessageSquarePlus },
         { label: 'Sections', href: '/sections', icon: Grid },
-        { label: 'Minute', href: '/news/maine-minute', isMinute: true },
+        { label: 'Minute', href: '/the-maine-minute', isMinute: true },
     ];
 
     const [visible, setVisible] = useState(true);
