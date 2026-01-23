@@ -211,7 +211,7 @@ async function loadAutoStories(date: string): Promise<MinuteStory[]> {
     filtered.forEach(story => {
         const lead = getStoryLead(story);
         story.location = findMaineLocation(lead);
-        story.score = scoreStory(story.category, story.isOriginal, story.publishedDate);
+        story.score = scoreStory(story.category, story.isOriginal ?? undefined, story.publishedDate);
     });
 
     return filtered.sort((a, b) => (b.score || 0) - (a.score || 0));
@@ -249,12 +249,12 @@ async function loadManualStories(date: string) {
                 const keystaticPost = await reader.collections.posts.read(story.postSlug);
                 if (keystaticPost) {
                     title = keystaticPost.title as string;
-                    category = keystaticPost.category as string | undefined;
+                    category = (keystaticPost.category as string | undefined) ?? 'local';
                     const parsedDate = new Date((keystaticPost.publishedDate as string) || '');
                     publishedDate = Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
-                    sourceUrl = (keystaticPost as any).sourceUrl as string | undefined;
+                    sourceUrl = ((keystaticPost as any).sourceUrl as string | undefined) ?? null;
                     isOriginal = !sourceUrl;
-                    isNational = (keystaticPost as any).isNational as boolean | undefined;
+                    isNational = ((keystaticPost as any).isNational as boolean | undefined) ?? null;
 
                     let contentText = '';
                     const contentValue = keystaticPost.content as unknown as () => Promise<{ node: any }>;
@@ -286,7 +286,7 @@ async function loadManualStories(date: string) {
     filteredStories.forEach(story => {
         const lead = getStoryLead(story);
         story.location = findMaineLocation(lead);
-        story.score = scoreStory(story.category, story.isOriginal, story.publishedDate);
+        story.score = scoreStory(story.category, story.isOriginal ?? undefined, story.publishedDate);
     });
 
     return {
