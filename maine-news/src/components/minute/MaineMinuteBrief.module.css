@@ -84,6 +84,37 @@
     gap: 0.75rem;
 }
 
+.shareSocialRow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    justify-content: flex-start;
+    opacity: 0.85;
+}
+
+.shareSocialButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.45);
+    transition: transform 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.shareSocialButton:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-accent);
+    opacity: 1;
+}
+
+.shareLibertyIcon {
+    opacity: 0.7;
+}
+
 .shareButton,
 .copyButton {
     padding: 0.55rem 1rem;
