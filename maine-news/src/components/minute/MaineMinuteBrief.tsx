@@ -2,12 +2,15 @@ import Link from 'next/link';
 import styles from './MaineMinuteBrief.module.css';
 import { EDITORIAL_DISCLAIMER_PARAGRAPHS } from '@/lib/editorialDisclaimer';
 import type { MaineMinuteReport } from '@/lib/maineMinuteReport';
+import MinuteShareTools from './MinuteShareTools';
 
 interface MaineMinuteBriefProps {
     report: MaineMinuteReport;
 }
 
 export default function MaineMinuteBrief({ report }: MaineMinuteBriefProps) {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mainenewsnow.com';
+    const permalink = `${siteUrl}/the-maine-minute/${report.date}`;
     const dateLabel = new Date(report.date).toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
@@ -22,6 +25,8 @@ export default function MaineMinuteBrief({ report }: MaineMinuteBriefProps) {
                 <p className={styles.subhead}>{report.subhead}</p>
                 <div className={styles.meta}>Data timestamp: {report.timestamp}</div>
             </header>
+
+            <MinuteShareTools url={permalink} title={`The Maine Minute — ${dateLabel}`} />
 
             <section className={styles.body}>
                 {report.sections.map(section => (

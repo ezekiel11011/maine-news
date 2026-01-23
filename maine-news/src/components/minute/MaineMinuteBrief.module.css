@@ -47,6 +47,67 @@
     gap: 2rem;
 }
 
+.shareBox {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-radius: 18px;
+    border: 1px solid var(--border-color-dim);
+    background: rgba(191, 155, 48, 0.08);
+}
+
+.shareInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.shareTitle {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08rem;
+    color: var(--color-accent);
+}
+
+.shareLink {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.75);
+    word-break: break-all;
+}
+
+.shareActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.shareButton,
+.copyButton {
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(191, 155, 48, 0.5);
+    background: rgba(0, 0, 0, 0.5);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08rem;
+    transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.shareButton:hover,
+.copyButton:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    transform: translateY(-1px);
+}
+
+.copyButton {
+    cursor: pointer;
+}
+
 .section {
     padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--border-color-dim);
@@ -190,5 +251,9 @@
 
     .header {
         padding: 2rem 1.5rem;
+    }
+
+    .shareBox {
+        padding: 1.25rem;
     }
 }
