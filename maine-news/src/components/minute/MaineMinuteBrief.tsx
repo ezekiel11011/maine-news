@@ -84,13 +84,6 @@ export default function MaineMinuteBrief({ report }: MaineMinuteBriefProps) {
                     </div>
                 </section>
             )}
-
-            <section className={styles.disclaimer}>
-                <h2 className={styles.sectionTitle}>Editorial Disclaimer</h2>
-                {EDITORIAL_DISCLAIMER_PARAGRAPHS.map((paragraph, index) => (
-                    <p key={index}>{paragraph}</p>
-                ))}
-            </section>
         </article>
     );
 }
