@@ -1,6 +1,5 @@
 import React from 'react';
 import { db } from '@/db';
-import { reader } from '@/lib/reader';
 import MaineMinuteForm from '@/components/admin/MaineMinuteForm';
 import { desc, eq } from 'drizzle-orm';
 import { posts as dbPosts, maineMinute } from '@/db/schema';
@@ -27,30 +26,17 @@ export default async function EditMaineMinutePage({ params }: EditMaineMinutePag
     }
 
     // Fetch all available posts to choose from
-    const [keystaticPosts, authoredPosts] = await Promise.all([
-        reader.collections.posts.all(),
-        db.query.posts.findMany({
-            orderBy: [desc(dbPosts.publishedDate)],
-        })
-    ]);
+    const authoredPosts = await db.query.posts.findMany({
+        orderBy: [desc(dbPosts.publishedDate)],
+    });
 
-    const formattedKeystatic = keystaticPosts.map(post => ({
-        id: post.slug,
-        title: post.entry.title as string,
-        slug: post.slug,
-        publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
-    }));
-
-    const formattedAuthored = authoredPosts.map(post => ({
+    const allPosts = authoredPosts.map(post => ({
         id: post.id,
         title: post.title,
         slug: post.slug,
         publishedDate: post.publishedDate.toISOString(),
+        category: post.category,
     }));
-
-    const allPosts = [...formattedAuthored, ...formattedKeystatic].sort((a, b) =>
-        new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime()
-    );
 
     return (
         <div className="space-y-8 animate-in fade-in">

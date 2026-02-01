@@ -1,6 +1,5 @@
 import React from 'react';
 import { db } from '@/db';
-import { reader } from '@/lib/reader';
 import MaineMinuteForm from '@/components/admin/MaineMinuteForm';
 import { desc } from 'drizzle-orm';
 import { posts as dbPosts } from '@/db/schema';
@@ -11,30 +10,17 @@ export const dynamic = 'force-dynamic';
 
 export default async function NewMaineMinutePage() {
     // Fetch all available posts to choose from
-    const [keystaticPosts, authoredPosts] = await Promise.all([
-        reader.collections.posts.all(),
-        db.query.posts.findMany({
-            orderBy: [desc(dbPosts.publishedDate)],
-        })
-    ]);
+    const authoredPosts = await db.query.posts.findMany({
+        orderBy: [desc(dbPosts.publishedDate)],
+    });
 
-    const formattedKeystatic = keystaticPosts.map(post => ({
-        id: post.slug,
-        title: post.entry.title as string,
-        slug: post.slug,
-        publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
-    }));
-
-    const formattedAuthored = authoredPosts.map(post => ({
+    const allPosts = authoredPosts.map(post => ({
         id: post.id,
         title: post.title,
         slug: post.slug,
         publishedDate: post.publishedDate.toISOString(),
+        category: post.category,
     }));
-
-    const allPosts = [...formattedAuthored, ...formattedKeystatic].sort((a, b) =>
-        new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime()
-    );
 
     // Filter for posts from the last 24 hours
     const cutoff = new Date();
@@ -46,7 +32,7 @@ export default async function NewMaineMinutePage() {
 
     // Apply diversity logic (match auto-gen)
     // Ensure Category Diversity
-    const uniqueCategories = Array.from(new Set(recentPosts.map(p => (p as any).category || 'general')));
+    const uniqueCategories = Array.from(new Set(recentPosts.map(p => p.category || 'general')));
     const selectedStories: any[] = [];
     const selectedSlugs = new Set();
 

@@ -3,6 +3,9 @@ import Parser from 'rss-parser';
 import fs from 'fs/promises';
 import path from 'path';
 import TurndownService from 'turndown';
+import { db } from '@/db';
+import { posts as dbPosts, videos as dbVideos } from '@/db/schema';
+import { sql } from 'drizzle-orm';
 export const dynamic = 'force-dynamic';
 
 const parser = new Parser();
@@ -621,6 +624,108 @@ ${story.region ? `\n*Region: ${story.region}*` : ''}
     }
 }
 
+function chunkArray<T>(items: T[], chunkSize: number) {
+    const chunks: T[][] = [];
+    for (let i = 0; i < items.length; i += chunkSize) {
+        chunks.push(items.slice(i, i + chunkSize));
+    }
+    return chunks;
+}
+
+function normalizePublishedDate(value?: string) {
+    const parsed = new Date(value || '');
+    return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+}
+
+function buildPostRecord(story: ScrapedStory) {
+    const slug = sanitizeForFilename(story.title);
+    const publishedDate = normalizePublishedDate(story.publishedDate);
+
+    return {
+        title: story.title,
+        slug,
+        image: story.image || null,
+        author: story.author || story.source || 'Staff',
+        publishedDate,
+        category: story.category || 'local',
+        content: story.content || story.excerpt || '',
+        sourceUrl: story.sourceUrl || null,
+        isOriginal: false,
+        isNational: story.isNational,
+        metadata: {
+            source: story.source,
+            region: story.region,
+            locations: story.locations,
+            urgency: story.urgency,
+            feedType: story.feedType
+        }
+    };
+}
+
+async function saveStoriesToDatabase(stories: ScrapedStory[]) {
+    if (stories.length === 0) return 0;
+    const records = stories.map(buildPostRecord);
+    const chunks = chunkArray(records, 50);
+
+    for (const chunk of chunks) {
+        await db.insert(dbPosts)
+            .values(chunk)
+            .onConflictDoUpdate({
+                target: dbPosts.slug,
+                set: {
+                    title: sql`excluded.title`,
+                    image: sql`excluded.image`,
+                    author: sql`excluded.author`,
+                    publishedDate: sql`excluded.published_date`,
+                    category: sql`excluded.category`,
+                    content: sql`excluded.content`,
+                    sourceUrl: sql`excluded.source_url`,
+                    isOriginal: sql`excluded.is_original`,
+                    isNational: sql`excluded.is_national`,
+                    metadata: sql`excluded.metadata`,
+                }
+            });
+    }
+
+    return records.length;
+}
+
+async function saveVideosToDatabase(videos: ScrapedVideo[]) {
+    if (videos.length === 0) return 0;
+    const records = videos.map(video => ({
+        title: video.title,
+        slug: sanitizeForFilename(video.title),
+        videoUrl: video.videoUrl,
+        thumbnail: video.thumbnail,
+        duration: video.duration,
+        views: video.views,
+        category: video.category || 'local',
+        publishedDate: normalizePublishedDate(video.publishedDate),
+        description: video.description,
+    }));
+
+    const chunks = chunkArray(records, 50);
+    for (const chunk of chunks) {
+        await db.insert(dbVideos)
+            .values(chunk)
+            .onConflictDoUpdate({
+                target: dbVideos.slug,
+                set: {
+                    title: sql`excluded.title`,
+                    videoUrl: sql`excluded.video_url`,
+                    thumbnail: sql`excluded.thumbnail`,
+                    duration: sql`excluded.duration`,
+                    views: sql`excluded.views`,
+                    category: sql`excluded.category`,
+                    publishedDate: sql`excluded.published_date`,
+                    description: sql`excluded.description`,
+                }
+            });
+    }
+
+    return records.length;
+}
+
 export async function runScraper(options: { save: boolean, includeNational: boolean }) {
     const { save, includeNational } = options;
 
@@ -683,44 +788,12 @@ export async function runScraper(options: { save: boolean, includeNational: bool
         // Sort by urgency
         finalStories.sort((a, b) => b.urgency - a.urgency);
 
-        // Fetch existing slugs from GitHub if in production to avoid duplicates
-        const repo = 'ezekiel11011/maine-news';
-        const token = process.env.KEYSTATIC_GITHUB_TOKEN;
-        const existingSlugs = (process.env.NODE_ENV === 'production' && token)
-            ? await getExistingSlugs(repo, token)
-            : new Set<string>();
-
-        // Save to Keystatic if requested
+        // Save to DB if requested
         let savedCount = 0;
         let savedVideoCount = 0;
         if (save) {
-            const batchFiles: { path: string, content: string }[] = [];
-
-            for (const story of finalStories) {
-                const result = await saveToKeystatic(story, existingSlugs);
-                if (result) {
-                    if (process.env.NODE_ENV === 'production') {
-                        batchFiles.push(result);
-                    } else {
-                        savedCount++;
-                    }
-                }
-            }
-            for (const video of allVideos) {
-                const result = await saveVideoToKeystatic(video, existingSlugs);
-                if (result) {
-                    if (process.env.NODE_ENV === 'production') {
-                        batchFiles.push(result);
-                    } else {
-                        savedVideoCount++;
-                    }
-                }
-            }
-
-            if (process.env.NODE_ENV === 'production' && batchFiles.length > 0) {
-                const pushedCount = await commitBatchToGitHub(batchFiles, `chore: automated news update (${batchFiles.length} items)`);
-                savedCount = pushedCount; // Rough estimate for the summary
-            }
+            savedCount = await saveStoriesToDatabase(finalStories);
+            savedVideoCount = await saveVideosToDatabase(allVideos);
         }
 
         return {

@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { reader } from '@/lib/reader';
 import { db } from '@/db';
 import { posts as dbPosts } from '@/db/schema';
 import { desc, eq } from 'drizzle-orm';
@@ -8,38 +7,17 @@ import styles from './Opinion.module.css';
 export const dynamic = 'force-dynamic';
 
 export default async function OpinionPage() {
-    const [keystaticPosts, authoredPosts] = await Promise.all([
-        reader.collections.posts.all(),
-        db.query.posts.findMany({
-            where: eq(dbPosts.category, 'opinion'),
-            orderBy: [desc(dbPosts.publishedDate)],
-        })
-    ]);
+    const authoredPosts = await db.query.posts.findMany({
+        where: eq(dbPosts.category, 'opinion'),
+        orderBy: [desc(dbPosts.publishedDate)],
+    });
 
-    const formattedKeystatic = keystaticPosts
-        .filter(post => post.entry.category === 'opinion')
-        .map(post => ({
-            slug: post.slug,
-            title: post.entry.title as string,
-            author: post.entry.author as string || 'Staff',
-            publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
-        }));
-
-    const formattedAuthored = authoredPosts.map(post => ({
+    const allOpinionPosts = authoredPosts.map(post => ({
         slug: post.slug,
         title: post.title,
         author: post.author,
         publishedDate: post.publishedDate.toISOString(),
     }));
-
-    const allOpinionPosts = [...formattedAuthored, ...formattedKeystatic];
-
-    // Sort by date descending
-    allOpinionPosts.sort((a, b) => {
-        const dateA = new Date(a.publishedDate).getTime();
-        const dateB = new Date(b.publishedDate).getTime();
-        return dateB - dateA;
-    });
 
     return (
         <main className={styles.container}>

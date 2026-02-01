@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { reader } from '@/lib/reader';
 import { db } from '@/db';
 import { posts as dbPosts } from '@/db/schema';
 import { desc } from 'drizzle-orm';
@@ -8,37 +7,17 @@ import styles from './Latest.module.css';
 export const dynamic = 'force-dynamic';
 
 export default async function LatestPage() {
-    const [keystaticPosts, authoredPosts] = await Promise.all([
-        reader.collections.posts.all(),
-        db.query.posts.findMany({
-            orderBy: [desc(dbPosts.publishedDate)],
-        })
-    ]);
+    const authoredPosts = await db.query.posts.findMany({
+        orderBy: [desc(dbPosts.publishedDate)],
+    });
 
-    const formattedKeystatic = keystaticPosts.map(post => ({
-        slug: post.slug,
-        title: post.entry.title as string,
-        category: post.entry.category as string,
-        publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
-        author: post.entry.author as string || 'Staff',
-    }));
-
-    const formattedAuthored = authoredPosts.map(post => ({
+    const allPosts = authoredPosts.map(post => ({
         slug: post.slug,
         title: post.title,
         category: post.category,
         publishedDate: post.publishedDate.toISOString(),
         author: post.author,
     }));
-
-    const allPosts = [...formattedAuthored, ...formattedKeystatic];
-
-    // Sort by date descending
-    allPosts.sort((a, b) => {
-        const dateA = new Date(a.publishedDate).getTime();
-        const dateB = new Date(b.publishedDate).getTime();
-        return dateB - dateA;
-    });
 
     return (
         <main className={styles.container}>

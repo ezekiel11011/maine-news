@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { reader } from '@/lib/reader';
 import { db } from '@/db';
-import { posts as dbPosts, authors as dbAuthors } from '@/db/schema';
+import { posts as dbPosts } from '@/db/schema';
 import { desc } from 'drizzle-orm';
 
 export const dynamic = 'force-dynamic';
@@ -25,40 +24,15 @@ export async function GET(request: Request) {
                 });
             }
 
-            // Fallback: Keystatic
-            const post = await reader.collections.posts.read(slug);
-            if (post) {
-                return NextResponse.json({
-                    ...post,
-                    slug,
-                    content: (await (post.content as any)()).node
-                });
-            }
-
             return NextResponse.json({ error: 'Post not found' }, { status: 404 });
         }
 
         // Fetch all for list/search
-        const [keystaticPosts, authoredPosts] = await Promise.all([
-            reader.collections.posts.all(),
-            db.query.posts.findMany({
-                orderBy: [desc(dbPosts.publishedDate)],
-            })
-        ]);
+        const authoredPosts = await db.query.posts.findMany({
+            orderBy: [desc(dbPosts.publishedDate)],
+        });
 
-        const formattedKeystatic = keystaticPosts.map(post => ({
-            id: post.slug,
-            title: post.entry.title as string,
-            slug: post.slug,
-            image: (post.entry.image as unknown as string) || undefined,
-            category: post.entry.category as string,
-            isNational: post.entry.isNational as boolean || false,
-            publishedDate: post.entry.publishedDate as string || new Date().toISOString(),
-            author: post.entry.author as string || 'Staff',
-            isOriginal: false
-        }));
-
-        const formattedAuthored = authoredPosts.map(post => ({
+        const formattedPosts = authoredPosts.map(post => ({
             id: post.id,
             title: post.title,
             slug: post.slug,
@@ -67,19 +41,10 @@ export async function GET(request: Request) {
             isNational: post.isNational || false,
             publishedDate: post.publishedDate.toISOString(),
             author: post.author,
-            isOriginal: true
+            isOriginal: post.isOriginal
         }));
 
-        const allPosts = [...formattedAuthored, ...formattedKeystatic];
-
-        // Sort by date descending
-        allPosts.sort((a, b) => {
-            const dateA = new Date(a.publishedDate).getTime();
-            const dateB = new Date(b.publishedDate).getTime();
-            return dateB - dateA;
-        });
-
-        return NextResponse.json({ posts: allPosts });
+        return NextResponse.json({ posts: formattedPosts });
     } catch (error) {
         console.error('API Error:', error);
         return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 });

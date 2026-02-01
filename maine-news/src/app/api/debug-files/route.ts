@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { reader } from '@/lib/reader';
+import { db } from '@/db';
+import { posts as dbPosts } from '@/db/schema';
+import { desc } from 'drizzle-orm';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,15 +50,16 @@ export async function GET() {
         results.treeError = e.message;
     }
 
-    // Check Reader (Keystatic)
+    // Check DB
     try {
-        const posts = await reader.collections.posts.all();
+        const posts = await db.query.posts.findMany({
+            orderBy: [desc(dbPosts.publishedDate)],
+            limit: 1,
+        });
         results.reader.count = posts.length;
         results.reader.success = true;
         if (posts.length > 0) {
             results.reader.firstSlug = posts[0].slug;
-            // Try to read content of first post to verify full access
-            // results.reader.firstContent = (await posts[0].entry.content()).node ? 'Has Node' : 'Empty';
         }
     } catch (e: any) {
         results.reader.error = e.message;

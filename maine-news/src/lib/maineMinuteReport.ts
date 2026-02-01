@@ -1,6 +1,5 @@
 import { db } from '@/db';
 import { lotteryResults, maineMinute, posts as dbPosts } from '@/db/schema';
-import { reader } from '@/lib/reader';
 import { findMaineLocation, hasMaineLocation, isAllowedSource, scoreStory, stripContent } from '@/lib/maineMinute';
 import { desc, eq, gte } from 'drizzle-orm';
 
@@ -75,21 +74,6 @@ function getEasternDateString(date: Date = new Date()) {
     }).format(date);
 }
 
-function extractTextFromMarkdocNode(node: any): string {
-    if (!node) return '';
-    if (typeof node === 'string') return node;
-    if (Array.isArray(node)) {
-        return node.map(child => extractTextFromMarkdocNode(child)).join(' ');
-    }
-    if (node.attributes?.content) {
-        return String(node.attributes.content);
-    }
-    if (node.children) {
-        return node.children.map((child: any) => extractTextFromMarkdocNode(child)).join(' ');
-    }
-    return '';
-}
-
 function buildMinuteSentence(story: MinuteStory, index: number): string {
     const base = (story.summary || story.title || '').trim();
     if (!base) return '';
@@ -155,13 +139,10 @@ async function loadAutoStories(date: string): Promise<MinuteStory[]> {
     const rangeStart = endUtc < now ? startUtc : new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const rangeEnd = endUtc < now ? endUtc : now;
 
-    const [dbResults, keystaticPosts] = await Promise.all([
-        db.query.posts.findMany({
-            where: gte(dbPosts.publishedDate, rangeStart),
-            orderBy: [desc(dbPosts.publishedDate)],
-        }),
-        reader.collections.posts.all(),
-    ]);
+    const dbResults = await db.query.posts.findMany({
+        where: gte(dbPosts.publishedDate, rangeStart),
+        orderBy: [desc(dbPosts.publishedDate)],
+    });
 
     const merged = new Map<string, MinuteStory>();
 
@@ -176,34 +157,6 @@ async function loadAutoStories(date: string): Promise<MinuteStory[]> {
             sourceUrl: post.sourceUrl,
             isOriginal: post.isOriginal,
             isNational: post.isNational,
-        });
-    }
-
-    for (const post of keystaticPosts) {
-        if (merged.has(post.slug)) continue;
-        const publishedDate = new Date((post.entry.publishedDate as string) || '');
-        if (Number.isNaN(publishedDate.getTime()) || publishedDate < rangeStart || publishedDate > rangeEnd) continue;
-
-        let contentText = '';
-        try {
-            const contentValue = post.entry.content as unknown as () => Promise<{ node: any }>;
-            if (typeof contentValue === 'function') {
-                const contentNode = await contentValue();
-                contentText = extractTextFromMarkdocNode(contentNode?.node ?? contentNode);
-            }
-        } catch (error) {
-            console.warn('Failed to read Keystatic content for minute:', post.slug, error);
-        }
-
-        merged.set(post.slug, {
-            title: post.entry.title as string,
-            slug: post.slug,
-            category: post.entry.category as string | undefined,
-            publishedDate,
-            content: contentText,
-            sourceUrl: (post.entry as any).sourceUrl as string | undefined,
-            isOriginal: !(post.entry as any).sourceUrl,
-            isNational: (post.entry as any).isNational as boolean | undefined,
         });
     }
 
@@ -246,24 +199,10 @@ async function loadManualStories(date: string) {
                 isOriginal = dbPost.isOriginal;
                 isNational = dbPost.isNational;
             } else {
-                const keystaticPost = await reader.collections.posts.read(story.postSlug);
-                if (keystaticPost) {
-                    title = keystaticPost.title as string;
-                    category = (keystaticPost.category as string | undefined) ?? 'local';
-                    const parsedDate = new Date((keystaticPost.publishedDate as string) || '');
-                    publishedDate = Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
-                    sourceUrl = ((keystaticPost as any).sourceUrl as string | undefined) ?? null;
-                    isOriginal = !sourceUrl;
-                    isNational = ((keystaticPost as any).isNational as boolean | undefined) ?? null;
-
-                    let contentText = '';
-                    const contentValue = keystaticPost.content as unknown as () => Promise<{ node: any }>;
-                    if (typeof contentValue === 'function') {
-                        const contentNode = await contentValue();
-                        contentText = extractTextFromMarkdocNode(contentNode?.node ?? contentNode);
-                    }
-                    content = contentText;
-                }
+                title = story.postSlug || title;
+                content = story.summary || '';
+                isOriginal = true;
+                isNational = false;
             }
         } catch (error) {
             console.warn('Manual Minute story lookup failed:', error);
